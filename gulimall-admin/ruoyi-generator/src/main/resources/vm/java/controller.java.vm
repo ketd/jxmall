@@ -1,0 +1,117 @@
+package ${packageName}.controller;
+
+
+
+
+import java.util.Arrays;
+import java.util.List;
+
+
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import com.ketd.common.BaseController;
+import com.ketd.common.AjaxResult;
+import com.ketd.common.TableDataInfo;
+import com.ketd.common.domain.PageRequest;
+
+import ${packageName}.domain.${ClassName};
+import ${packageName}.service.I${ClassName}Service;
+
+
+/**
+ * ${functionName}Controller
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@Tag(name = "${functionName}Controller")
+@RestController
+@RequestMapping("/${moduleName}/${ClassName}")
+public class ${ClassName}Controller extends BaseController{
+
+    @Autowired
+    private I${ClassName}Service ${className}Service;
+
+    /**
+     * 分页查询${functionName}列表
+     */
+    @Operation(summary ="分页查询${functionName}列表")
+    @PostMapping("/list/page")
+    public TableDataInfo list(@RequestBody PageRequest<${ClassName}> pageRequest)
+    {
+
+        Integer pageNum = pageRequest.getPageNum();
+        Integer pageSize = pageRequest.getPageSize();
+
+        // 执行条件查询
+        ${ClassName} ${className}= pageRequest.getData();
+        Page<${ClassName}> page = new Page<>(pageNum, pageSize);
+        QueryWrapper<${ClassName}> queryWrapper = new QueryWrapper<>(${className});
+
+        IPage<${ClassName}> ${className}Page = ${className}Service.page(page, queryWrapper);
+        return getDataTable(${className}Page.getRecords(), ${className}Page.getTotal());
+
+
+
+    }
+
+
+    /**
+     * 导出${functionName}列表
+     */
+    @Operation(summary = "导出${functionName}列表")
+    @PostMapping("/export")
+    public void export(HttpServletResponse response, @RequestBody Long[] ${className}Ids)
+    {
+        List<${ClassName}> list = ${className}Service.listByIds(Arrays.asList(${className}Ids));
+            ${className}Service.export(list, response);
+
+    }
+
+    /**
+     * 获取${functionName}详细信息
+     */
+    @Operation(summary = "获取${functionName}详细信息")
+    @GetMapping(value = "/info")
+    public AjaxResult getInfo(@RequestParam("${pkColumn.javaField}") ${pkColumn.javaType} ${pkColumn.javaField})
+    {
+        return success(${className}Service.select${ClassName}By${pkColumn.capJavaField}(${pkColumn.javaField}));
+    }
+
+    /**
+     * 新增${functionName}
+     */
+    @Operation(summary = "新增${functionName}")
+    @PostMapping("/save")
+    public AjaxResult add(@RequestBody ${ClassName} ${className})
+    {
+        return toAjax(${className}Service.insert${ClassName}(${className}));
+    }
+
+    /**
+     * 修改${functionName}
+     */
+    @Operation(summary = "修改${functionName}")
+    @PutMapping("/update")
+    public AjaxResult edit(@RequestBody ${ClassName} ${className})
+    {
+        return toAjax(${className}Service.update${ClassName}(${className}));
+    }
+
+    /**
+     * 删除${functionName}
+     */
+    @Operation(summary = "删除${functionName}")
+	@DeleteMapping("/delete")
+    public AjaxResult remove(@RequestBody ${pkColumn.javaType}[] ${pkColumn.javaField}s)
+    {
+        return toAjax(${className}Service.delete${ClassName}By${pkColumn.capJavaField}s(${pkColumn.javaField}s));
+    }
+}

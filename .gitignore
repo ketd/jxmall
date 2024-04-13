@@ -1,0 +1,63 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### IntelliJ IDEA ###
+.idea/modules.xml
+.idea/jarRepositories.xml
+.idea/compiler.xml
+.idea/libraries/
+*.iws
+*.iml
+*.ipr
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store### Example user template template
+### Example user template
+
+# IntelliJ project files
+.idea
+*.iml
+out
+gen
+/gulimall-product/src/main/resources/application.yml
+/gulimall-product/src/main/resources/bootstrap.yml
+/gulimall-admin/ruoyi-admin/src/main/resources/application.yml
+/gulimall-admin/ruoyi-admin/src/main/resources/application-druid.yml
+/gulimall-admin/ruoyi-admin/src/main/resources/banner.txt
+/gulimall-admin/ruoyi-admin/src/main/resources/bootstrap.yml
+/gulimall-coupon/src/main/resources/application.yml
+/gulimall-coupon/src/main/resources/bootstrap.yml
+/gulimall-gateway/src/main/resources/application.yml
+/gulimall-gateway/src/main/resources/bootstrap.yml
+/gulimall-member/src/main/resources/application.yml
+/gulimall-member/src/main/resources/bootstrap.yml
+/gulimall-order/src/main/resources/application.yml
+/gulimall-order/src/main/resources/bootstrap.yml
+/gulimall-search/src/main/resources/application.yml
+/gulimall-search/src/main/resources/bootstrap.yml
+/gulimall-ware/src/main/resources/application.yml
+/gulimall-ware/src/main/resources/bootstrap.yml

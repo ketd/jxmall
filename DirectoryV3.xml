@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+ <trees>
+     <tree path="/gilimall-ware" title="8000"/>
+     <tree path="/RuoYi-Vue-master" title="8800"/>
+     <tree path="/gulimall-coupon" title="8002"/>
+     <tree path="/gulimall-member" title="8003"/>
+     <tree path="/gulimall-product" title="8001"/>
+     <tree path="/gulimall-order" title="8004"/>
+     <tree path="/gulimall-ware" title="8005"/>
+     <tree path="/gulimall-gateway" title="8000"/>
+     <tree path="/gulimall-search" title="8006"/>
+     <tree path="/gulimall-admin" title="7000"/>
+ </trees>

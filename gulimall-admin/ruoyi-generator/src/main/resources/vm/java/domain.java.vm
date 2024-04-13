@@ -1,0 +1,46 @@
+package ${packageName}.domain;
+
+
+
+import com.alibaba.excel.annotation.ExcelIgnore;
+import com.alibaba.excel.annotation.ExcelProperty;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+
+import java.io.Serial;
+import java.io.Serializable;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
+/**
+ * ${functionName}对象 ${tableName}
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+
+@TableName(value ="${tableName}")
+@Data
+public class ${ClassName}  implements Serializable
+{
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+
+    #foreach ($column in $columns)
+
+        #if($column.isPk==1)
+        @TableId
+        @ExcelIgnore
+        @ExcelProperty(value = "${column.columnComment}")
+        @Schema(description =  "${column.columnComment}")
+        #else
+        @ExcelProperty(value = "${column.columnComment}")
+        @Schema(description =  "${column.columnComment}")
+        #end
+        private $column.javaType $column.javaField;
+    #end
+
+
+}

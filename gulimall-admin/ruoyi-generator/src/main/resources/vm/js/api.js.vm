@@ -1,0 +1,87 @@
+import axios from 'axios';
+const baseURL = process.env.VUE_APP_PRODUCT_BASE_API;
+
+// 分页查询${functionName}列表
+export function list${BusinessName}Page(queryParams) {
+  return axios({
+    baseURL: baseURL,
+    url: '/${moduleName}/${ClassName}/list/page',
+    method: 'post',
+    data: queryParams
+  })
+}
+
+
+// 查询${functionName}详细
+export function get${BusinessName}(${pkColumn.javaField}) {
+  return axios({
+    baseURL: baseURL,
+    url: `/${moduleName}/${ClassName}/info`,
+    method: 'get',
+    params: {
+        ${pkColumn.javaField}: ${pkColumn.javaField}
+    }
+  })
+}
+
+// 新增${functionName}
+export function add${BusinessName}(data) {
+  return axios({
+    baseURL: baseURL,
+    url: '/${moduleName}/${ClassName}/save',
+    method: 'post',
+    data: data
+  })
+}
+
+// 修改${functionName}
+export function update${BusinessName}(data) {
+  return axios({
+    baseURL: baseURL,
+    url: '/${moduleName}/${ClassName}/update',
+    method: 'put',
+    data: data
+  })
+}
+
+// 删除${functionName}
+export function del${BusinessName}(${pkColumn.javaField}s) {
+  return axios({
+    baseURL: baseURL,
+    url: '/${moduleName}/${ClassName}/delete',
+    method: 'delete',
+    data: ${pkColumn.javaField}s
+  })
+}
+
+
+// 导出${functionName}属性
+export function export${BusinessName}(${pkColumn.javaField}s) {
+  return axios({
+    baseURL: baseURL,
+    url: '/${moduleName}/${ClassName}/export',
+    method: 'post',
+    data: ${pkColumn.javaField}s,
+    responseType: 'blob' // 设置响应类型为 blob
+  }).then(response => {
+    const filename = '导出${businessName}数据.xlsx';
+    const blob = new Blob([response.data], { type: 'application/octet-stream' });
+
+    // 使用 FileSaver.js 来触发下载
+    if (typeof window.navigator.msSaveBlob !== 'undefined') {
+      window.navigator.msSaveBlob(blob, filename);
+    } else {
+      const link = document.createElement('a');
+      if (link.download !== undefined) {
+        // 创建一个链接，并将 Blob 对象设置为其 href 属性，以触发下载
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    }
+  });
+}
+

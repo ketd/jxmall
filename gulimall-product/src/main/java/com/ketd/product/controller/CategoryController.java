@@ -16,9 +16,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.ketd.common.BaseController;
-import com.ketd.common.AjaxResult;
-import com.ketd.common.TableDataInfo;
+
+import com.ketd.common.result.Result;
+import com.ketd.common.domain.TableDataInfo;
 import com.ketd.common.domain.PageRequest;
 
 import com.ketd.product.domain.Category;
@@ -29,12 +29,12 @@ import com.ketd.product.service.ICategoryService;
  * 商品三级分类Controller
  *
  * @author ketd
- * @date 2024-04-12
+ * @date 2024-04-13
  */
 @Tag(name = "商品三级分类Controller")
 @RestController
 @RequestMapping("/product/Category")
-public class CategoryController extends BaseController{
+public class CategoryController{
 
     @Autowired
     private ICategoryService categoryService;
@@ -56,7 +56,7 @@ public class CategoryController extends BaseController{
         QueryWrapper<Category> queryWrapper = new QueryWrapper<>(category);
 
         IPage<Category> categoryPage = categoryService.page(page, queryWrapper);
-        return getDataTable(categoryPage.getRecords(), categoryPage.getTotal());
+        return TableDataInfo.getDataTable(categoryPage.getRecords(), categoryPage.getTotal());
 
 
 
@@ -67,12 +67,13 @@ public class CategoryController extends BaseController{
      */
     @Operation(summary ="树形结构查询所有分类以及子分类")
     @GetMapping("/list/tree")
-    public AjaxResult list(){
+    public Result<?> list(){
 
         List<Category> categoryEntityList= categoryService.listWithTree();
 
-        return success(categoryEntityList);
+        return Result.ok(categoryEntityList);
     }
+
 
 
     /**
@@ -92,9 +93,9 @@ public class CategoryController extends BaseController{
      */
     @Operation(summary = "获取商品三级分类详细信息")
     @GetMapping(value = "/info")
-    public AjaxResult getInfo(@RequestParam("catId") Long catId)
+    public Result<?> getInfo(@RequestParam("catId") Long catId)
     {
-        return success(categoryService.selectCategoryByCatId(catId));
+        return Result.ok(categoryService.selectCategoryByCatId(catId));
     }
 
     /**
@@ -102,9 +103,9 @@ public class CategoryController extends BaseController{
      */
     @Operation(summary = "新增商品三级分类")
     @PostMapping("/save")
-    public AjaxResult add(@RequestBody Category category)
+    public Result<?> add(@RequestBody Category category)
     {
-        return toAjax(categoryService.insertCategory(category));
+        return Result.ok(categoryService.insertCategory(category));
     }
 
     /**
@@ -112,9 +113,9 @@ public class CategoryController extends BaseController{
      */
     @Operation(summary = "修改商品三级分类")
     @PutMapping("/update")
-    public AjaxResult edit(@RequestBody Category category)
+    public Result<?> edit(@RequestBody Category category)
     {
-        return toAjax(categoryService.updateCategory(category));
+        return Result.ok(categoryService.updateCategory(category));
     }
 
     /**
@@ -122,8 +123,8 @@ public class CategoryController extends BaseController{
      */
     @Operation(summary = "删除商品三级分类")
 	@DeleteMapping("/delete")
-    public AjaxResult remove(@RequestBody Long[] catIds)
+    public Result<?> remove(@RequestBody Long[] catIds)
     {
-        return toAjax(categoryService.deleteCategoryByCatIds(catIds));
+        return Result.ok(categoryService.deleteCategoryByCatIds(catIds));
     }
 }

@@ -18,6 +18,7 @@
         <module>gulimall-gateway</module>
         <module>gulimall-search</module>
         <module>gulimall-admin</module>
+        <module>gulimall-third-party</module>
 
 
     </modules>

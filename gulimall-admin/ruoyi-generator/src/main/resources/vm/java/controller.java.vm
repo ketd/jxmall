@@ -16,9 +16,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.ketd.common.BaseController;
-import com.ketd.common.AjaxResult;
-import com.ketd.common.TableDataInfo;
+
+import com.ketd.common.result.Result;
+import com.ketd.common.domain.TableDataInfo;
 import com.ketd.common.domain.PageRequest;
 
 import ${packageName}.domain.${ClassName};
@@ -34,7 +34,7 @@ import ${packageName}.service.I${ClassName}Service;
 @Tag(name = "${functionName}Controller")
 @RestController
 @RequestMapping("/${moduleName}/${ClassName}")
-public class ${ClassName}Controller extends BaseController{
+public class ${ClassName}Controller{
 
     @Autowired
     private I${ClassName}Service ${className}Service;
@@ -56,7 +56,7 @@ public class ${ClassName}Controller extends BaseController{
         QueryWrapper<${ClassName}> queryWrapper = new QueryWrapper<>(${className});
 
         IPage<${ClassName}> ${className}Page = ${className}Service.page(page, queryWrapper);
-        return getDataTable(${className}Page.getRecords(), ${className}Page.getTotal());
+        return TableDataInfo.getDataTable(${className}Page.getRecords(), ${className}Page.getTotal());
 
 
 
@@ -80,9 +80,9 @@ public class ${ClassName}Controller extends BaseController{
      */
     @Operation(summary = "获取${functionName}详细信息")
     @GetMapping(value = "/info")
-    public AjaxResult getInfo(@RequestParam("${pkColumn.javaField}") ${pkColumn.javaType} ${pkColumn.javaField})
+    public Result<?> getInfo(@RequestParam("${pkColumn.javaField}") ${pkColumn.javaType} ${pkColumn.javaField})
     {
-        return success(${className}Service.select${ClassName}By${pkColumn.capJavaField}(${pkColumn.javaField}));
+        return Result.ok(${className}Service.select${ClassName}By${pkColumn.capJavaField}(${pkColumn.javaField}));
     }
 
     /**
@@ -90,9 +90,9 @@ public class ${ClassName}Controller extends BaseController{
      */
     @Operation(summary = "新增${functionName}")
     @PostMapping("/save")
-    public AjaxResult add(@RequestBody ${ClassName} ${className})
+    public Result<?> add(@RequestBody ${ClassName} ${className})
     {
-        return toAjax(${className}Service.insert${ClassName}(${className}));
+        return Result.ok(${className}Service.insert${ClassName}(${className}));
     }
 
     /**
@@ -100,9 +100,9 @@ public class ${ClassName}Controller extends BaseController{
      */
     @Operation(summary = "修改${functionName}")
     @PutMapping("/update")
-    public AjaxResult edit(@RequestBody ${ClassName} ${className})
+    public Result<?> edit(@RequestBody ${ClassName} ${className})
     {
-        return toAjax(${className}Service.update${ClassName}(${className}));
+        return Result.ok(${className}Service.update${ClassName}(${className}));
     }
 
     /**
@@ -110,8 +110,8 @@ public class ${ClassName}Controller extends BaseController{
      */
     @Operation(summary = "删除${functionName}")
 	@DeleteMapping("/delete")
-    public AjaxResult remove(@RequestBody ${pkColumn.javaType}[] ${pkColumn.javaField}s)
+    public Result<?> remove(@RequestBody ${pkColumn.javaType}[] ${pkColumn.javaField}s)
     {
-        return toAjax(${className}Service.delete${ClassName}By${pkColumn.capJavaField}s(${pkColumn.javaField}s));
+        return Result.ok(${className}Service.delete${ClassName}By${pkColumn.capJavaField}s(${pkColumn.javaField}s));
     }
 }

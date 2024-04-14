@@ -16,9 +16,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.ketd.common.BaseController;
-import com.ketd.common.AjaxResult;
-import com.ketd.common.TableDataInfo;
+
+import com.ketd.common.result.Result;
+import com.ketd.common.domain.TableDataInfo;
 import com.ketd.common.domain.PageRequest;
 
 import com.ketd.product.domain.AttrGroup;
@@ -29,12 +29,12 @@ import com.ketd.product.service.IAttrGroupService;
  * 属性分组Controller
  *
  * @author ketd
- * @date 2024-04-12
+ * @date 2024-04-13
  */
 @Tag(name = "属性分组Controller")
 @RestController
 @RequestMapping("/product/AttrGroup")
-public class AttrGroupController extends BaseController{
+public class AttrGroupController{
 
     @Autowired
     private IAttrGroupService attrGroupService;
@@ -56,7 +56,7 @@ public class AttrGroupController extends BaseController{
         QueryWrapper<AttrGroup> queryWrapper = new QueryWrapper<>(attrGroup);
 
         IPage<AttrGroup> attrGroupPage = attrGroupService.page(page, queryWrapper);
-        return getDataTable(attrGroupPage.getRecords(), attrGroupPage.getTotal());
+        return TableDataInfo.getDataTable(attrGroupPage.getRecords(), attrGroupPage.getTotal());
 
 
 
@@ -80,9 +80,9 @@ public class AttrGroupController extends BaseController{
      */
     @Operation(summary = "获取属性分组详细信息")
     @GetMapping(value = "/info")
-    public AjaxResult getInfo(@RequestParam("attrGroupId") Long attrGroupId)
+    public Result<?> getInfo(@RequestParam("attrGroupId") Long attrGroupId)
     {
-        return success(attrGroupService.selectAttrGroupByAttrGroupId(attrGroupId));
+        return Result.ok(attrGroupService.selectAttrGroupByAttrGroupId(attrGroupId));
     }
 
     /**
@@ -90,9 +90,9 @@ public class AttrGroupController extends BaseController{
      */
     @Operation(summary = "新增属性分组")
     @PostMapping("/save")
-    public AjaxResult add(@RequestBody AttrGroup attrGroup)
+    public Result<?> add(@RequestBody AttrGroup attrGroup)
     {
-        return toAjax(attrGroupService.insertAttrGroup(attrGroup));
+        return Result.ok(attrGroupService.insertAttrGroup(attrGroup));
     }
 
     /**
@@ -100,9 +100,9 @@ public class AttrGroupController extends BaseController{
      */
     @Operation(summary = "修改属性分组")
     @PutMapping("/update")
-    public AjaxResult edit(@RequestBody AttrGroup attrGroup)
+    public Result<?> edit(@RequestBody AttrGroup attrGroup)
     {
-        return toAjax(attrGroupService.updateAttrGroup(attrGroup));
+        return Result.ok(attrGroupService.updateAttrGroup(attrGroup));
     }
 
     /**
@@ -110,8 +110,8 @@ public class AttrGroupController extends BaseController{
      */
     @Operation(summary = "删除属性分组")
 	@DeleteMapping("/delete")
-    public AjaxResult remove(@RequestBody Long[] attrGroupIds)
+    public Result<?> remove(@RequestBody Long[] attrGroupIds)
     {
-        return toAjax(attrGroupService.deleteAttrGroupByAttrGroupIds(attrGroupIds));
+        return Result.ok(attrGroupService.deleteAttrGroupByAttrGroupIds(attrGroupIds));
     }
 }

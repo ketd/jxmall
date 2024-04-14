@@ -16,9 +16,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.ketd.common.BaseController;
-import com.ketd.common.AjaxResult;
-import com.ketd.common.TableDataInfo;
+
+import com.ketd.common.result.Result;
+import com.ketd.common.domain.TableDataInfo;
 import com.ketd.common.domain.PageRequest;
 
 import com.ketd.product.domain.SkuImages;
@@ -29,12 +29,12 @@ import com.ketd.product.service.ISkuImagesService;
  * sku图片Controller
  *
  * @author ketd
- * @date 2024-04-12
+ * @date 2024-04-13
  */
 @Tag(name = "sku图片Controller")
 @RestController
 @RequestMapping("/product/SkuImages")
-public class SkuImagesController extends BaseController{
+public class SkuImagesController{
 
     @Autowired
     private ISkuImagesService skuImagesService;
@@ -56,7 +56,7 @@ public class SkuImagesController extends BaseController{
         QueryWrapper<SkuImages> queryWrapper = new QueryWrapper<>(skuImages);
 
         IPage<SkuImages> skuImagesPage = skuImagesService.page(page, queryWrapper);
-        return getDataTable(skuImagesPage.getRecords(), skuImagesPage.getTotal());
+        return TableDataInfo.getDataTable(skuImagesPage.getRecords(), skuImagesPage.getTotal());
 
 
 
@@ -80,9 +80,9 @@ public class SkuImagesController extends BaseController{
      */
     @Operation(summary = "获取sku图片详细信息")
     @GetMapping(value = "/info")
-    public AjaxResult getInfo(@RequestParam("id") Long id)
+    public Result<?> getInfo(@RequestParam("id") Long id)
     {
-        return success(skuImagesService.selectSkuImagesById(id));
+        return Result.ok(skuImagesService.selectSkuImagesById(id));
     }
 
     /**
@@ -90,9 +90,9 @@ public class SkuImagesController extends BaseController{
      */
     @Operation(summary = "新增sku图片")
     @PostMapping("/save")
-    public AjaxResult add(@RequestBody SkuImages skuImages)
+    public Result<?> add(@RequestBody SkuImages skuImages)
     {
-        return toAjax(skuImagesService.insertSkuImages(skuImages));
+        return Result.ok(skuImagesService.insertSkuImages(skuImages));
     }
 
     /**
@@ -100,9 +100,9 @@ public class SkuImagesController extends BaseController{
      */
     @Operation(summary = "修改sku图片")
     @PutMapping("/update")
-    public AjaxResult edit(@RequestBody SkuImages skuImages)
+    public Result<?> edit(@RequestBody SkuImages skuImages)
     {
-        return toAjax(skuImagesService.updateSkuImages(skuImages));
+        return Result.ok(skuImagesService.updateSkuImages(skuImages));
     }
 
     /**
@@ -110,8 +110,8 @@ public class SkuImagesController extends BaseController{
      */
     @Operation(summary = "删除sku图片")
 	@DeleteMapping("/delete")
-    public AjaxResult remove(@RequestBody Long[] ids)
+    public Result<?> remove(@RequestBody Long[] ids)
     {
-        return toAjax(skuImagesService.deleteSkuImagesByIds(ids));
+        return Result.ok(skuImagesService.deleteSkuImagesByIds(ids));
     }
 }

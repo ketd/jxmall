@@ -16,9 +16,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.ketd.common.BaseController;
-import com.ketd.common.AjaxResult;
-import com.ketd.common.TableDataInfo;
+
+import com.ketd.common.result.Result;
+import com.ketd.common.domain.TableDataInfo;
 import com.ketd.common.domain.PageRequest;
 
 import com.ketd.product.domain.Brand;
@@ -29,12 +29,12 @@ import com.ketd.product.service.IBrandService;
  * 品牌Controller
  *
  * @author ketd
- * @date 2024-04-12
+ * @date 2024-04-13
  */
 @Tag(name = "品牌Controller")
 @RestController
 @RequestMapping("/product/Brand")
-public class BrandController extends BaseController{
+public class BrandController{
 
     @Autowired
     private IBrandService brandService;
@@ -56,7 +56,7 @@ public class BrandController extends BaseController{
         QueryWrapper<Brand> queryWrapper = new QueryWrapper<>(brand);
 
         IPage<Brand> brandPage = brandService.page(page, queryWrapper);
-        return getDataTable(brandPage.getRecords(), brandPage.getTotal());
+        return TableDataInfo.getDataTable(brandPage.getRecords(), brandPage.getTotal());
 
 
 
@@ -80,9 +80,9 @@ public class BrandController extends BaseController{
      */
     @Operation(summary = "获取品牌详细信息")
     @GetMapping(value = "/info")
-    public AjaxResult getInfo(@RequestParam("brandId") Long brandId)
+    public Result<?> getInfo(@RequestParam("brandId") Long brandId)
     {
-        return success(brandService.selectBrandByBrandId(brandId));
+        return Result.ok(brandService.selectBrandByBrandId(brandId));
     }
 
     /**
@@ -90,9 +90,9 @@ public class BrandController extends BaseController{
      */
     @Operation(summary = "新增品牌")
     @PostMapping("/save")
-    public AjaxResult add(@RequestBody Brand brand)
+    public Result<?> add(@RequestBody Brand brand)
     {
-        return toAjax(brandService.insertBrand(brand));
+        return Result.ok(brandService.insertBrand(brand));
     }
 
     /**
@@ -100,9 +100,9 @@ public class BrandController extends BaseController{
      */
     @Operation(summary = "修改品牌")
     @PutMapping("/update")
-    public AjaxResult edit(@RequestBody Brand brand)
+    public Result<?> edit(@RequestBody Brand brand)
     {
-        return toAjax(brandService.updateBrand(brand));
+        return Result.ok(brandService.updateBrand(brand));
     }
 
     /**
@@ -110,8 +110,8 @@ public class BrandController extends BaseController{
      */
     @Operation(summary = "删除品牌")
 	@DeleteMapping("/delete")
-    public AjaxResult remove(@RequestBody Long[] brandIds)
+    public Result<?> remove(@RequestBody Long[] brandIds)
     {
-        return toAjax(brandService.deleteBrandByBrandIds(brandIds));
+        return Result.ok(brandService.deleteBrandByBrandIds(brandIds));
     }
 }

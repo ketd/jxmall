@@ -16,9 +16,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.ketd.common.BaseController;
-import com.ketd.common.AjaxResult;
-import com.ketd.common.TableDataInfo;
+
+import com.ketd.common.result.Result;
+import com.ketd.common.domain.TableDataInfo;
 import com.ketd.common.domain.PageRequest;
 
 import com.ketd.product.domain.AttrAttrgroupRelation;
@@ -29,12 +29,12 @@ import com.ketd.product.service.IAttrAttrgroupRelationService;
  * 属性&属性分组关联Controller
  *
  * @author ketd
- * @date 2024-04-12
+ * @date 2024-04-13
  */
 @Tag(name = "属性&属性分组关联Controller")
 @RestController
 @RequestMapping("/product/AttrAttrgroupRelation")
-public class AttrAttrgroupRelationController extends BaseController{
+public class AttrAttrgroupRelationController{
 
     @Autowired
     private IAttrAttrgroupRelationService attrAttrgroupRelationService;
@@ -56,7 +56,7 @@ public class AttrAttrgroupRelationController extends BaseController{
         QueryWrapper<AttrAttrgroupRelation> queryWrapper = new QueryWrapper<>(attrAttrgroupRelation);
 
         IPage<AttrAttrgroupRelation> attrAttrgroupRelationPage = attrAttrgroupRelationService.page(page, queryWrapper);
-        return getDataTable(attrAttrgroupRelationPage.getRecords(), attrAttrgroupRelationPage.getTotal());
+        return TableDataInfo.getDataTable(attrAttrgroupRelationPage.getRecords(), attrAttrgroupRelationPage.getTotal());
 
 
 
@@ -80,9 +80,9 @@ public class AttrAttrgroupRelationController extends BaseController{
      */
     @Operation(summary = "获取属性&属性分组关联详细信息")
     @GetMapping(value = "/info")
-    public AjaxResult getInfo(@RequestParam("id") Long id)
+    public Result<?> getInfo(@RequestParam("id") Long id)
     {
-        return success(attrAttrgroupRelationService.selectAttrAttrgroupRelationById(id));
+        return Result.ok(attrAttrgroupRelationService.selectAttrAttrgroupRelationById(id));
     }
 
     /**
@@ -90,9 +90,9 @@ public class AttrAttrgroupRelationController extends BaseController{
      */
     @Operation(summary = "新增属性&属性分组关联")
     @PostMapping("/save")
-    public AjaxResult add(@RequestBody AttrAttrgroupRelation attrAttrgroupRelation)
+    public Result<?> add(@RequestBody AttrAttrgroupRelation attrAttrgroupRelation)
     {
-        return toAjax(attrAttrgroupRelationService.insertAttrAttrgroupRelation(attrAttrgroupRelation));
+        return Result.ok(attrAttrgroupRelationService.insertAttrAttrgroupRelation(attrAttrgroupRelation));
     }
 
     /**
@@ -100,9 +100,9 @@ public class AttrAttrgroupRelationController extends BaseController{
      */
     @Operation(summary = "修改属性&属性分组关联")
     @PutMapping("/update")
-    public AjaxResult edit(@RequestBody AttrAttrgroupRelation attrAttrgroupRelation)
+    public Result<?> edit(@RequestBody AttrAttrgroupRelation attrAttrgroupRelation)
     {
-        return toAjax(attrAttrgroupRelationService.updateAttrAttrgroupRelation(attrAttrgroupRelation));
+        return Result.ok(attrAttrgroupRelationService.updateAttrAttrgroupRelation(attrAttrgroupRelation));
     }
 
     /**
@@ -110,8 +110,8 @@ public class AttrAttrgroupRelationController extends BaseController{
      */
     @Operation(summary = "删除属性&属性分组关联")
 	@DeleteMapping("/delete")
-    public AjaxResult remove(@RequestBody Long[] ids)
+    public Result<?> remove(@RequestBody Long[] ids)
     {
-        return toAjax(attrAttrgroupRelationService.deleteAttrAttrgroupRelationByIds(ids));
+        return Result.ok(attrAttrgroupRelationService.deleteAttrAttrgroupRelationByIds(ids));
     }
 }

@@ -10,4 +10,5 @@
      <tree path="/gulimall-gateway" title="8000"/>
      <tree path="/gulimall-search" title="8006"/>
      <tree path="/gulimall-admin" title="7000"/>
+     <tree path="/gulimall-third-party/src/main/java/com/ketd/utils/GetCosStsClient.java" title="生成临时密钥"/>
  </trees>

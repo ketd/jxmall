@@ -4,10 +4,8 @@
       multiple
       :action="uploadImgUrl"
       list-type="picture-card"
-      :on-success="handleUploadSuccess"
       :before-upload="handleBeforeUpload"
       :limit="limit"
-      :on-error="handleUploadError"
       :on-exceed="handleExceed"
       ref="imageUpload"
       :on-remove="handleDelete"
@@ -16,6 +14,7 @@
       :file-list="fileList"
       :on-preview="handlePictureCardPreview"
       :class="{hide: this.fileList.length >= this.limit}"
+      :http-request="customUpload"
     >
       <i class="el-icon-plus"></i>
     </el-upload>
@@ -44,9 +43,12 @@
 
 <script>
 import { getToken } from "@/utils/auth";
+import {getUploadUrl} from "@/api/product/brand";
+import axios from "axios";
 
 export default {
   props: {
+
     value: [String, Object, Array],
     // 图片数量限制
     limit: {
@@ -76,8 +78,8 @@ export default {
       dialogImageUrl: "",
       dialogVisible: false,
       hideUpload: false,
-      baseUrl: process.env.VUE_APP_BASE_API,
-      uploadImgUrl: process.env.VUE_APP_BASE_API + "/common/upload", // 上传的图片服务器地址
+      baseUrl: '/',
+      uploadImgUrl: '/', // 上传的图片服务器地址
       headers: {
         Authorization: "Bearer " + getToken(),
       },
@@ -117,8 +119,8 @@ export default {
     },
   },
   methods: {
-    // 上传前loading加载
-    handleBeforeUpload(file) {
+    // 上传前的处理方法
+    async handleBeforeUpload(file) {
       let isImg = false;
       if (this.fileType.length) {
         let fileExtension = "";
@@ -145,23 +147,71 @@ export default {
           return false;
         }
       }
-      this.$modal.loading("正在上传图片，请稍候...");
-      this.number++;
+
+
+
+      try {
+        // 生成随机唯一文件名
+        const uniqueFileName = generateUniqueFileName(file);
+
+        this.uniqueFileName = uniqueFileName;
+        // 发送 PUT 请求来获取上传地址
+        const uploadUrlResponse = await getUploadUrl(uniqueFileName, 'PUT');
+        this.uploadImgUrl = uploadUrlResponse.data;
+        console.log(this.uploadImgUrl);
+
+
+      } catch (error) {
+        console.error('Error getting upload URL or uploading file:', error);
+        this.$modal.msgError('获取上传地址失败或上传文件失败，请重试！');
+      }
+      return false;
     },
+    async customUpload(file, filename) {
+
+      console.log('自定义上传方法开始');
+      console.log('待上传文件信息:', file);
+      console.log('上传地址:', this.uploadImgUrl);
+
+
+      try {
+        this.$modal.loading("正在上传图片，请稍候...");
+        // 使用 axios 发送 PUT 请求
+        await axios.put(this.uploadImgUrl, file.file, {
+
+        }).then(res => {
+          console.log("上传文件信息：", file);
+          console.log(res.status);
+          this.$emit('upload-success','https://gulimall-1320567392.cos.ap-beijing.myqcloud.com/img%2F'+  this.uniqueFileName);
+          this.handleUploadSuccess(res, file);
+        });
+        // 上传成功后关闭 loading 状态
+        this.$modal.closeLoading();
+      } catch (error) {
+        console.error('上传文件失败:', error);
+        console.error('Error uploading file:', error);
+        // 上传失败后执行失败回调
+        this.handleUploadError();
+      }
+      console.log('自定义上传方法结束');
+    },
+
+
     // 文件个数超出
     handleExceed() {
       this.$modal.msgError(`上传文件数量不能超过 ${this.limit} 个!`);
     },
     // 上传成功回调
     handleUploadSuccess(res, file) {
-      if (res.code === 200) {
-        this.uploadList.push({ name: res.fileName, url: res.fileName });
+      if (res.status === 200) {
+        //this.uploadList.push({ name: res.fileName, url: res.fileName });
+        //this.$emit('input', this.uniqueFileName);
         this.uploadedSuccessfully();
       } else {
         this.number--;
         this.$modal.closeLoading();
-        this.$modal.msgError(res.msg);
-        this.$refs.imageUpload.handleRemove(file);
+        //this.$modal.msgError(res.msg);
+        //this.$refs.imageUpload.handleRemove(file);
         this.uploadedSuccessfully();
       }
     },
@@ -176,7 +226,7 @@ export default {
     // 上传失败
     handleUploadError() {
       this.$modal.msgError("上传图片失败，请重试");
-      this.$modal.closeLoading();
+      this.$modal.closeLoading(); // 关闭 loading 状态
     },
     // 上传结束处理
     uploadedSuccessfully() {
@@ -205,7 +255,17 @@ export default {
       return strs != '' ? strs.substr(0, strs.length - 1) : '';
     }
   }
+
 };
+
+// 生成随机唯一文件名
+function generateUniqueFileName(file) {
+  const timestamp = Date.now();
+  const randomString = Math.random().toString(36).substring(2, 8);
+  const fileExtension = file.name.slice(file.name.lastIndexOf(".") + 1);
+  return `${timestamp}-${randomString}.${fileExtension}`;
+}
+
 </script>
 <style scoped lang="scss">
 // .el-upload--picture-card 控制加号部分

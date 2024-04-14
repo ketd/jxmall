@@ -16,9 +16,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.ketd.common.BaseController;
-import com.ketd.common.AjaxResult;
-import com.ketd.common.TableDataInfo;
+
+import com.ketd.common.result.Result;
+import com.ketd.common.domain.TableDataInfo;
 import com.ketd.common.domain.PageRequest;
 
 import com.ketd.product.domain.SkuInfo;
@@ -29,12 +29,12 @@ import com.ketd.product.service.ISkuInfoService;
  * sku信息Controller
  *
  * @author ketd
- * @date 2024-04-12
+ * @date 2024-04-13
  */
 @Tag(name = "sku信息Controller")
 @RestController
 @RequestMapping("/product/SkuInfo")
-public class SkuInfoController extends BaseController{
+public class SkuInfoController{
 
     @Autowired
     private ISkuInfoService skuInfoService;
@@ -56,7 +56,7 @@ public class SkuInfoController extends BaseController{
         QueryWrapper<SkuInfo> queryWrapper = new QueryWrapper<>(skuInfo);
 
         IPage<SkuInfo> skuInfoPage = skuInfoService.page(page, queryWrapper);
-        return getDataTable(skuInfoPage.getRecords(), skuInfoPage.getTotal());
+        return TableDataInfo.getDataTable(skuInfoPage.getRecords(), skuInfoPage.getTotal());
 
 
 
@@ -80,9 +80,9 @@ public class SkuInfoController extends BaseController{
      */
     @Operation(summary = "获取sku信息详细信息")
     @GetMapping(value = "/info")
-    public AjaxResult getInfo(@RequestParam("skuId") Long skuId)
+    public Result<?> getInfo(@RequestParam("skuId") Long skuId)
     {
-        return success(skuInfoService.selectSkuInfoBySkuId(skuId));
+        return Result.ok(skuInfoService.selectSkuInfoBySkuId(skuId));
     }
 
     /**
@@ -90,9 +90,9 @@ public class SkuInfoController extends BaseController{
      */
     @Operation(summary = "新增sku信息")
     @PostMapping("/save")
-    public AjaxResult add(@RequestBody SkuInfo skuInfo)
+    public Result<?> add(@RequestBody SkuInfo skuInfo)
     {
-        return toAjax(skuInfoService.insertSkuInfo(skuInfo));
+        return Result.ok(skuInfoService.insertSkuInfo(skuInfo));
     }
 
     /**
@@ -100,9 +100,9 @@ public class SkuInfoController extends BaseController{
      */
     @Operation(summary = "修改sku信息")
     @PutMapping("/update")
-    public AjaxResult edit(@RequestBody SkuInfo skuInfo)
+    public Result<?> edit(@RequestBody SkuInfo skuInfo)
     {
-        return toAjax(skuInfoService.updateSkuInfo(skuInfo));
+        return Result.ok(skuInfoService.updateSkuInfo(skuInfo));
     }
 
     /**
@@ -110,8 +110,8 @@ public class SkuInfoController extends BaseController{
      */
     @Operation(summary = "删除sku信息")
 	@DeleteMapping("/delete")
-    public AjaxResult remove(@RequestBody Long[] skuIds)
+    public Result<?> remove(@RequestBody Long[] skuIds)
     {
-        return toAjax(skuInfoService.deleteSkuInfoBySkuIds(skuIds));
+        return Result.ok(skuInfoService.deleteSkuInfoBySkuIds(skuIds));
     }
 }

@@ -16,9 +16,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.ketd.common.BaseController;
-import com.ketd.common.AjaxResult;
-import com.ketd.common.TableDataInfo;
+
+import com.ketd.common.result.Result;
+import com.ketd.common.domain.TableDataInfo;
 import com.ketd.common.domain.PageRequest;
 
 import com.ketd.product.domain.SpuInfo;
@@ -29,12 +29,12 @@ import com.ketd.product.service.ISpuInfoService;
  * spu信息Controller
  *
  * @author ketd
- * @date 2024-04-12
+ * @date 2024-04-13
  */
 @Tag(name = "spu信息Controller")
 @RestController
 @RequestMapping("/product/SpuInfo")
-public class SpuInfoController extends BaseController{
+public class SpuInfoController{
 
     @Autowired
     private ISpuInfoService spuInfoService;
@@ -56,7 +56,7 @@ public class SpuInfoController extends BaseController{
         QueryWrapper<SpuInfo> queryWrapper = new QueryWrapper<>(spuInfo);
 
         IPage<SpuInfo> spuInfoPage = spuInfoService.page(page, queryWrapper);
-        return getDataTable(spuInfoPage.getRecords(), spuInfoPage.getTotal());
+        return TableDataInfo.getDataTable(spuInfoPage.getRecords(), spuInfoPage.getTotal());
 
 
 
@@ -80,9 +80,9 @@ public class SpuInfoController extends BaseController{
      */
     @Operation(summary = "获取spu信息详细信息")
     @GetMapping(value = "/info")
-    public AjaxResult getInfo(@RequestParam("id") Long id)
+    public Result<?> getInfo(@RequestParam("id") Long id)
     {
-        return success(spuInfoService.selectSpuInfoById(id));
+        return Result.ok(spuInfoService.selectSpuInfoById(id));
     }
 
     /**
@@ -90,9 +90,9 @@ public class SpuInfoController extends BaseController{
      */
     @Operation(summary = "新增spu信息")
     @PostMapping("/save")
-    public AjaxResult add(@RequestBody SpuInfo spuInfo)
+    public Result<?> add(@RequestBody SpuInfo spuInfo)
     {
-        return toAjax(spuInfoService.insertSpuInfo(spuInfo));
+        return Result.ok(spuInfoService.insertSpuInfo(spuInfo));
     }
 
     /**
@@ -100,9 +100,9 @@ public class SpuInfoController extends BaseController{
      */
     @Operation(summary = "修改spu信息")
     @PutMapping("/update")
-    public AjaxResult edit(@RequestBody SpuInfo spuInfo)
+    public Result<?> edit(@RequestBody SpuInfo spuInfo)
     {
-        return toAjax(spuInfoService.updateSpuInfo(spuInfo));
+        return Result.ok(spuInfoService.updateSpuInfo(spuInfo));
     }
 
     /**
@@ -110,8 +110,8 @@ public class SpuInfoController extends BaseController{
      */
     @Operation(summary = "删除spu信息")
 	@DeleteMapping("/delete")
-    public AjaxResult remove(@RequestBody Long[] ids)
+    public Result<?> remove(@RequestBody Long[] ids)
     {
-        return toAjax(spuInfoService.deleteSpuInfoByIds(ids));
+        return Result.ok(spuInfoService.deleteSpuInfoByIds(ids));
     }
 }

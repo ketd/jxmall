@@ -16,9 +16,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.ketd.common.BaseController;
-import com.ketd.common.AjaxResult;
-import com.ketd.common.TableDataInfo;
+
+import com.ketd.common.result.Result;
+import com.ketd.common.domain.TableDataInfo;
 import com.ketd.common.domain.PageRequest;
 
 import com.ketd.product.domain.CommentReplay;
@@ -29,12 +29,12 @@ import com.ketd.product.service.ICommentReplayService;
  * 商品评价回复关系Controller
  *
  * @author ketd
- * @date 2024-04-12
+ * @date 2024-04-13
  */
 @Tag(name = "商品评价回复关系Controller")
 @RestController
 @RequestMapping("/product/CommentReplay")
-public class CommentReplayController extends BaseController{
+public class CommentReplayController{
 
     @Autowired
     private ICommentReplayService commentReplayService;
@@ -56,7 +56,7 @@ public class CommentReplayController extends BaseController{
         QueryWrapper<CommentReplay> queryWrapper = new QueryWrapper<>(commentReplay);
 
         IPage<CommentReplay> commentReplayPage = commentReplayService.page(page, queryWrapper);
-        return getDataTable(commentReplayPage.getRecords(), commentReplayPage.getTotal());
+        return TableDataInfo.getDataTable(commentReplayPage.getRecords(), commentReplayPage.getTotal());
 
 
 
@@ -80,9 +80,9 @@ public class CommentReplayController extends BaseController{
      */
     @Operation(summary = "获取商品评价回复关系详细信息")
     @GetMapping(value = "/info")
-    public AjaxResult getInfo(@RequestParam("id") Long id)
+    public Result<?> getInfo(@RequestParam("id") Long id)
     {
-        return success(commentReplayService.selectCommentReplayById(id));
+        return Result.ok(commentReplayService.selectCommentReplayById(id));
     }
 
     /**
@@ -90,9 +90,9 @@ public class CommentReplayController extends BaseController{
      */
     @Operation(summary = "新增商品评价回复关系")
     @PostMapping("/save")
-    public AjaxResult add(@RequestBody CommentReplay commentReplay)
+    public Result<?> add(@RequestBody CommentReplay commentReplay)
     {
-        return toAjax(commentReplayService.insertCommentReplay(commentReplay));
+        return Result.ok(commentReplayService.insertCommentReplay(commentReplay));
     }
 
     /**
@@ -100,9 +100,9 @@ public class CommentReplayController extends BaseController{
      */
     @Operation(summary = "修改商品评价回复关系")
     @PutMapping("/update")
-    public AjaxResult edit(@RequestBody CommentReplay commentReplay)
+    public Result<?> edit(@RequestBody CommentReplay commentReplay)
     {
-        return toAjax(commentReplayService.updateCommentReplay(commentReplay));
+        return Result.ok(commentReplayService.updateCommentReplay(commentReplay));
     }
 
     /**
@@ -110,8 +110,8 @@ public class CommentReplayController extends BaseController{
      */
     @Operation(summary = "删除商品评价回复关系")
 	@DeleteMapping("/delete")
-    public AjaxResult remove(@RequestBody Long[] ids)
+    public Result<?> remove(@RequestBody Long[] ids)
     {
-        return toAjax(commentReplayService.deleteCommentReplayByIds(ids));
+        return Result.ok(commentReplayService.deleteCommentReplayByIds(ids));
     }
 }

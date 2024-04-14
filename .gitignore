@@ -61,3 +61,5 @@ gen
 /gulimall-search/src/main/resources/bootstrap.yml
 /gulimall-ware/src/main/resources/application.yml
 /gulimall-ware/src/main/resources/bootstrap.yml
+/gulimall-third-party/src/main/resources/application.yml
+/gulimall-third-party/src/main/resources/bootstrap.yml

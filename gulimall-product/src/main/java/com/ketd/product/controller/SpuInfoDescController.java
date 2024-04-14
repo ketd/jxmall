@@ -16,9 +16,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.ketd.common.BaseController;
-import com.ketd.common.AjaxResult;
-import com.ketd.common.TableDataInfo;
+
+import com.ketd.common.result.Result;
+import com.ketd.common.domain.TableDataInfo;
 import com.ketd.common.domain.PageRequest;
 
 import com.ketd.product.domain.SpuInfoDesc;
@@ -29,12 +29,12 @@ import com.ketd.product.service.ISpuInfoDescService;
  * spu信息介绍Controller
  *
  * @author ketd
- * @date 2024-04-12
+ * @date 2024-04-13
  */
 @Tag(name = "spu信息介绍Controller")
 @RestController
 @RequestMapping("/product/SpuInfoDesc")
-public class SpuInfoDescController extends BaseController{
+public class SpuInfoDescController{
 
     @Autowired
     private ISpuInfoDescService spuInfoDescService;
@@ -56,7 +56,7 @@ public class SpuInfoDescController extends BaseController{
         QueryWrapper<SpuInfoDesc> queryWrapper = new QueryWrapper<>(spuInfoDesc);
 
         IPage<SpuInfoDesc> spuInfoDescPage = spuInfoDescService.page(page, queryWrapper);
-        return getDataTable(spuInfoDescPage.getRecords(), spuInfoDescPage.getTotal());
+        return TableDataInfo.getDataTable(spuInfoDescPage.getRecords(), spuInfoDescPage.getTotal());
 
 
 
@@ -80,9 +80,9 @@ public class SpuInfoDescController extends BaseController{
      */
     @Operation(summary = "获取spu信息介绍详细信息")
     @GetMapping(value = "/info")
-    public AjaxResult getInfo(@RequestParam("spuId") Long spuId)
+    public Result<?> getInfo(@RequestParam("spuId") Long spuId)
     {
-        return success(spuInfoDescService.selectSpuInfoDescBySpuId(spuId));
+        return Result.ok(spuInfoDescService.selectSpuInfoDescBySpuId(spuId));
     }
 
     /**
@@ -90,9 +90,9 @@ public class SpuInfoDescController extends BaseController{
      */
     @Operation(summary = "新增spu信息介绍")
     @PostMapping("/save")
-    public AjaxResult add(@RequestBody SpuInfoDesc spuInfoDesc)
+    public Result<?> add(@RequestBody SpuInfoDesc spuInfoDesc)
     {
-        return toAjax(spuInfoDescService.insertSpuInfoDesc(spuInfoDesc));
+        return Result.ok(spuInfoDescService.insertSpuInfoDesc(spuInfoDesc));
     }
 
     /**
@@ -100,9 +100,9 @@ public class SpuInfoDescController extends BaseController{
      */
     @Operation(summary = "修改spu信息介绍")
     @PutMapping("/update")
-    public AjaxResult edit(@RequestBody SpuInfoDesc spuInfoDesc)
+    public Result<?> edit(@RequestBody SpuInfoDesc spuInfoDesc)
     {
-        return toAjax(spuInfoDescService.updateSpuInfoDesc(spuInfoDesc));
+        return Result.ok(spuInfoDescService.updateSpuInfoDesc(spuInfoDesc));
     }
 
     /**
@@ -110,8 +110,8 @@ public class SpuInfoDescController extends BaseController{
      */
     @Operation(summary = "删除spu信息介绍")
 	@DeleteMapping("/delete")
-    public AjaxResult remove(@RequestBody Long[] spuIds)
+    public Result<?> remove(@RequestBody Long[] spuIds)
     {
-        return toAjax(spuInfoDescService.deleteSpuInfoDescBySpuIds(spuIds));
+        return Result.ok(spuInfoDescService.deleteSpuInfoDescBySpuIds(spuIds));
     }
 }

@@ -16,9 +16,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.ketd.common.BaseController;
-import com.ketd.common.AjaxResult;
-import com.ketd.common.TableDataInfo;
+
+import com.ketd.common.result.Result;
+import com.ketd.common.domain.TableDataInfo;
 import com.ketd.common.domain.PageRequest;
 
 import com.ketd.product.domain.SkuSaleAttrValue;
@@ -29,12 +29,12 @@ import com.ketd.product.service.ISkuSaleAttrValueService;
  * sku销售属性&值Controller
  *
  * @author ketd
- * @date 2024-04-12
+ * @date 2024-04-13
  */
 @Tag(name = "sku销售属性&值Controller")
 @RestController
 @RequestMapping("/product/SkuSaleAttrValue")
-public class SkuSaleAttrValueController extends BaseController{
+public class SkuSaleAttrValueController{
 
     @Autowired
     private ISkuSaleAttrValueService skuSaleAttrValueService;
@@ -56,7 +56,7 @@ public class SkuSaleAttrValueController extends BaseController{
         QueryWrapper<SkuSaleAttrValue> queryWrapper = new QueryWrapper<>(skuSaleAttrValue);
 
         IPage<SkuSaleAttrValue> skuSaleAttrValuePage = skuSaleAttrValueService.page(page, queryWrapper);
-        return getDataTable(skuSaleAttrValuePage.getRecords(), skuSaleAttrValuePage.getTotal());
+        return TableDataInfo.getDataTable(skuSaleAttrValuePage.getRecords(), skuSaleAttrValuePage.getTotal());
 
 
 
@@ -80,9 +80,9 @@ public class SkuSaleAttrValueController extends BaseController{
      */
     @Operation(summary = "获取sku销售属性&值详细信息")
     @GetMapping(value = "/info")
-    public AjaxResult getInfo(@RequestParam("id") Long id)
+    public Result<?> getInfo(@RequestParam("id") Long id)
     {
-        return success(skuSaleAttrValueService.selectSkuSaleAttrValueById(id));
+        return Result.ok(skuSaleAttrValueService.selectSkuSaleAttrValueById(id));
     }
 
     /**
@@ -90,9 +90,9 @@ public class SkuSaleAttrValueController extends BaseController{
      */
     @Operation(summary = "新增sku销售属性&值")
     @PostMapping("/save")
-    public AjaxResult add(@RequestBody SkuSaleAttrValue skuSaleAttrValue)
+    public Result<?> add(@RequestBody SkuSaleAttrValue skuSaleAttrValue)
     {
-        return toAjax(skuSaleAttrValueService.insertSkuSaleAttrValue(skuSaleAttrValue));
+        return Result.ok(skuSaleAttrValueService.insertSkuSaleAttrValue(skuSaleAttrValue));
     }
 
     /**
@@ -100,9 +100,9 @@ public class SkuSaleAttrValueController extends BaseController{
      */
     @Operation(summary = "修改sku销售属性&值")
     @PutMapping("/update")
-    public AjaxResult edit(@RequestBody SkuSaleAttrValue skuSaleAttrValue)
+    public Result<?> edit(@RequestBody SkuSaleAttrValue skuSaleAttrValue)
     {
-        return toAjax(skuSaleAttrValueService.updateSkuSaleAttrValue(skuSaleAttrValue));
+        return Result.ok(skuSaleAttrValueService.updateSkuSaleAttrValue(skuSaleAttrValue));
     }
 
     /**
@@ -110,8 +110,8 @@ public class SkuSaleAttrValueController extends BaseController{
      */
     @Operation(summary = "删除sku销售属性&值")
 	@DeleteMapping("/delete")
-    public AjaxResult remove(@RequestBody Long[] ids)
+    public Result<?> remove(@RequestBody Long[] ids)
     {
-        return toAjax(skuSaleAttrValueService.deleteSkuSaleAttrValueByIds(ids));
+        return Result.ok(skuSaleAttrValueService.deleteSkuSaleAttrValueByIds(ids));
     }
 }

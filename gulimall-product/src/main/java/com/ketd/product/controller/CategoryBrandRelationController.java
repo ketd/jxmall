@@ -16,9 +16,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.ketd.common.BaseController;
-import com.ketd.common.AjaxResult;
-import com.ketd.common.TableDataInfo;
+
+import com.ketd.common.result.Result;
+import com.ketd.common.domain.TableDataInfo;
 import com.ketd.common.domain.PageRequest;
 
 import com.ketd.product.domain.CategoryBrandRelation;
@@ -29,12 +29,12 @@ import com.ketd.product.service.ICategoryBrandRelationService;
  * 品牌分类关联Controller
  *
  * @author ketd
- * @date 2024-04-12
+ * @date 2024-04-13
  */
 @Tag(name = "品牌分类关联Controller")
 @RestController
 @RequestMapping("/product/CategoryBrandRelation")
-public class CategoryBrandRelationController extends BaseController{
+public class CategoryBrandRelationController{
 
     @Autowired
     private ICategoryBrandRelationService categoryBrandRelationService;
@@ -56,7 +56,7 @@ public class CategoryBrandRelationController extends BaseController{
         QueryWrapper<CategoryBrandRelation> queryWrapper = new QueryWrapper<>(categoryBrandRelation);
 
         IPage<CategoryBrandRelation> categoryBrandRelationPage = categoryBrandRelationService.page(page, queryWrapper);
-        return getDataTable(categoryBrandRelationPage.getRecords(), categoryBrandRelationPage.getTotal());
+        return TableDataInfo.getDataTable(categoryBrandRelationPage.getRecords(), categoryBrandRelationPage.getTotal());
 
 
 
@@ -80,9 +80,9 @@ public class CategoryBrandRelationController extends BaseController{
      */
     @Operation(summary = "获取品牌分类关联详细信息")
     @GetMapping(value = "/info")
-    public AjaxResult getInfo(@RequestParam("id") Long id)
+    public Result<?> getInfo(@RequestParam("id") Long id)
     {
-        return success(categoryBrandRelationService.selectCategoryBrandRelationById(id));
+        return Result.ok(categoryBrandRelationService.selectCategoryBrandRelationById(id));
     }
 
     /**
@@ -90,9 +90,9 @@ public class CategoryBrandRelationController extends BaseController{
      */
     @Operation(summary = "新增品牌分类关联")
     @PostMapping("/save")
-    public AjaxResult add(@RequestBody CategoryBrandRelation categoryBrandRelation)
+    public Result<?> add(@RequestBody CategoryBrandRelation categoryBrandRelation)
     {
-        return toAjax(categoryBrandRelationService.insertCategoryBrandRelation(categoryBrandRelation));
+        return Result.ok(categoryBrandRelationService.insertCategoryBrandRelation(categoryBrandRelation));
     }
 
     /**
@@ -100,9 +100,9 @@ public class CategoryBrandRelationController extends BaseController{
      */
     @Operation(summary = "修改品牌分类关联")
     @PutMapping("/update")
-    public AjaxResult edit(@RequestBody CategoryBrandRelation categoryBrandRelation)
+    public Result<?> edit(@RequestBody CategoryBrandRelation categoryBrandRelation)
     {
-        return toAjax(categoryBrandRelationService.updateCategoryBrandRelation(categoryBrandRelation));
+        return Result.ok(categoryBrandRelationService.updateCategoryBrandRelation(categoryBrandRelation));
     }
 
     /**
@@ -110,8 +110,8 @@ public class CategoryBrandRelationController extends BaseController{
      */
     @Operation(summary = "删除品牌分类关联")
 	@DeleteMapping("/delete")
-    public AjaxResult remove(@RequestBody Long[] ids)
+    public Result<?> remove(@RequestBody Long[] ids)
     {
-        return toAjax(categoryBrandRelationService.deleteCategoryBrandRelationByIds(ids));
+        return Result.ok(categoryBrandRelationService.deleteCategoryBrandRelationByIds(ids));
     }
 }

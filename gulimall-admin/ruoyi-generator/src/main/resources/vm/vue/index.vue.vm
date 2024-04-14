@@ -199,7 +199,7 @@
                         </el-form-item>
                       #elseif($column.htmlType == "imageUpload")
                         <el-form-item label="${comment}" prop="${field}">
-                          <image-upload v-model="form.${field}"/>
+                          <image-upload v-model="form.${field}" @upload-success="handleUploadSuccess"/>
                         </el-form-item>
                       #elseif($column.htmlType == "fileUpload")
                         <el-form-item label="${comment}" prop="${field}">
@@ -617,7 +617,14 @@
     console.log("导出失败");
     });
 
-  }
+  },
+  #foreach($column in $columns)
+  #if($column.htmlType == "imageUpload")
+  handleUploadSuccess(fileName) {
+    this.form.${javaField} = fileName;
+  },
+  #end
+  #end
   }
   };
 </script>

@@ -16,9 +16,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.ketd.common.BaseController;
-import com.ketd.common.AjaxResult;
-import com.ketd.common.TableDataInfo;
+
+import com.ketd.common.result.Result;
+import com.ketd.common.domain.TableDataInfo;
 import com.ketd.common.domain.PageRequest;
 
 import com.ketd.product.domain.SpuComment;
@@ -29,12 +29,12 @@ import com.ketd.product.service.ISpuCommentService;
  * 商品评价Controller
  *
  * @author ketd
- * @date 2024-04-12
+ * @date 2024-04-13
  */
 @Tag(name = "商品评价Controller")
 @RestController
 @RequestMapping("/product/SpuComment")
-public class SpuCommentController extends BaseController{
+public class SpuCommentController{
 
     @Autowired
     private ISpuCommentService spuCommentService;
@@ -56,7 +56,7 @@ public class SpuCommentController extends BaseController{
         QueryWrapper<SpuComment> queryWrapper = new QueryWrapper<>(spuComment);
 
         IPage<SpuComment> spuCommentPage = spuCommentService.page(page, queryWrapper);
-        return getDataTable(spuCommentPage.getRecords(), spuCommentPage.getTotal());
+        return TableDataInfo.getDataTable(spuCommentPage.getRecords(), spuCommentPage.getTotal());
 
 
 
@@ -80,9 +80,9 @@ public class SpuCommentController extends BaseController{
      */
     @Operation(summary = "获取商品评价详细信息")
     @GetMapping(value = "/info")
-    public AjaxResult getInfo(@RequestParam("id") Long id)
+    public Result<?> getInfo(@RequestParam("id") Long id)
     {
-        return success(spuCommentService.selectSpuCommentById(id));
+        return Result.ok(spuCommentService.selectSpuCommentById(id));
     }
 
     /**
@@ -90,9 +90,9 @@ public class SpuCommentController extends BaseController{
      */
     @Operation(summary = "新增商品评价")
     @PostMapping("/save")
-    public AjaxResult add(@RequestBody SpuComment spuComment)
+    public Result<?> add(@RequestBody SpuComment spuComment)
     {
-        return toAjax(spuCommentService.insertSpuComment(spuComment));
+        return Result.ok(spuCommentService.insertSpuComment(spuComment));
     }
 
     /**
@@ -100,9 +100,9 @@ public class SpuCommentController extends BaseController{
      */
     @Operation(summary = "修改商品评价")
     @PutMapping("/update")
-    public AjaxResult edit(@RequestBody SpuComment spuComment)
+    public Result<?> edit(@RequestBody SpuComment spuComment)
     {
-        return toAjax(spuCommentService.updateSpuComment(spuComment));
+        return Result.ok(spuCommentService.updateSpuComment(spuComment));
     }
 
     /**
@@ -110,8 +110,8 @@ public class SpuCommentController extends BaseController{
      */
     @Operation(summary = "删除商品评价")
 	@DeleteMapping("/delete")
-    public AjaxResult remove(@RequestBody Long[] ids)
+    public Result<?> remove(@RequestBody Long[] ids)
     {
-        return toAjax(spuCommentService.deleteSpuCommentByIds(ids));
+        return Result.ok(spuCommentService.deleteSpuCommentByIds(ids));
     }
 }

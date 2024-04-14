@@ -16,9 +16,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.ketd.common.BaseController;
-import com.ketd.common.AjaxResult;
-import com.ketd.common.TableDataInfo;
+
+import com.ketd.common.result.Result;
+import com.ketd.common.domain.TableDataInfo;
 import com.ketd.common.domain.PageRequest;
 
 import com.ketd.product.domain.SpuImages;
@@ -29,12 +29,12 @@ import com.ketd.product.service.ISpuImagesService;
  * spu图片Controller
  *
  * @author ketd
- * @date 2024-04-12
+ * @date 2024-04-13
  */
 @Tag(name = "spu图片Controller")
 @RestController
 @RequestMapping("/product/SpuImages")
-public class SpuImagesController extends BaseController{
+public class SpuImagesController{
 
     @Autowired
     private ISpuImagesService spuImagesService;
@@ -56,7 +56,7 @@ public class SpuImagesController extends BaseController{
         QueryWrapper<SpuImages> queryWrapper = new QueryWrapper<>(spuImages);
 
         IPage<SpuImages> spuImagesPage = spuImagesService.page(page, queryWrapper);
-        return getDataTable(spuImagesPage.getRecords(), spuImagesPage.getTotal());
+        return TableDataInfo.getDataTable(spuImagesPage.getRecords(), spuImagesPage.getTotal());
 
 
 
@@ -80,9 +80,9 @@ public class SpuImagesController extends BaseController{
      */
     @Operation(summary = "获取spu图片详细信息")
     @GetMapping(value = "/info")
-    public AjaxResult getInfo(@RequestParam("id") Long id)
+    public Result<?> getInfo(@RequestParam("id") Long id)
     {
-        return success(spuImagesService.selectSpuImagesById(id));
+        return Result.ok(spuImagesService.selectSpuImagesById(id));
     }
 
     /**
@@ -90,9 +90,9 @@ public class SpuImagesController extends BaseController{
      */
     @Operation(summary = "新增spu图片")
     @PostMapping("/save")
-    public AjaxResult add(@RequestBody SpuImages spuImages)
+    public Result<?> add(@RequestBody SpuImages spuImages)
     {
-        return toAjax(spuImagesService.insertSpuImages(spuImages));
+        return Result.ok(spuImagesService.insertSpuImages(spuImages));
     }
 
     /**
@@ -100,9 +100,9 @@ public class SpuImagesController extends BaseController{
      */
     @Operation(summary = "修改spu图片")
     @PutMapping("/update")
-    public AjaxResult edit(@RequestBody SpuImages spuImages)
+    public Result<?> edit(@RequestBody SpuImages spuImages)
     {
-        return toAjax(spuImagesService.updateSpuImages(spuImages));
+        return Result.ok(spuImagesService.updateSpuImages(spuImages));
     }
 
     /**
@@ -110,8 +110,8 @@ public class SpuImagesController extends BaseController{
      */
     @Operation(summary = "删除spu图片")
 	@DeleteMapping("/delete")
-    public AjaxResult remove(@RequestBody Long[] ids)
+    public Result<?> remove(@RequestBody Long[] ids)
     {
-        return toAjax(spuImagesService.deleteSpuImagesByIds(ids));
+        return Result.ok(spuImagesService.deleteSpuImagesByIds(ids));
     }
 }

@@ -10,6 +10,7 @@ import java.util.List;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.ketd.product.domain.AttrGroup;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -80,8 +81,8 @@ public class AttrController{
      */
     @Operation(summary = "获取商品属性详细信息")
     @GetMapping(value = "/info")
-    public Result<?> getInfo(@RequestParam("attrId") Long attrId)
-    {
+    public Result<?> getInfo(@RequestParam("attrId") Long attrId) {
+
         return Result.ok(attrService.selectAttrByAttrId(attrId));
     }
 

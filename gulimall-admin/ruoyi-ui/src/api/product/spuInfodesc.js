@@ -1,70 +1,70 @@
 import axios from 'axios';
 const baseURL = process.env.VUE_APP_PRODUCT_BASE_API;
 
-// 分页查询品牌列表
-export function listBrandPage(queryParams) {
+// 分页查询spu信息介绍列表
+export function listSpuInfodescPage(queryParams) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/list/page',
+    url: '/product/SpuInfoDesc/list/page',
     method: 'post',
     data: queryParams
   })
 }
 
 
-// 查询品牌详细
-export function getBrand(brandId) {
+// 查询spu信息介绍详细
+export function getSpuInfodesc(spuId) {
   return axios({
     baseURL: baseURL,
-    url: `/product/Brand/info`,
+    url: `/product/SpuInfoDesc/info`,
     method: 'get',
     params: {
-        brandId: brandId
+        spuId: spuId
     }
   })
 }
 
-// 新增品牌
-export function addBrand(data) {
+// 新增spu信息介绍
+export function addSpuInfodesc(data) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/save',
+    url: '/product/SpuInfoDesc/save',
     method: 'post',
     data: data
   })
 }
 
-// 修改品牌
-export function updateBrand(data) {
+// 修改spu信息介绍
+export function updateSpuInfodesc(data) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/update',
+    url: '/product/SpuInfoDesc/update',
     method: 'put',
     data: data
   })
 }
 
-// 删除品牌
-export function delBrand(brandIds) {
+// 删除spu信息介绍
+export function delSpuInfodesc(spuIds) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/delete',
+    url: '/product/SpuInfoDesc/delete',
     method: 'delete',
-    data: brandIds
+    data: spuIds
   })
 }
 
 
-// 导出品牌属性
-export function exportBrand(brandIds) {
+// 导出spu信息介绍属性
+export function exportSpuInfodesc(spuIds) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/export',
+    url: '/product/SpuInfoDesc/export',
     method: 'post',
-    data: brandIds,
+    data: spuIds,
     responseType: 'blob' // 设置响应类型为 blob
   }).then(response => {
-    const filename = '导出brand数据.xlsx';
+    const filename = '导出spuInfodesc数据.xlsx';
     const blob = new Blob([response.data], { type: 'application/octet-stream' });
 
     // 使用 FileSaver.js 来触发下载

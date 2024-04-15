@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -90,7 +91,7 @@ public class BrandController{
      */
     @Operation(summary = "新增品牌")
     @PostMapping("/save")
-    public Result<?> add(@RequestBody Brand brand)
+    public Result<?> add(@Valid @RequestBody Brand brand)
     {
         return Result.ok(brandService.insertBrand(brand));
     }

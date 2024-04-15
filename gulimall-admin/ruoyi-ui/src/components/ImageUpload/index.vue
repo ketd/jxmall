@@ -42,9 +42,11 @@
 </template>
 
 <script>
+const bucket_url = process.env.VUE_APP_BUCKET_COS_BASE_URL;
 import { getToken } from "@/utils/auth";
-import {getUploadUrl} from "@/api/product/brand";
+
 import axios from "axios";
+import {getUploadUrl} from "@/api/system/common";
 
 export default {
   props: {
@@ -155,8 +157,8 @@ export default {
         const uniqueFileName = generateUniqueFileName(file);
 
         this.uniqueFileName = uniqueFileName;
-        // 发送 PUT 请求来获取上传地址
-        const uploadUrlResponse = await getUploadUrl(uniqueFileName, 'PUT');
+
+        const uploadUrlResponse = await getUploadUrl(uniqueFileName);
         this.uploadImgUrl = uploadUrlResponse.data;
         console.log(this.uploadImgUrl);
 
@@ -182,7 +184,7 @@ export default {
         }).then(res => {
           console.log("上传文件信息：", file);
           console.log(res.status);
-          this.$emit('upload-success','https://gulimall-1320567392.cos.ap-beijing.myqcloud.com/img%2F'+  this.uniqueFileName);
+          this.$emit('upload-success',bucket_url + this.uniqueFileName);
           this.handleUploadSuccess(res, file);
         });
         // 上传成功后关闭 loading 状态

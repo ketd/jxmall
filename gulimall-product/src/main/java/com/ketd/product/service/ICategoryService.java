@@ -68,4 +68,14 @@ public interface ICategoryService  extends IService<Category> {
     void export(List<Category> list, HttpServletResponse response);
 
     List<Category> listWithTree();
+
+    /*
+     * 描述:
+     * @description: 根据分类id查找分类路径
+     * @author: ketd
+     * @date: 2024/4/15 19:54
+     * @param null
+     * @return: null
+     **/
+    Long[] findCategoryPath(Long attrGroupId);
 }

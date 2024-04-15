@@ -1,31 +1,31 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams.data" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-                  <el-form-item label="品牌名" prop="name">
+                  <el-form-item label="sku_id" prop="skuId">
                     <el-input
-                        v-model="queryParams.data.name"
-                        placeholder="请输入品牌名"
+                        v-model="queryParams.data.skuId"
+                        placeholder="请输入sku_id"
                         clearable
                         @keyup.enter.native="handleQuery"
                     />
                   </el-form-item>
-                  <el-form-item label="显示状态" prop="showStatus">
-                    <el-select v-model="queryParams.data.showStatus" placeholder="请选择显示状态" clearable>
+                  <el-form-item label="排序" prop="imgSort">
+                    <el-input
+                        v-model="queryParams.data.imgSort"
+                        placeholder="请输入排序"
+                        clearable
+                        @keyup.enter.native="handleQuery"
+                    />
+                  </el-form-item>
+                  <el-form-item label="默认图" prop="defaultImg">
+                    <el-select v-model="queryParams.data.defaultImg" placeholder="请选择默认图" clearable>
                       <el-option
-                          v-for="dict in dict.type.show_status"
+                          v-for="dict in dict.type.default_image"
                           :key="dict.value"
                           :label="dict.label"
                           :value="dict.value"
                       />
                     </el-select>
-                  </el-form-item>
-                  <el-form-item label="检索首字母" prop="firstLetter">
-                    <el-input
-                        v-model="queryParams.data.firstLetter"
-                        placeholder="请输入检索首字母"
-                        clearable
-                        @keyup.enter.native="handleQuery"
-                    />
                   </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -41,7 +41,7 @@
             icon="el-icon-plus"
             size="mini"
             @click="handleAdd"
-            v-hasPermi="['product:brand:add']"
+            v-hasPermi="['product:skuImages:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -52,7 +52,7 @@
             size="mini"
             :disabled="single"
             @click="handleUpdate"
-            v-hasPermi="['product:brand:edit']"
+            v-hasPermi="['product:skuImages:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -63,7 +63,7 @@
             size="mini"
             :disabled="multiple"
             @click="handleDelete"
-            v-hasPermi="['product:brand:remove']"
+            v-hasPermi="['product:skuImages:remove']"
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -73,29 +73,27 @@
             icon="el-icon-download"
             size="mini"
             @click="handleExport"
-            v-hasPermi="['product:brand:export']"
+            v-hasPermi="['product:skuImages:export']"
         >导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="brandList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="skuImagesList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-              <el-table-column label="品牌id" align="center" prop="brandId" />
-              <el-table-column label="品牌名" align="center" prop="name" />
-              <el-table-column label="品牌logo地址" align="center" prop="logo" width="100">
+              <el-table-column label="id" align="center" prop="id" />
+              <el-table-column label="sku_id" align="center" prop="skuId" />
+              <el-table-column label="图片地址" align="center" prop="imgUrl" width="100">
                 <template slot-scope="scope">
-                  <image-preview :src="scope.row.logo" :width="50" :height="50"/>
+                  <image-preview :src="scope.row.imgUrl" :width="50" :height="50"/>
                 </template>
               </el-table-column>
-              <el-table-column label="介绍" align="center" prop="descript" />
-              <el-table-column label="显示状态" align="center" prop="showStatus">
+              <el-table-column label="排序" align="center" prop="imgSort" />
+              <el-table-column label="默认图" align="center" prop="defaultImg">
                 <template slot-scope="scope">
-                      <dict-tag :options="dict.type.show_status" :value="scope.row.showStatus"/>
+                      <dict-tag :options="dict.type.default_image" :value="scope.row.defaultImg"/>
                 </template>
               </el-table-column>
-              <el-table-column label="检索首字母" align="center" prop="firstLetter" />
-              <el-table-column label="排序" align="center" prop="sort" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -103,14 +101,14 @@
               type="text"
               icon="el-icon-edit"
               @click="handleUpdate(scope.row)"
-              v-hasPermi="['product:brand:edit']"
+              v-hasPermi="['product:skuImages:edit']"
           >修改</el-button>
           <el-button
               size="mini"
               type="text"
               icon="el-icon-delete"
               @click="handleDelete(scope.row)"
-              v-hasPermi="['product:brand:remove']"
+              v-hasPermi="['product:skuImages:remove']"
           >删除</el-button>
         </template>
       </el-table-column>
@@ -124,29 +122,26 @@
         @pagination="getList"
     />
 
-    <!-- 添加或修改品牌对话框 -->
+    <!-- 添加或修改sku图片对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-                        <el-form-item label="品牌名" prop="name">
-                          <el-input v-model="form.name" placeholder="请输入品牌名" />
+                        <el-form-item label="sku_id" prop="skuId">
+                          <el-input v-model="form.skuId" placeholder="请输入sku_id" />
                         </el-form-item>
-                        <el-form-item label="品牌logo地址" prop="logo">
-                          <image-upload v-model="form.logo" @upload-success="handleUploadSuccess"/>
+                        <el-form-item label="图片地址" prop="imgUrl">
+                          <image-upload v-model="form.imgUrl" @upload-success="handleUploadSuccess"/>
                         </el-form-item>
-                        <el-form-item label="介绍" prop="descript">
-                          <el-input v-model="form.descript" type="textarea" placeholder="请输入内容" />
+                        <el-form-item label="排序" prop="imgSort">
+                          <el-input v-model="form.imgSort" placeholder="请输入排序" />
                         </el-form-item>
-                        <el-form-item label="显示状态" prop="showStatus">
-                          <el-radio-group v-model="form.showStatus">
+                        <el-form-item label="默认图" prop="defaultImg">
+                          <el-radio-group v-model="form.defaultImg">
                             <el-radio
-                                v-for="dict in dict.type.show_status"
+                                v-for="dict in dict.type.default_image"
                                 :key="dict.value"
                                 :label="parseInt(dict.value)"
                             >{{dict.label}}</el-radio>
                           </el-radio-group>
-                        </el-form-item>
-                        <el-form-item label="检索首字母" prop="firstLetter">
-                          <el-input v-model="form.firstLetter" placeholder="请输入检索首字母" />
                         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -159,17 +154,17 @@
 
 <script>
   import {
-      listBrandPage,
-    getBrand,
-    delBrand,
-    addBrand,
-    updateBrand ,
-    exportBrand
-  } from "@/api/product/brand";
+      listSkuImagesPage,
+    getSkuImages,
+    delSkuImages,
+    addSkuImages,
+    updateSkuImages ,
+    exportSkuImages
+  } from "@/api/product/skuImages";
 
   export default {
-    name: "Brand",
-        dicts: ['show_status'],
+    name: "SkuImages",
+        dicts: ['default_image'],
     data() {
       return {
         // 遮罩层
@@ -184,8 +179,8 @@
         showSearch: true,
         // 总条数
         total: 0,
-        // 品牌表格数据
-              brandList: [],
+        // sku图片表格数据
+              skuImagesList: [],
         // 弹出层标题
         title: "",
         // 是否显示弹出层
@@ -195,12 +190,10 @@
           pageNum: 1,
           pageSize: 10,
             data:{
-                        name: null,
-                        logo: null,
-                        descript: null,
-                        showStatus: null,
-                        firstLetter: null,
-                        sort: null
+                        skuId: null,
+                        imgUrl: null,
+                        imgSort: null,
+                        defaultImg: null
           }
         },
         // 表单参数
@@ -214,11 +207,11 @@
       this.getList();
     },
     methods: {
-      /** 查询品牌列表 */
+      /** 查询sku图片列表 */
       getList() {
         this.loading = true;
-        listBrandPage(this.queryParams).then(response => {
-          this.brandList = response.data.rows;
+        listSkuImagesPage(this.queryParams).then(response => {
+          this.skuImagesList = response.data.rows;
           this.total = response.data.total;
           this.loading = false;
         });
@@ -231,13 +224,11 @@
       // 表单重置
       reset() {
         this.form = {
-                        brandId: null,
-                        name: null,
-                        logo: null,
-                        descript: null,
-                        showStatus: null,
-                        firstLetter: null,
-                        sort: null
+                        id: null,
+                        skuId: null,
+                        imgUrl: null,
+                        imgSort: null,
+                        defaultImg: null
         };
         this.resetForm("form");
       },
@@ -253,7 +244,7 @@
       },
       // 多选框选中数据
       handleSelectionChange(selection) {
-        this.ids = selection.map(item => item.brandId)
+        this.ids = selection.map(item => item.id)
         this.single = selection.length!==1
         this.multiple = !selection.length
       },
@@ -261,30 +252,30 @@
       handleAdd() {
         this.reset();
         this.open = true;
-        this.title = "添加品牌";
+        this.title = "添加sku图片";
       },
       /** 修改按钮操作 */
       handleUpdate(row) {
         this.reset();
-        const brandId = row.brandId || this.ids
-        getBrand(brandId).then(response => {
+        const id = row.id || this.ids
+        getSkuImages(id).then(response => {
           this.form = response.data.data;
           this.open = true;
-          this.title = "修改品牌";
+          this.title = "修改sku图片";
         });
       },
       /** 提交按钮 */
       submitForm() {
         this.$refs["form"].validate(valid => {
           if (valid) {
-            if (this.form.brandId != null) {
-              updateBrand(this.form).then(response => {
+            if (this.form.id != null) {
+              updateSkuImages(this.form).then(response => {
                 this.$modal.msgSuccess("修改成功");
                 this.open = false;
                 this.getList();
               });
             } else {
-              addBrand(this.form).then(response => {
+              addSkuImages(this.form).then(response => {
                 this.$modal.msgSuccess("新增成功");
                 this.open = false;
                 this.getList();
@@ -295,9 +286,9 @@
       },
       /** 删除按钮操作 */
       handleDelete(row) {
-        const brandIds = [].concat(row.brandId !== undefined ? row.brandId : [], this.ids); // 将属性ID合并为一个数组
-        this.$modal.confirm('是否确认删除商品属性编号为"' + brandIds.join(', ') + '"的数据项？').then(() => {
-          return delBrand(brandIds);
+        const ids = [].concat(row.id !== undefined ? row.id : [], this.ids); // 将属性ID合并为一个数组
+        this.$modal.confirm('是否确认删除商品属性编号为"' + ids.join(', ') + '"的数据项？').then(() => {
+          return delSkuImages(ids);
         }).then(() => {
           // 删除成功后刷新列表并显示成功消息
           this.getList();
@@ -310,9 +301,9 @@
   /** 导出按钮操作 */
   handleExport(row)
   {
-    const brandIds = [].concat(row.brandId !== undefined ? row.brandId : [], this.ids); // 将属性ID合并为一个数组
-    this.$modal.confirm('是否确认导出商品属性编号为"' + brandIds.join(', ') + '"的数据项？').then(() => {
-    return exportBrand(brandIds);
+    const ids = [].concat(row.id !== undefined ? row.id : [], this.ids); // 将属性ID合并为一个数组
+    this.$modal.confirm('是否确认导出商品属性编号为"' + ids.join(', ') + '"的数据项？').then(() => {
+    return exportSkuImages(ids);
     }).then(() => {
     this.$modal.msgSuccess("导出成功");
     this.getList();
@@ -322,7 +313,7 @@
 
   },
   handleUploadSuccess(fileName) {
-    this.form.sort = fileName;
+    this.form.defaultImg = fileName;
   },
   }
   };

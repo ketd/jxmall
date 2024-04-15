@@ -1,70 +1,70 @@
 import axios from 'axios';
 const baseURL = process.env.VUE_APP_PRODUCT_BASE_API;
 
-// 分页查询品牌列表
-export function listBrandPage(queryParams) {
+// 分页查询品牌分类关联列表
+export function listCategoryBrandRelationPage(queryParams) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/list/page',
+    url: '/product/CategoryBrandRelation/list/page',
     method: 'post',
     data: queryParams
   })
 }
 
 
-// 查询品牌详细
-export function getBrand(brandId) {
+// 查询品牌分类关联详细
+export function getCategoryBrandRelation(id) {
   return axios({
     baseURL: baseURL,
-    url: `/product/Brand/info`,
+    url: `/product/CategoryBrandRelation/info`,
     method: 'get',
     params: {
-        brandId: brandId
+        id: id
     }
   })
 }
 
-// 新增品牌
-export function addBrand(data) {
+// 新增品牌分类关联
+export function addCategoryBrandRelation(data) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/save',
+    url: '/product/CategoryBrandRelation/save',
     method: 'post',
     data: data
   })
 }
 
-// 修改品牌
-export function updateBrand(data) {
+// 修改品牌分类关联
+export function updateCategoryBrandRelation(data) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/update',
+    url: '/product/CategoryBrandRelation/update',
     method: 'put',
     data: data
   })
 }
 
-// 删除品牌
-export function delBrand(brandIds) {
+// 删除品牌分类关联
+export function delCategoryBrandRelation(ids) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/delete',
+    url: '/product/CategoryBrandRelation/delete',
     method: 'delete',
-    data: brandIds
+    data: ids
   })
 }
 
 
-// 导出品牌属性
-export function exportBrand(brandIds) {
+// 导出品牌分类关联属性
+export function exportCategoryBrandRelation(ids) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/export',
+    url: '/product/CategoryBrandRelation/export',
     method: 'post',
-    data: brandIds,
+    data: ids,
     responseType: 'blob' // 设置响应类型为 blob
   }).then(response => {
-    const filename = '导出brand数据.xlsx';
+    const filename = '导出categoryBrandRelation数据.xlsx';
     const blob = new Blob([response.data], { type: 'application/octet-stream' });
 
     // 使用 FileSaver.js 来触发下载

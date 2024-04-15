@@ -16,6 +16,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 @SpringBootApplication
 @MapperScan("com.ketd.product.mapper")
 @EnableDiscoveryClient
+
 public class Product {
     public static void main(String[] args) {
         SpringApplication.run(Product.class, args);

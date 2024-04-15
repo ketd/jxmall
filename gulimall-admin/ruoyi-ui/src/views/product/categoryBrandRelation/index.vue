@@ -1,28 +1,34 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams.data" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-                  <el-form-item label="品牌名" prop="name">
+                  <el-form-item label="品牌id" prop="brandId">
                     <el-input
-                        v-model="queryParams.data.name"
+                        v-model="queryParams.data.brandId"
+                        placeholder="请输入品牌id"
+                        clearable
+                        @keyup.enter.native="handleQuery"
+                    />
+                  </el-form-item>
+                  <el-form-item label="分类id" prop="catelogId">
+                    <el-input
+                        v-model="queryParams.data.catelogId"
+                        placeholder="请输入分类id"
+                        clearable
+                        @keyup.enter.native="handleQuery"
+                    />
+                  </el-form-item>
+                  <el-form-item label="品牌名" prop="brandName">
+                    <el-input
+                        v-model="queryParams.data.brandName"
                         placeholder="请输入品牌名"
                         clearable
                         @keyup.enter.native="handleQuery"
                     />
                   </el-form-item>
-                  <el-form-item label="显示状态" prop="showStatus">
-                    <el-select v-model="queryParams.data.showStatus" placeholder="请选择显示状态" clearable>
-                      <el-option
-                          v-for="dict in dict.type.show_status"
-                          :key="dict.value"
-                          :label="dict.label"
-                          :value="dict.value"
-                      />
-                    </el-select>
-                  </el-form-item>
-                  <el-form-item label="检索首字母" prop="firstLetter">
+                  <el-form-item label="分类名" prop="catelogName">
                     <el-input
-                        v-model="queryParams.data.firstLetter"
-                        placeholder="请输入检索首字母"
+                        v-model="queryParams.data.catelogName"
+                        placeholder="请输入分类名"
                         clearable
                         @keyup.enter.native="handleQuery"
                     />
@@ -41,7 +47,7 @@
             icon="el-icon-plus"
             size="mini"
             @click="handleAdd"
-            v-hasPermi="['product:brand:add']"
+            v-hasPermi="['product:categoryBrandRelation:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -52,7 +58,7 @@
             size="mini"
             :disabled="single"
             @click="handleUpdate"
-            v-hasPermi="['product:brand:edit']"
+            v-hasPermi="['product:categoryBrandRelation:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -63,7 +69,7 @@
             size="mini"
             :disabled="multiple"
             @click="handleDelete"
-            v-hasPermi="['product:brand:remove']"
+            v-hasPermi="['product:categoryBrandRelation:remove']"
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -73,29 +79,19 @@
             icon="el-icon-download"
             size="mini"
             @click="handleExport"
-            v-hasPermi="['product:brand:export']"
+            v-hasPermi="['product:categoryBrandRelation:export']"
         >导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="brandList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="categoryBrandRelationList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
+              <el-table-column label="${comment}" align="center" prop="id" />
               <el-table-column label="品牌id" align="center" prop="brandId" />
-              <el-table-column label="品牌名" align="center" prop="name" />
-              <el-table-column label="品牌logo地址" align="center" prop="logo" width="100">
-                <template slot-scope="scope">
-                  <image-preview :src="scope.row.logo" :width="50" :height="50"/>
-                </template>
-              </el-table-column>
-              <el-table-column label="介绍" align="center" prop="descript" />
-              <el-table-column label="显示状态" align="center" prop="showStatus">
-                <template slot-scope="scope">
-                      <dict-tag :options="dict.type.show_status" :value="scope.row.showStatus"/>
-                </template>
-              </el-table-column>
-              <el-table-column label="检索首字母" align="center" prop="firstLetter" />
-              <el-table-column label="排序" align="center" prop="sort" />
+              <el-table-column label="分类id" align="center" prop="catelogId" />
+              <el-table-column label="品牌名" align="center" prop="brandName" />
+              <el-table-column label="分类名" align="center" prop="catelogName" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -103,14 +99,14 @@
               type="text"
               icon="el-icon-edit"
               @click="handleUpdate(scope.row)"
-              v-hasPermi="['product:brand:edit']"
+              v-hasPermi="['product:categoryBrandRelation:edit']"
           >修改</el-button>
           <el-button
               size="mini"
               type="text"
               icon="el-icon-delete"
               @click="handleDelete(scope.row)"
-              v-hasPermi="['product:brand:remove']"
+              v-hasPermi="['product:categoryBrandRelation:remove']"
           >删除</el-button>
         </template>
       </el-table-column>
@@ -124,29 +120,20 @@
         @pagination="getList"
     />
 
-    <!-- 添加或修改品牌对话框 -->
+    <!-- 添加或修改品牌分类关联对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-                        <el-form-item label="品牌名" prop="name">
-                          <el-input v-model="form.name" placeholder="请输入品牌名" />
+                        <el-form-item label="品牌id" prop="brandId">
+                          <el-input v-model="form.brandId" placeholder="请输入品牌id" />
                         </el-form-item>
-                        <el-form-item label="品牌logo地址" prop="logo">
-                          <image-upload v-model="form.logo" @upload-success="handleUploadSuccess"/>
+                        <el-form-item label="分类id" prop="catelogId">
+                          <el-input v-model="form.catelogId" placeholder="请输入分类id" />
                         </el-form-item>
-                        <el-form-item label="介绍" prop="descript">
-                          <el-input v-model="form.descript" type="textarea" placeholder="请输入内容" />
+                        <el-form-item label="品牌名" prop="brandName">
+                          <el-input v-model="form.brandName" placeholder="请输入品牌名" />
                         </el-form-item>
-                        <el-form-item label="显示状态" prop="showStatus">
-                          <el-radio-group v-model="form.showStatus">
-                            <el-radio
-                                v-for="dict in dict.type.show_status"
-                                :key="dict.value"
-                                :label="parseInt(dict.value)"
-                            >{{dict.label}}</el-radio>
-                          </el-radio-group>
-                        </el-form-item>
-                        <el-form-item label="检索首字母" prop="firstLetter">
-                          <el-input v-model="form.firstLetter" placeholder="请输入检索首字母" />
+                        <el-form-item label="分类名" prop="catelogName">
+                          <el-input v-model="form.catelogName" placeholder="请输入分类名" />
                         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -159,17 +146,16 @@
 
 <script>
   import {
-      listBrandPage,
-    getBrand,
-    delBrand,
-    addBrand,
-    updateBrand ,
-    exportBrand
-  } from "@/api/product/brand";
+      listCategoryBrandRelationPage,
+    getCategoryBrandRelation,
+    delCategoryBrandRelation,
+    addCategoryBrandRelation,
+    updateCategoryBrandRelation ,
+    exportCategoryBrandRelation
+  } from "@/api/product/categoryBrandRelation";
 
   export default {
-    name: "Brand",
-        dicts: ['show_status'],
+    name: "CategoryBrandRelation",
     data() {
       return {
         // 遮罩层
@@ -184,8 +170,8 @@
         showSearch: true,
         // 总条数
         total: 0,
-        // 品牌表格数据
-              brandList: [],
+        // 品牌分类关联表格数据
+              categoryBrandRelationList: [],
         // 弹出层标题
         title: "",
         // 是否显示弹出层
@@ -195,12 +181,10 @@
           pageNum: 1,
           pageSize: 10,
             data:{
-                        name: null,
-                        logo: null,
-                        descript: null,
-                        showStatus: null,
-                        firstLetter: null,
-                        sort: null
+                        brandId: null,
+                        catelogId: null,
+                        brandName: null,
+                        catelogName: null
           }
         },
         // 表单参数
@@ -214,11 +198,11 @@
       this.getList();
     },
     methods: {
-      /** 查询品牌列表 */
+      /** 查询品牌分类关联列表 */
       getList() {
         this.loading = true;
-        listBrandPage(this.queryParams).then(response => {
-          this.brandList = response.data.rows;
+        listCategoryBrandRelationPage(this.queryParams).then(response => {
+          this.categoryBrandRelationList = response.data.rows;
           this.total = response.data.total;
           this.loading = false;
         });
@@ -231,13 +215,11 @@
       // 表单重置
       reset() {
         this.form = {
+                        id: null,
                         brandId: null,
-                        name: null,
-                        logo: null,
-                        descript: null,
-                        showStatus: null,
-                        firstLetter: null,
-                        sort: null
+                        catelogId: null,
+                        brandName: null,
+                        catelogName: null
         };
         this.resetForm("form");
       },
@@ -253,7 +235,7 @@
       },
       // 多选框选中数据
       handleSelectionChange(selection) {
-        this.ids = selection.map(item => item.brandId)
+        this.ids = selection.map(item => item.id)
         this.single = selection.length!==1
         this.multiple = !selection.length
       },
@@ -261,30 +243,30 @@
       handleAdd() {
         this.reset();
         this.open = true;
-        this.title = "添加品牌";
+        this.title = "添加品牌分类关联";
       },
       /** 修改按钮操作 */
       handleUpdate(row) {
         this.reset();
-        const brandId = row.brandId || this.ids
-        getBrand(brandId).then(response => {
+        const id = row.id || this.ids
+        getCategoryBrandRelation(id).then(response => {
           this.form = response.data.data;
           this.open = true;
-          this.title = "修改品牌";
+          this.title = "修改品牌分类关联";
         });
       },
       /** 提交按钮 */
       submitForm() {
         this.$refs["form"].validate(valid => {
           if (valid) {
-            if (this.form.brandId != null) {
-              updateBrand(this.form).then(response => {
+            if (this.form.id != null) {
+              updateCategoryBrandRelation(this.form).then(response => {
                 this.$modal.msgSuccess("修改成功");
                 this.open = false;
                 this.getList();
               });
             } else {
-              addBrand(this.form).then(response => {
+              addCategoryBrandRelation(this.form).then(response => {
                 this.$modal.msgSuccess("新增成功");
                 this.open = false;
                 this.getList();
@@ -295,9 +277,9 @@
       },
       /** 删除按钮操作 */
       handleDelete(row) {
-        const brandIds = [].concat(row.brandId !== undefined ? row.brandId : [], this.ids); // 将属性ID合并为一个数组
-        this.$modal.confirm('是否确认删除商品属性编号为"' + brandIds.join(', ') + '"的数据项？').then(() => {
-          return delBrand(brandIds);
+        const ids = [].concat(row.id !== undefined ? row.id : [], this.ids); // 将属性ID合并为一个数组
+        this.$modal.confirm('是否确认删除商品属性编号为"' + ids.join(', ') + '"的数据项？').then(() => {
+          return delCategoryBrandRelation(ids);
         }).then(() => {
           // 删除成功后刷新列表并显示成功消息
           this.getList();
@@ -310,9 +292,9 @@
   /** 导出按钮操作 */
   handleExport(row)
   {
-    const brandIds = [].concat(row.brandId !== undefined ? row.brandId : [], this.ids); // 将属性ID合并为一个数组
-    this.$modal.confirm('是否确认导出商品属性编号为"' + brandIds.join(', ') + '"的数据项？').then(() => {
-    return exportBrand(brandIds);
+    const ids = [].concat(row.id !== undefined ? row.id : [], this.ids); // 将属性ID合并为一个数组
+    this.$modal.confirm('是否确认导出商品属性编号为"' + ids.join(', ') + '"的数据项？').then(() => {
+    return exportCategoryBrandRelation(ids);
     }).then(() => {
     this.$modal.msgSuccess("导出成功");
     this.getList();
@@ -320,9 +302,6 @@
     console.log("导出失败");
     });
 
-  },
-  handleUploadSuccess(fileName) {
-    this.form.sort = fileName;
   },
   }
   };

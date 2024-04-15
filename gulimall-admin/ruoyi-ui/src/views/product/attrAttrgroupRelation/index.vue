@@ -1,52 +1,29 @@
 <template>
   <div class="app-container">
-    <el-row :gutter="20">
-      <!--部门数据-->
-      <el-col :span="4" :xs="24">
-        <div class="head-container">
-          <el-input
-            placeholder="请输入分组名称"
-            clearable
-            size="small"
-            prefix-icon="el-icon-search"
-            style="margin-bottom: 20px"
-          />
-        </div>
-        <div class="head-container">
-          <tree @handleNodeClick="handleNodeClick"></tree>
-        </div>
-      </el-col>
-      <el-col :span="20" :xs="24">
+
+
         <el-form :model="queryParams.data" ref="queryForm" size="small" :inline="true" v-show="showSearch"
                  label-width="68px">
-          <el-form-item label="组名" prop="attrGroupName">
+          <el-form-item label="属性id" prop="attrId">
             <el-input
-              v-model="queryParams.data.attrGroupName"
-              placeholder="请输入组名"
+              v-model="queryParams.data.attrId"
+              placeholder="请输入属性id"
               clearable
               @keyup.enter.native="handleQuery"
             />
           </el-form-item>
-          <el-form-item label="排序" prop="sort">
+          <el-form-item label="属性分组id" prop="attrGroupId">
             <el-input
-              v-model="queryParams.data.sort"
-              placeholder="请输入排序"
+              v-model="queryParams.data.attrGroupId"
+              placeholder="请输入属性分组id"
               clearable
               @keyup.enter.native="handleQuery"
             />
           </el-form-item>
-          <el-form-item label="描述" prop="descript">
+          <el-form-item label="属性组内排序" prop="attrSort">
             <el-input
-              v-model="queryParams.data.descript"
-              placeholder="请输入描述"
-              clearable
-              @keyup.enter.native="handleQuery"
-            />
-          </el-form-item>
-          <el-form-item label="所属分类id" prop="catelogId">
-            <el-input
-              v-model="queryParams.data.catelogId"
-              placeholder="请输入所属分类"
+              v-model="queryParams.data.attrSort"
+              placeholder="请输入属性组内排序"
               clearable
               @keyup.enter.native="handleQuery"
             />
@@ -65,7 +42,7 @@
               icon="el-icon-plus"
               size="mini"
               @click="handleAdd"
-              v-hasPermi="['product:group:add']"
+              v-hasPermi="['product:attrAttrgroupRelation:add']"
             >新增
             </el-button>
           </el-col>
@@ -77,7 +54,7 @@
               size="mini"
               :disabled="single"
               @click="handleUpdate"
-              v-hasPermi="['product:group:edit']"
+              v-hasPermi="['product:attrAttrgroupRelation:edit']"
             >修改
             </el-button>
           </el-col>
@@ -89,7 +66,7 @@
               size="mini"
               :disabled="multiple"
               @click="handleDelete"
-              v-hasPermi="['product:group:remove']"
+              v-hasPermi="['product:attrAttrgroupRelation:remove']"
             >删除
             </el-button>
           </el-col>
@@ -100,25 +77,19 @@
               icon="el-icon-download"
               size="mini"
               @click="handleExport"
-              v-hasPermi="['product:group:export']"
+              v-hasPermi="['product:attrAttrgroupRelation:export']"
             >导出
             </el-button>
           </el-col>
           <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
 
-        <el-table v-loading="loading" :data="groupList" @selection-change="handleSelectionChange">
+        <el-table v-loading="loading" :data="attrAttrgroupRelationList" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="55" align="center"/>
-          <el-table-column label="分组id" align="center" prop="attrGroupId"/>
-          <el-table-column label="组名" align="center" prop="attrGroupName"/>
-          <el-table-column label="排序" align="center" prop="sort"/>
-          <el-table-column label="描述" align="center" prop="descript"/>
-          <el-table-column label="组图标" align="center" prop="icon" width="100">
-            <template slot-scope="scope">
-              <image-preview :src="scope.row.icon" :width="50" :height="50"/>
-            </template>
-          </el-table-column>
-          <el-table-column label="所属分类" align="center" prop="catelogId"/>
+          <el-table-column label="id" align="center" prop="id"/>
+          <el-table-column label="属性id" align="center" prop="attrId"/>
+          <el-table-column label="属性分组id" align="center" prop="attrGroupId"/>
+          <el-table-column label="属性组内排序" align="center" prop="attrSort"/>
           <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
             <template slot-scope="scope">
               <el-button
@@ -126,7 +97,7 @@
                 type="text"
                 icon="el-icon-edit"
                 @click="handleUpdate(scope.row)"
-                v-hasPermi="['product:group:edit']"
+                v-hasPermi="['product:attrAttrgroupRelation:edit']"
               >修改
               </el-button>
               <el-button
@@ -134,14 +105,14 @@
                 type="text"
                 icon="el-icon-delete"
                 @click="handleDelete(scope.row)"
-                v-hasPermi="['product:group:remove']"
+                v-hasPermi="['product:attrAttrgroupRelation:remove']"
               >删除
               </el-button>
             </template>
           </el-table-column>
         </el-table>
-      </el-col>
-    </el-row>
+
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -150,30 +121,17 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改属性分组对话框 -->
+    <!-- 添加或修改属性&属性分组关联对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="组名" prop="attrGroupName">
-          <el-input v-model="form.attrGroupName" placeholder="请输入组名"/>
+        <el-form-item label="属性id" prop="attrId">
+          <el-input v-model="form.attrId" placeholder="请输入属性id"/>
         </el-form-item>
-        <el-form-item label="排序" prop="sort">
-          <el-input v-model="form.sort" placeholder="请输入排序"/>
+        <el-form-item label="属性分组id" prop="attrGroupId">
+          <el-input v-model="form.attrGroupId" placeholder="请输入属性分组id"/>
         </el-form-item>
-        <el-form-item label="描述" prop="descript">
-          <el-input v-model="form.descript" placeholder="请输入描述"/>
-        </el-form-item>
-        <el-form-item label="组图标" prop="icon">
-          <image-upload v-model="form.icon" @upload-success="handleUploadSuccess"/>
-        </el-form-item>
-
-        <el-form-item label="所属分类id" prop="catelogId">
-<!--          <el-input v-model="form.catelogId" placeholder="请输入所属分类id"/>-->
-          <el-cascader
-            v-model="catelogIds"
-            :options="options"
-            :props="props"
-           >
-          </el-cascader>
+        <el-form-item label="属性组内排序" prop="attrSort">
+          <el-input v-model="form.attrSort" placeholder="请输入属性组内排序"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -186,21 +144,16 @@
 
 <script>
 import {
-  listGroupPage,
-  getGroup,
-  delGroup,
-  addGroup,
-  updateGroup,
-  exportGroup
-} from "@/api/product/group";
-import tree from "@/views/commoin/tree.vue";
-import {getMenus} from "@/api/commoin/commoin";
+  listAttrAttrgroupRelationPage,
+  getAttrAttrgroupRelation,
+  delAttrAttrgroupRelation,
+  addAttrAttrgroupRelation,
+  updateAttrAttrgroupRelation,
+  exportAttrAttrgroupRelation
+} from "@/api/product/attrAttrgroupRelation";
 
 export default {
-  components: {
-    tree
-  },
-  name: "Group",
+  name: "AttrAttrgroupRelation",
   data() {
     return {
       // 遮罩层
@@ -215,8 +168,8 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 属性分组表格数据
-      groupList: [],
+      // 属性&属性分组关联表格数据
+      attrAttrgroupRelationList: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -226,37 +179,26 @@ export default {
         pageNum: 1,
         pageSize: 10,
         data: {
-          attrGroupName: null,
-          sort: null,
-          descript: null,
-          icon: null,
-          catelogId: null,
+          attrId: null,
+          attrGroupId: null,
+          attrSort: null
         }
       },
       // 表单参数
       form: {},
       // 表单校验
-      rules: {},
-      options: [],
-       props: {
-        value: 'catId',
-        label: 'name',
-        children: 'children'
-      },
-      catelogIds: []
+      rules: {}
     };
   },
   created() {
     this.getList();
-    this.getMenus();
-
   },
   methods: {
-    /** 查询属性分组列表 */
+    /** 查询属性&属性分组关联列表 */
     getList() {
       this.loading = true;
-      listGroupPage(this.queryParams).then(response => {
-        this.groupList = response.data.rows;
+      listAttrAttrgroupRelationPage(this.queryParams).then(response => {
+        this.attrAttrgroupRelationList = response.data.rows;
         this.total = response.data.total;
         this.loading = false;
       });
@@ -269,14 +211,11 @@ export default {
     // 表单重置
     reset() {
       this.form = {
+        id: null,
+        attrId: null,
         attrGroupId: null,
-        attrGroupName: null,
-        sort: null,
-        descript: null,
-        icon: null,
-        catelogId: null,
+        attrSort: null
       };
-      this.catelogIds=[]
       this.resetForm("form");
     },
     /** 搜索按钮操作 */
@@ -291,7 +230,7 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.attrGroupId)
+      this.ids = selection.map(item => item.id)
       this.single = selection.length !== 1
       this.multiple = !selection.length
     },
@@ -299,34 +238,30 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加属性分组";
+      this.title = "添加属性&属性分组关联";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
-      const attrGroupId = row.attrGroupId || this.ids
-      getGroup(attrGroupId).then(response => {
+      const id = row.id || this.ids
+      getAttrAttrgroupRelation(id).then(response => {
         this.form = response.data.data;
-        console.log(response.data.data.catelogPath);
-        this.catelogIds = response.data.data.catelogPath;
         this.open = true;
-        this.title = "修改属性分组";
+        this.title = "修改属性&属性分组关联";
       });
     },
     /** 提交按钮 */
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          if (this.form.attrGroupId != null) {
-            this.form.catelogId = this.catelogIds[2];
-            updateGroup(this.form).then(response => {
+          if (this.form.id != null) {
+            updateAttrAttrgroupRelation(this.form).then(response => {
               this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
-            this.form.catelogId = this.catelogIds[2];
-            addGroup(this.form).then(response => {
+            addAttrAttrgroupRelation(this.form).then(response => {
               this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
@@ -337,9 +272,9 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      const attrGroupIds = [].concat(row.attrGroupId !== undefined ? row.attrGroupId : [], this.ids); // 将属性ID合并为一个数组
-      this.$modal.confirm('是否确认删除商品属性编号为"' + attrGroupIds.join(', ') + '"的数据项？').then(() => {
-        return delGroup(attrGroupIds);
+      const ids = [].concat(row.id !== undefined ? row.id : [], this.ids); // 将属性ID合并为一个数组
+      this.$modal.confirm('是否确认删除商品属性编号为"' + ids.join(', ') + '"的数据项？').then(() => {
+        return delAttrAttrgroupRelation(ids);
       }).then(() => {
         // 删除成功后刷新列表并显示成功消息
         this.getList();
@@ -351,9 +286,9 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport(row) {
-      const attrGroupIds = [].concat(row.attrGroupId !== undefined ? row.attrGroupId : [], this.ids); // 将属性ID合并为一个数组
-      this.$modal.confirm('是否确认导出商品属性编号为"' + attrGroupIds.join(', ') + '"的数据项？').then(() => {
-        return exportGroup(attrGroupIds);
+      const ids = [].concat(row.id !== undefined ? row.id : [], this.ids); // 将属性ID合并为一个数组
+      this.$modal.confirm('是否确认导出商品属性编号为"' + ids.join(', ') + '"的数据项？').then(() => {
+        return exportAttrAttrgroupRelation(ids);
       }).then(() => {
         this.$modal.msgSuccess("导出成功");
         this.getList();
@@ -362,26 +297,6 @@ export default {
       });
 
     },
-    handleUploadSuccess(fileName) {
-      this.form.icon = fileName;
-    },
-    handleNodeClick(data, node, component) {
-      if(node.level === 3){
-        this.queryParams.data.catelogId = data.catId;
-        this.handleQuery();
-      }
-    },
-    getMenus(){
-      getMenus().then(response => {
-        this.options = response.data.data;
-        console.log(this.options);
-     }).catch(error => {
-
-     }).finally(() => {
-
-     });
-
-    }
   }
 };
 </script>

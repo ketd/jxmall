@@ -12,6 +12,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -26,8 +27,8 @@ import lombok.Data;
 @Data
 public class Category  implements Serializable
 {
-    @Serial
-    private static final long serialVersionUID = 1L;
+        @Serial
+        private static final long serialVersionUID = 1L;
 
 
 
@@ -69,7 +70,8 @@ public class Category  implements Serializable
         @Schema(description =  "商品数量")
         private Long productCount;
 
-    @TableField(exist = false)
-    private List<Category> children;
+        @JsonInclude(JsonInclude.Include.NON_EMPTY)
+        @TableField(exist = false)
+        private List<Category> children;
 
 }

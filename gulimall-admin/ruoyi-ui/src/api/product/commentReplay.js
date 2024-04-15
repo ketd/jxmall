@@ -1,70 +1,70 @@
 import axios from 'axios';
 const baseURL = process.env.VUE_APP_PRODUCT_BASE_API;
 
-// 分页查询品牌列表
-export function listBrandPage(queryParams) {
+// 分页查询商品评价回复关系列表
+export function listCommentReplayPage(queryParams) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/list/page',
+    url: '/product/CommentReplay/list/page',
     method: 'post',
     data: queryParams
   })
 }
 
 
-// 查询品牌详细
-export function getBrand(brandId) {
+// 查询商品评价回复关系详细
+export function getCommentReplay(id) {
   return axios({
     baseURL: baseURL,
-    url: `/product/Brand/info`,
+    url: `/product/CommentReplay/info`,
     method: 'get',
     params: {
-        brandId: brandId
+        id: id
     }
   })
 }
 
-// 新增品牌
-export function addBrand(data) {
+// 新增商品评价回复关系
+export function addCommentReplay(data) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/save',
+    url: '/product/CommentReplay/save',
     method: 'post',
     data: data
   })
 }
 
-// 修改品牌
-export function updateBrand(data) {
+// 修改商品评价回复关系
+export function updateCommentReplay(data) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/update',
+    url: '/product/CommentReplay/update',
     method: 'put',
     data: data
   })
 }
 
-// 删除品牌
-export function delBrand(brandIds) {
+// 删除商品评价回复关系
+export function delCommentReplay(ids) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/delete',
+    url: '/product/CommentReplay/delete',
     method: 'delete',
-    data: brandIds
+    data: ids
   })
 }
 
 
-// 导出品牌属性
-export function exportBrand(brandIds) {
+// 导出商品评价回复关系属性
+export function exportCommentReplay(ids) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/export',
+    url: '/product/CommentReplay/export',
     method: 'post',
-    data: brandIds,
+    data: ids,
     responseType: 'blob' // 设置响应类型为 blob
   }).then(response => {
-    const filename = '导出brand数据.xlsx';
+    const filename = '导出commentReplay数据.xlsx';
     const blob = new Blob([response.data], { type: 'application/octet-stream' });
 
     // 使用 FileSaver.js 来触发下载

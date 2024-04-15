@@ -1,9 +1,7 @@
 package com.ketd.product.service.impl;
 
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.alibaba.excel.EasyExcel;
@@ -149,6 +147,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
 
     }
 
+
     private List<Category> getChildrens(Category root,List<Category> all){
 
         return all.stream().filter(categoryEntity -> {
@@ -157,4 +156,30 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
             return Math.toIntExact((menu1.getSort() == null ? 0 : menu1.getSort()) - (menu2.getSort() == null ? 0 : menu2.getSort()));
         }).collect(Collectors.toList());
     }
+
+    /*
+     * 描述:
+     * @description: 查询分类路径
+     * @author: ketd
+     * @date: 2024/4/15 19:54
+     * @param null
+     * @return: null
+     **/
+    @Override
+    public Long[] findCategoryPath(Long attrGroupId) {
+        List<Long> paths = new ArrayList<>();
+        List<Long> parentPath = findParentPath(attrGroupId, paths);
+        Collections.reverse(parentPath);
+        return (Long[]) parentPath.toArray(new Long[parentPath.size()]);
+    }
+
+    private List<Long> findParentPath(Long attrGroupId, List<Long> paths) {
+        paths.add(attrGroupId);
+        Category category = this.getById(attrGroupId);
+        if (category.getParentCid() != 0) {
+            findParentPath(category.getParentCid(), paths);
+        }
+        return paths;
+    }
+
 }

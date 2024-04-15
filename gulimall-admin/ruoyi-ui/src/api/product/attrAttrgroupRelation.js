@@ -1,70 +1,70 @@
 import axios from 'axios';
 const baseURL = process.env.VUE_APP_PRODUCT_BASE_API;
 
-// 分页查询品牌列表
-export function listBrandPage(queryParams) {
+// 分页查询属性&属性分组关联列表
+export function listAttrAttrgroupRelationPage(queryParams) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/list/page',
+    url: '/product/AttrAttrgroupRelation/list/page',
     method: 'post',
     data: queryParams
   })
 }
 
 
-// 查询品牌详细
-export function getBrand(brandId) {
+// 查询属性&属性分组关联详细
+export function getAttrAttrgroupRelation(id) {
   return axios({
     baseURL: baseURL,
-    url: `/product/Brand/info`,
+    url: `/product/AttrAttrgroupRelation/info`,
     method: 'get',
     params: {
-        brandId: brandId
+        id: id
     }
   })
 }
 
-// 新增品牌
-export function addBrand(data) {
+// 新增属性&属性分组关联
+export function addAttrAttrgroupRelation(data) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/save',
+    url: '/product/AttrAttrgroupRelation/save',
     method: 'post',
     data: data
   })
 }
 
-// 修改品牌
-export function updateBrand(data) {
+// 修改属性&属性分组关联
+export function updateAttrAttrgroupRelation(data) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/update',
+    url: '/product/AttrAttrgroupRelation/update',
     method: 'put',
     data: data
   })
 }
 
-// 删除品牌
-export function delBrand(brandIds) {
+// 删除属性&属性分组关联
+export function delAttrAttrgroupRelation(ids) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/delete',
+    url: '/product/AttrAttrgroupRelation/delete',
     method: 'delete',
-    data: brandIds
+    data: ids
   })
 }
 
 
-// 导出品牌属性
-export function exportBrand(brandIds) {
+// 导出属性&属性分组关联属性
+export function exportAttrAttrgroupRelation(ids) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/export',
+    url: '/product/AttrAttrgroupRelation/export',
     method: 'post',
-    data: brandIds,
+    data: ids,
     responseType: 'blob' // 设置响应类型为 blob
   }).then(response => {
-    const filename = '导出brand数据.xlsx';
+    const filename = '导出attrAttrgroupRelation数据.xlsx';
     const blob = new Blob([response.data], { type: 'application/octet-stream' });
 
     // 使用 FileSaver.js 来触发下载

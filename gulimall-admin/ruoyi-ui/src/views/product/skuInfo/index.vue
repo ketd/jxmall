@@ -1,60 +1,58 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams.data" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-                  <el-form-item label="分类名称" prop="name">
+                  <el-form-item label="spuId" prop="spuId">
                     <el-input
-                        v-model="queryParams.data.name"
-                        placeholder="请输入分类名称"
+                        v-model="queryParams.data.spuId"
+                        placeholder="请输入spuId"
                         clearable
                         @keyup.enter.native="handleQuery"
                     />
                   </el-form-item>
-                  <el-form-item label="父分类id" prop="parentCid">
+                  <el-form-item label="sku名称" prop="skuName">
                     <el-input
-                        v-model="queryParams.data.parentCid"
-                        placeholder="请输入父分类id"
+                        v-model="queryParams.data.skuName"
+                        placeholder="请输入sku名称"
                         clearable
                         @keyup.enter.native="handleQuery"
                     />
                   </el-form-item>
-                  <el-form-item label="层级" prop="catLevel">
+                  <el-form-item label="所属分类id" prop="catalogId">
                     <el-input
-                        v-model="queryParams.data.catLevel"
-                        placeholder="请输入层级"
+                        v-model="queryParams.data.catalogId"
+                        placeholder="请输入所属分类id"
                         clearable
                         @keyup.enter.native="handleQuery"
                     />
                   </el-form-item>
-                  <el-form-item label="是否显示[0-不显示，1显示]" prop="showStatus">
-                    <el-select v-model="queryParams.data.showStatus" placeholder="请选择是否显示[0-不显示，1显示]" clearable>
-                      <el-option
-                          v-for="dict in dict.type.show_status"
-                          :key="dict.value"
-                          :label="dict.label"
-                          :value="dict.value"
-                      />
-                    </el-select>
-                  </el-form-item>
-                  <el-form-item label="排序" prop="sort">
+                  <el-form-item label="品牌id" prop="brandId">
                     <el-input
-                        v-model="queryParams.data.sort"
-                        placeholder="请输入排序"
+                        v-model="queryParams.data.brandId"
+                        placeholder="请输入品牌id"
                         clearable
                         @keyup.enter.native="handleQuery"
                     />
                   </el-form-item>
-                  <el-form-item label="计量单位" prop="productUnit">
+                  <el-form-item label="标题" prop="skuTitle">
                     <el-input
-                        v-model="queryParams.data.productUnit"
-                        placeholder="请输入计量单位"
+                        v-model="queryParams.data.skuTitle"
+                        placeholder="请输入标题"
                         clearable
                         @keyup.enter.native="handleQuery"
                     />
                   </el-form-item>
-                  <el-form-item label="商品数量" prop="productCount">
+                  <el-form-item label="价格" prop="price">
                     <el-input
-                        v-model="queryParams.data.productCount"
-                        placeholder="请输入商品数量"
+                        v-model="queryParams.data.price"
+                        placeholder="请输入价格"
+                        clearable
+                        @keyup.enter.native="handleQuery"
+                    />
+                  </el-form-item>
+                  <el-form-item label="销量" prop="saleCount">
+                    <el-input
+                        v-model="queryParams.data.saleCount"
+                        placeholder="请输入销量"
                         clearable
                         @keyup.enter.native="handleQuery"
                     />
@@ -73,7 +71,7 @@
             icon="el-icon-plus"
             size="mini"
             @click="handleAdd"
-            v-hasPermi="['product:category:add']"
+            v-hasPermi="['product:skuInfo:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -84,7 +82,7 @@
             size="mini"
             :disabled="single"
             @click="handleUpdate"
-            v-hasPermi="['product:category:edit']"
+            v-hasPermi="['product:skuInfo:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -95,7 +93,7 @@
             size="mini"
             :disabled="multiple"
             @click="handleDelete"
-            v-hasPermi="['product:category:remove']"
+            v-hasPermi="['product:skuInfo:remove']"
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -105,31 +103,29 @@
             icon="el-icon-download"
             size="mini"
             @click="handleExport"
-            v-hasPermi="['product:category:export']"
+            v-hasPermi="['product:skuInfo:export']"
         >导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="categoryList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="skuInfoList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-              <el-table-column label="分类id" align="center" prop="catId" />
-              <el-table-column label="分类名称" align="center" prop="name" />
-              <el-table-column label="父分类id" align="center" prop="parentCid" />
-              <el-table-column label="层级" align="center" prop="catLevel" />
-              <el-table-column label="是否显示[0-不显示，1显示]" align="center" prop="showStatus">
+              <el-table-column label="skuId" align="center" prop="skuId" />
+              <el-table-column label="spuId" align="center" prop="spuId" />
+              <el-table-column label="sku名称" align="center" prop="skuName" />
+              <el-table-column label="sku介绍描述" align="center" prop="skuDesc" />
+              <el-table-column label="所属分类id" align="center" prop="catalogId" />
+              <el-table-column label="品牌id" align="center" prop="brandId" />
+              <el-table-column label="默认图片" align="center" prop="skuDefaultImg" width="100">
                 <template slot-scope="scope">
-                      <dict-tag :options="dict.type.show_status" :value="scope.row.showStatus"/>
+                  <image-preview :src="scope.row.skuDefaultImg" :width="50" :height="50"/>
                 </template>
               </el-table-column>
-              <el-table-column label="排序" align="center" prop="sort" />
-              <el-table-column label="图标地址" align="center" prop="icon" width="100">
-                <template slot-scope="scope">
-                  <image-preview :src="scope.row.icon" :width="50" :height="50"/>
-                </template>
-              </el-table-column>
-              <el-table-column label="计量单位" align="center" prop="productUnit" />
-              <el-table-column label="商品数量" align="center" prop="productCount" />
+              <el-table-column label="标题" align="center" prop="skuTitle" />
+              <el-table-column label="副标题" align="center" prop="skuSubtitle" />
+              <el-table-column label="价格" align="center" prop="price" />
+              <el-table-column label="销量" align="center" prop="saleCount" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -137,14 +133,14 @@
               type="text"
               icon="el-icon-edit"
               @click="handleUpdate(scope.row)"
-              v-hasPermi="['product:category:edit']"
+              v-hasPermi="['product:skuInfo:edit']"
           >修改</el-button>
           <el-button
               size="mini"
               type="text"
               icon="el-icon-delete"
               @click="handleDelete(scope.row)"
-              v-hasPermi="['product:category:remove']"
+              v-hasPermi="['product:skuInfo:remove']"
           >删除</el-button>
         </template>
       </el-table-column>
@@ -158,38 +154,38 @@
         @pagination="getList"
     />
 
-    <!-- 添加或修改商品三级分类对话框 -->
+    <!-- 添加或修改sku信息对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-                        <el-form-item label="分类名称" prop="name">
-                          <el-input v-model="form.name" placeholder="请输入分类名称" />
+                        <el-form-item label="spuId" prop="spuId">
+                          <el-input v-model="form.spuId" placeholder="请输入spuId" />
                         </el-form-item>
-                        <el-form-item label="父分类id" prop="parentCid">
-                          <el-input v-model="form.parentCid" placeholder="请输入父分类id" />
+                        <el-form-item label="sku名称" prop="skuName">
+                          <el-input v-model="form.skuName" placeholder="请输入sku名称" />
                         </el-form-item>
-                        <el-form-item label="层级" prop="catLevel">
-                          <el-input v-model="form.catLevel" placeholder="请输入层级" />
+                        <el-form-item label="sku介绍描述" prop="skuDesc">
+                          <el-input v-model="form.skuDesc" type="textarea" placeholder="请输入内容" />
                         </el-form-item>
-                        <el-form-item label="是否显示[0-不显示，1显示]" prop="showStatus">
-                          <el-radio-group v-model="form.showStatus">
-                            <el-radio
-                                v-for="dict in dict.type.show_status"
-                                :key="dict.value"
-                                :label="parseInt(dict.value)"
-                            >{{dict.label}}</el-radio>
-                          </el-radio-group>
+                        <el-form-item label="所属分类id" prop="catalogId">
+                          <el-input v-model="form.catalogId" placeholder="请输入所属分类id" />
                         </el-form-item>
-                        <el-form-item label="排序" prop="sort">
-                          <el-input v-model="form.sort" placeholder="请输入排序" />
+                        <el-form-item label="品牌id" prop="brandId">
+                          <el-input v-model="form.brandId" placeholder="请输入品牌id" />
                         </el-form-item>
-                        <el-form-item label="图标地址" prop="icon">
-                          <image-upload v-model="form.icon" @upload-success="handleUploadSuccess"/>
+                        <el-form-item label="默认图片" prop="skuDefaultImg">
+                          <image-upload v-model="form.skuDefaultImg" @upload-success="handleUploadSuccess"/>
                         </el-form-item>
-                        <el-form-item label="计量单位" prop="productUnit">
-                          <el-input v-model="form.productUnit" placeholder="请输入计量单位" />
+                        <el-form-item label="标题" prop="skuTitle">
+                          <el-input v-model="form.skuTitle" placeholder="请输入标题" />
                         </el-form-item>
-                        <el-form-item label="商品数量" prop="productCount">
-                          <el-input v-model="form.productCount" placeholder="请输入商品数量" />
+                        <el-form-item label="副标题" prop="skuSubtitle">
+                          <el-input v-model="form.skuSubtitle" type="textarea" placeholder="请输入内容" />
+                        </el-form-item>
+                        <el-form-item label="价格" prop="price">
+                          <el-input v-model="form.price" placeholder="请输入价格" />
+                        </el-form-item>
+                        <el-form-item label="销量" prop="saleCount">
+                          <el-input v-model="form.saleCount" placeholder="请输入销量" />
                         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -202,17 +198,16 @@
 
 <script>
   import {
-      listCategoryPage,
-    getCategory,
-    delCategory,
-    addCategory,
-    updateCategory ,
-    exportCategory
-  } from "@/api/product/category";
+      listSkuInfoPage,
+    getSkuInfo,
+    delSkuInfo,
+    addSkuInfo,
+    updateSkuInfo ,
+    exportSkuInfo
+  } from "@/api/product/skuInfo";
 
   export default {
-    name: "Category",
-        dicts: ['show_status'],
+    name: "SkuInfo",
     data() {
       return {
         // 遮罩层
@@ -227,8 +222,8 @@
         showSearch: true,
         // 总条数
         total: 0,
-        // 商品三级分类表格数据
-              categoryList: [],
+        // sku信息表格数据
+              skuInfoList: [],
         // 弹出层标题
         title: "",
         // 是否显示弹出层
@@ -238,14 +233,16 @@
           pageNum: 1,
           pageSize: 10,
             data:{
-                        name: null,
-                        parentCid: null,
-                        catLevel: null,
-                        showStatus: null,
-                        sort: null,
-                        icon: null,
-                        productUnit: null,
-                        productCount: null
+                        spuId: null,
+                        skuName: null,
+                        skuDesc: null,
+                        catalogId: null,
+                        brandId: null,
+                        skuDefaultImg: null,
+                        skuTitle: null,
+                        skuSubtitle: null,
+                        price: null,
+                        saleCount: null
           }
         },
         // 表单参数
@@ -259,11 +256,11 @@
       this.getList();
     },
     methods: {
-      /** 查询商品三级分类列表 */
+      /** 查询sku信息列表 */
       getList() {
         this.loading = true;
-        listCategoryPage(this.queryParams).then(response => {
-          this.categoryList = response.data.rows;
+        listSkuInfoPage(this.queryParams).then(response => {
+          this.skuInfoList = response.data.rows;
           this.total = response.data.total;
           this.loading = false;
         });
@@ -276,15 +273,17 @@
       // 表单重置
       reset() {
         this.form = {
-                        catId: null,
-                        name: null,
-                        parentCid: null,
-                        catLevel: null,
-                        showStatus: null,
-                        sort: null,
-                        icon: null,
-                        productUnit: null,
-                        productCount: null
+                        skuId: null,
+                        spuId: null,
+                        skuName: null,
+                        skuDesc: null,
+                        catalogId: null,
+                        brandId: null,
+                        skuDefaultImg: null,
+                        skuTitle: null,
+                        skuSubtitle: null,
+                        price: null,
+                        saleCount: null
         };
         this.resetForm("form");
       },
@@ -300,7 +299,7 @@
       },
       // 多选框选中数据
       handleSelectionChange(selection) {
-        this.ids = selection.map(item => item.catId)
+        this.ids = selection.map(item => item.skuId)
         this.single = selection.length!==1
         this.multiple = !selection.length
       },
@@ -308,30 +307,30 @@
       handleAdd() {
         this.reset();
         this.open = true;
-        this.title = "添加商品三级分类";
+        this.title = "添加sku信息";
       },
       /** 修改按钮操作 */
       handleUpdate(row) {
         this.reset();
-        const catId = row.catId || this.ids
-        getCategory(catId).then(response => {
+        const skuId = row.skuId || this.ids
+        getSkuInfo(skuId).then(response => {
           this.form = response.data.data;
           this.open = true;
-          this.title = "修改商品三级分类";
+          this.title = "修改sku信息";
         });
       },
       /** 提交按钮 */
       submitForm() {
         this.$refs["form"].validate(valid => {
           if (valid) {
-            if (this.form.catId != null) {
-              updateCategory(this.form).then(response => {
+            if (this.form.skuId != null) {
+              updateSkuInfo(this.form).then(response => {
                 this.$modal.msgSuccess("修改成功");
                 this.open = false;
                 this.getList();
               });
             } else {
-              addCategory(this.form).then(response => {
+              addSkuInfo(this.form).then(response => {
                 this.$modal.msgSuccess("新增成功");
                 this.open = false;
                 this.getList();
@@ -342,9 +341,9 @@
       },
       /** 删除按钮操作 */
       handleDelete(row) {
-        const catIds = [].concat(row.catId !== undefined ? row.catId : [], this.ids); // 将属性ID合并为一个数组
-        this.$modal.confirm('是否确认删除商品属性编号为"' + catIds.join(', ') + '"的数据项？').then(() => {
-          return delCategory(catIds);
+        const skuIds = [].concat(row.skuId !== undefined ? row.skuId : [], this.ids); // 将属性ID合并为一个数组
+        this.$modal.confirm('是否确认删除商品属性编号为"' + skuIds.join(', ') + '"的数据项？').then(() => {
+          return delSkuInfo(skuIds);
         }).then(() => {
           // 删除成功后刷新列表并显示成功消息
           this.getList();
@@ -357,9 +356,9 @@
   /** 导出按钮操作 */
   handleExport(row)
   {
-    const catIds = [].concat(row.catId !== undefined ? row.catId : [], this.ids); // 将属性ID合并为一个数组
-    this.$modal.confirm('是否确认导出商品属性编号为"' + catIds.join(', ') + '"的数据项？').then(() => {
-    return exportCategory(catIds);
+    const skuIds = [].concat(row.skuId !== undefined ? row.skuId : [], this.ids); // 将属性ID合并为一个数组
+    this.$modal.confirm('是否确认导出商品属性编号为"' + skuIds.join(', ') + '"的数据项？').then(() => {
+    return exportSkuInfo(skuIds);
     }).then(() => {
     this.$modal.msgSuccess("导出成功");
     this.getList();
@@ -369,7 +368,7 @@
 
   },
   handleUploadSuccess(fileName) {
-    this.form.productCount = fileName;
+    this.form.saleCount = fileName;
   },
   }
   };

@@ -1,70 +1,70 @@
 import axios from 'axios';
 const baseURL = process.env.VUE_APP_PRODUCT_BASE_API;
 
-// 分页查询品牌列表
-export function listBrandPage(queryParams) {
+// 分页查询商品评价列表
+export function listSpuCommentPage(queryParams) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/list/page',
+    url: '/product/SpuComment/list/page',
     method: 'post',
     data: queryParams
   })
 }
 
 
-// 查询品牌详细
-export function getBrand(brandId) {
+// 查询商品评价详细
+export function getSpuComment(id) {
   return axios({
     baseURL: baseURL,
-    url: `/product/Brand/info`,
+    url: `/product/SpuComment/info`,
     method: 'get',
     params: {
-        brandId: brandId
+        id: id
     }
   })
 }
 
-// 新增品牌
-export function addBrand(data) {
+// 新增商品评价
+export function addSpuComment(data) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/save',
+    url: '/product/SpuComment/save',
     method: 'post',
     data: data
   })
 }
 
-// 修改品牌
-export function updateBrand(data) {
+// 修改商品评价
+export function updateSpuComment(data) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/update',
+    url: '/product/SpuComment/update',
     method: 'put',
     data: data
   })
 }
 
-// 删除品牌
-export function delBrand(brandIds) {
+// 删除商品评价
+export function delSpuComment(ids) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/delete',
+    url: '/product/SpuComment/delete',
     method: 'delete',
-    data: brandIds
+    data: ids
   })
 }
 
 
-// 导出品牌属性
-export function exportBrand(brandIds) {
+// 导出商品评价属性
+export function exportSpuComment(ids) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/export',
+    url: '/product/SpuComment/export',
     method: 'post',
-    data: brandIds,
+    data: ids,
     responseType: 'blob' // 设置响应类型为 blob
   }).then(response => {
-    const filename = '导出brand数据.xlsx';
+    const filename = '导出spuComment数据.xlsx';
     const blob = new Blob([response.data], { type: 'application/octet-stream' });
 
     // 使用 FileSaver.js 来触发下载

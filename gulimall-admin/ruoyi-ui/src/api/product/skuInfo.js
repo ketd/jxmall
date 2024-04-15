@@ -1,70 +1,70 @@
 import axios from 'axios';
 const baseURL = process.env.VUE_APP_PRODUCT_BASE_API;
 
-// 分页查询品牌列表
-export function listBrandPage(queryParams) {
+// 分页查询sku信息列表
+export function listSkuInfoPage(queryParams) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/list/page',
+    url: '/product/SkuInfo/list/page',
     method: 'post',
     data: queryParams
   })
 }
 
 
-// 查询品牌详细
-export function getBrand(brandId) {
+// 查询sku信息详细
+export function getSkuInfo(skuId) {
   return axios({
     baseURL: baseURL,
-    url: `/product/Brand/info`,
+    url: `/product/SkuInfo/info`,
     method: 'get',
     params: {
-        brandId: brandId
+        skuId: skuId
     }
   })
 }
 
-// 新增品牌
-export function addBrand(data) {
+// 新增sku信息
+export function addSkuInfo(data) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/save',
+    url: '/product/SkuInfo/save',
     method: 'post',
     data: data
   })
 }
 
-// 修改品牌
-export function updateBrand(data) {
+// 修改sku信息
+export function updateSkuInfo(data) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/update',
+    url: '/product/SkuInfo/update',
     method: 'put',
     data: data
   })
 }
 
-// 删除品牌
-export function delBrand(brandIds) {
+// 删除sku信息
+export function delSkuInfo(skuIds) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/delete',
+    url: '/product/SkuInfo/delete',
     method: 'delete',
-    data: brandIds
+    data: skuIds
   })
 }
 
 
-// 导出品牌属性
-export function exportBrand(brandIds) {
+// 导出sku信息属性
+export function exportSkuInfo(skuIds) {
   return axios({
     baseURL: baseURL,
-    url: '/product/Brand/export',
+    url: '/product/SkuInfo/export',
     method: 'post',
-    data: brandIds,
+    data: skuIds,
     responseType: 'blob' // 设置响应类型为 blob
   }).then(response => {
-    const filename = '导出brand数据.xlsx';
+    const filename = '导出skuInfo数据.xlsx';
     const blob = new Blob([response.data], { type: 'application/octet-stream' });
 
     // 使用 FileSaver.js 来触发下载

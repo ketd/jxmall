@@ -9,6 +9,26 @@
                         @keyup.enter.native="handleQuery"
                     />
                   </el-form-item>
+                  <el-form-item label="是否需要检索" prop="searchType">
+                    <el-select v-model="queryParams.data.searchType" placeholder="请选择是否需要检索" clearable>
+                      <el-option
+                          v-for="dict in dict.type.search_type"
+                          :key="dict.value"
+                          :label="dict.label"
+                          :value="dict.value"
+                      />
+                    </el-select>
+                  </el-form-item>
+                  <el-form-item label="值类型" prop="valueType">
+                    <el-select v-model="queryParams.data.valueType" placeholder="请选择值类型" clearable>
+                      <el-option
+                          v-for="dict in dict.type.value_type"
+                          :key="dict.value"
+                          :label="dict.label"
+                          :value="dict.value"
+                      />
+                    </el-select>
+                  </el-form-item>
                   <el-form-item label="属性图标" prop="icon">
                     <el-input
                         v-model="queryParams.data.icon"
@@ -25,13 +45,25 @@
                         @keyup.enter.native="handleQuery"
                     />
                   </el-form-item>
-                  <el-form-item label="启用状态[0 - 禁用，1 - 启用]" prop="enable">
-                    <el-input
-                        v-model="queryParams.data.enable"
-                        placeholder="请输入启用状态[0 - 禁用，1 - 启用]"
-                        clearable
-                        @keyup.enter.native="handleQuery"
-                    />
+                  <el-form-item label="属性类型" prop="attrType">
+                    <el-select v-model="queryParams.data.attrType" placeholder="请选择属性类型" clearable>
+                      <el-option
+                          v-for="dict in dict.type.attr_type"
+                          :key="dict.value"
+                          :label="dict.label"
+                          :value="dict.value"
+                      />
+                    </el-select>
+                  </el-form-item>
+                  <el-form-item label="启用状态" prop="enable">
+                    <el-select v-model="queryParams.data.enable" placeholder="请选择启用状态" clearable>
+                      <el-option
+                          v-for="dict in dict.type.enable"
+                          :key="dict.value"
+                          :label="dict.label"
+                          :value="dict.value"
+                      />
+                    </el-select>
                   </el-form-item>
                   <el-form-item label="所属分类" prop="catelogId">
                     <el-input
@@ -41,13 +73,15 @@
                         @keyup.enter.native="handleQuery"
                     />
                   </el-form-item>
-                  <el-form-item label="快速展示【是否展示在介绍上；0-否 1-是】，在sku中仍然可以调整" prop="showDesc">
-                    <el-input
-                        v-model="queryParams.data.showDesc"
-                        placeholder="请输入快速展示【是否展示在介绍上；0-否 1-是】，在sku中仍然可以调整"
-                        clearable
-                        @keyup.enter.native="handleQuery"
-                    />
+                  <el-form-item label="快速展示" prop="showDesc">
+                    <el-select v-model="queryParams.data.showDesc" placeholder="请选择快速展示" clearable>
+                      <el-option
+                          v-for="dict in dict.type.show_status"
+                          :key="dict.value"
+                          :label="dict.label"
+                          :value="dict.value"
+                      />
+                    </el-select>
                   </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -105,14 +139,34 @@
       <el-table-column type="selection" width="55" align="center" />
               <el-table-column label="属性id" align="center" prop="attrId" />
               <el-table-column label="属性名" align="center" prop="attrName" />
-              <el-table-column label="是否需要检索[0-不需要，1-需要]" align="center" prop="searchType" />
-              <el-table-column label="值类型[0-为单个值，1-可以选择多个值]" align="center" prop="valueType" />
+              <el-table-column label="是否需要检索" align="center" prop="searchType">
+                <template slot-scope="scope">
+                      <dict-tag :options="dict.type.search_type" :value="scope.row.searchType"/>
+                </template>
+              </el-table-column>
+              <el-table-column label="值类型" align="center" prop="valueType">
+                <template slot-scope="scope">
+                      <dict-tag :options="dict.type.value_type" :value="scope.row.valueType"/>
+                </template>
+              </el-table-column>
               <el-table-column label="属性图标" align="center" prop="icon" />
               <el-table-column label="可选值列表[用逗号分隔]" align="center" prop="valueSelect" />
-              <el-table-column label="属性类型[0-销售属性，1-基本属性，2-既是销售属性又是基本属性]" align="center" prop="attrType" />
-              <el-table-column label="启用状态[0 - 禁用，1 - 启用]" align="center" prop="enable" />
+              <el-table-column label="属性类型" align="center" prop="attrType">
+                <template slot-scope="scope">
+                      <dict-tag :options="dict.type.attr_type" :value="scope.row.attrType"/>
+                </template>
+              </el-table-column>
+              <el-table-column label="启用状态" align="center" prop="enable">
+                <template slot-scope="scope">
+                      <dict-tag :options="dict.type.enable" :value="scope.row.enable"/>
+                </template>
+              </el-table-column>
               <el-table-column label="所属分类" align="center" prop="catelogId" />
-              <el-table-column label="快速展示【是否展示在介绍上；0-否 1-是】，在sku中仍然可以调整" align="center" prop="showDesc" />
+              <el-table-column label="快速展示" align="center" prop="showDesc">
+                <template slot-scope="scope">
+                      <dict-tag :options="dict.type.show_status" :value="scope.row.showDesc"/>
+                </template>
+              </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -147,20 +201,64 @@
                         <el-form-item label="属性名" prop="attrName">
                           <el-input v-model="form.attrName" placeholder="请输入属性名" />
                         </el-form-item>
+                        <el-form-item label="是否需要检索" prop="searchType">
+                          <el-select v-model="form.searchType" placeholder="请选择是否需要检索">
+                            <el-option
+                                v-for="dict in dict.type.search_type"
+                                :key="dict.value"
+                                :label="dict.label"
+                                :value="parseInt(dict.value)"
+                            ></el-option>
+                          </el-select>
+                        </el-form-item>
+                        <el-form-item label="值类型" prop="valueType">
+                          <el-select v-model="form.valueType" placeholder="请选择值类型">
+                            <el-option
+                                v-for="dict in dict.type.value_type"
+                                :key="dict.value"
+                                :label="dict.label"
+                                :value="parseInt(dict.value)"
+                            ></el-option>
+                          </el-select>
+                        </el-form-item>
                         <el-form-item label="属性图标" prop="icon">
                           <el-input v-model="form.icon" placeholder="请输入属性图标" />
                         </el-form-item>
                         <el-form-item label="可选值列表[用逗号分隔]" prop="valueSelect">
                           <el-input v-model="form.valueSelect" placeholder="请输入可选值列表[用逗号分隔]" />
                         </el-form-item>
-                        <el-form-item label="启用状态[0 - 禁用，1 - 启用]" prop="enable">
-                          <el-input v-model="form.enable" placeholder="请输入启用状态[0 - 禁用，1 - 启用]" />
+                        <el-form-item label="属性类型" prop="attrType">
+                          <el-select v-model="form.attrType" placeholder="请选择属性类型">
+                            <el-option
+                                v-for="dict in dict.type.attr_type"
+                                :key="dict.value"
+                                :label="dict.label"
+                                :value="parseInt(dict.value)"
+                            ></el-option>
+                          </el-select>
+                        </el-form-item>
+                        <el-form-item label="启用状态" prop="enable">
+                          <el-select v-model="form.enable" placeholder="请选择启用状态">
+                            <el-option
+                                v-for="dict in dict.type.enable"
+                                :key="dict.value"
+                                :label="dict.label"
+                                :value="parseInt(dict.value)"
+                            ></el-option>
+                          </el-select>
                         </el-form-item>
                         <el-form-item label="所属分类" prop="catelogId">
                           <el-input v-model="form.catelogId" placeholder="请输入所属分类" />
                         </el-form-item>
-                        <el-form-item label="快速展示【是否展示在介绍上；0-否 1-是】，在sku中仍然可以调整" prop="showDesc">
-                          <el-input v-model="form.showDesc" placeholder="请输入快速展示【是否展示在介绍上；0-否 1-是】，在sku中仍然可以调整" />
+                        <el-form-item label="快速展示" prop="showDesc">
+                          <el-select v-model="form.showDesc" placeholder="请选择快速展示">
+                            <el-option
+                                v-for="dict in dict.type.show_status"
+                                :key="dict.value"
+                                :label="dict.label"
+                                :value="parseInt(dict.value)"
+                            ></el-option>
+                          </el-select>
                         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -183,6 +281,7 @@
 
   export default {
     name: "Attr",
+        dicts: ['enable', 'search_type', 'attr_type', 'show_status', 'value_type'],
     data() {
       return {
         // 遮罩层
@@ -339,7 +438,7 @@
     console.log("导出失败");
     });
 
-  }
+  },
   }
   };
 </script>

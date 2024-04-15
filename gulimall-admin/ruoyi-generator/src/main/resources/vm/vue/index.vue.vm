@@ -621,7 +621,7 @@
   #foreach($column in $columns)
   #if($column.htmlType == "imageUpload")
   handleUploadSuccess(fileName) {
-    this.form.${javaField} = fileName;
+    this.form.${field} = fileName;
   },
   #end
   #end

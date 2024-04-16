@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.ketd.product.domain.AttrGroup;
+import com.ketd.product.service.ICategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -39,6 +40,8 @@ public class AttrController{
 
     @Autowired
     private IAttrService attrService;
+
+
 
     /**
      * 分页查询商品属性列表
@@ -83,7 +86,7 @@ public class AttrController{
     @GetMapping(value = "/info")
     public Result<?> getInfo(@RequestParam("attrId") Long attrId) {
 
-        return Result.ok(attrService.selectAttrByAttrId(attrId));
+        return attrService.selectAttrByAttrId(attrId);
     }
 
     /**

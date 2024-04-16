@@ -43,12 +43,12 @@ public class CategoryBrandRelation  implements Serializable
         @Schema(description =  "分类id")
         private Long catelogId;
 
-        @ExcelProperty(value = "${column.columnComment}")
-        @Schema(description =  "${column.columnComment}")
+        @ExcelProperty(value = "品牌名")
+        @Schema(description =  "品牌名")
         private String brandName;
 
-        @ExcelProperty(value = "${column.columnComment}")
-        @Schema(description =  "${column.columnComment}")
+        @ExcelProperty(value = "分类名")
+        @Schema(description =  "分类名")
         private String catelogName;
 
 

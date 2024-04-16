@@ -2,6 +2,8 @@ package com.ketd.product.service;
 
 
 import java.util.List;
+
+import com.ketd.common.result.Result;
 import jakarta.servlet.http.HttpServletResponse;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ketd.product.domain.CategoryBrandRelation;
@@ -36,7 +38,7 @@ public interface ICategoryBrandRelationService  extends IService<CategoryBrandRe
      * @param categoryBrandRelation 品牌分类关联
      * @return 结果
      */
-    public int insertCategoryBrandRelation(CategoryBrandRelation categoryBrandRelation);
+    public Result<?> insertCategoryBrandRelation(CategoryBrandRelation categoryBrandRelation);
 
     /**
      * 修改品牌分类关联

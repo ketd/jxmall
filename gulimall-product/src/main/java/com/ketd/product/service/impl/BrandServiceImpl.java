@@ -6,6 +6,9 @@ import java.util.List;
 
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.ketd.common.result.Result;
+import com.ketd.product.mapper.CategoryBrandRelationMapper;
+import com.ketd.product.mapper.CategoryMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +31,10 @@ public class BrandServiceImpl extends ServiceImpl<BrandMapper, Brand> implements
 
     @Autowired
     private BrandMapper brandMapper;
+
+
+    @Autowired
+    private CategoryBrandRelationMapper  categoryBrandRelationMapper;
 
 
 
@@ -82,8 +89,16 @@ public class BrandServiceImpl extends ServiceImpl<BrandMapper, Brand> implements
      */
 
     @Override
-    public int updateBrand(Brand brand) {
-        return brandMapper.updateById(brand);
+    public Result<?> updateBrand(Brand brand) {
+
+        try {
+            categoryBrandRelationMapper.updateBrandNameByBrandId(brand.getName(),brand.getBrandId());
+            brandMapper.updateById(brand);
+            return Result.ok(null);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+
     }
 
     /**

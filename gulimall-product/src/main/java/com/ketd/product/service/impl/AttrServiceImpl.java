@@ -6,7 +6,11 @@ import java.util.List;
 
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.ketd.common.result.Result;
+import com.ketd.product.service.ICategoryService;
+import com.ketd.product.vo.AttrVo;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -29,6 +33,10 @@ public class AttrServiceImpl extends ServiceImpl<AttrMapper, Attr> implements IA
     @Autowired
     private AttrMapper attrMapper;
 
+    @Autowired
+    private ICategoryService categoryService;
+
+
 
 
     /**
@@ -38,9 +46,20 @@ public class AttrServiceImpl extends ServiceImpl<AttrMapper, Attr> implements IA
      * @return 商品属性
      */
     @Override
-    public Attr selectAttrByAttrId(Long attrId)
+    public Result<?> selectAttrByAttrId(Long attrId)
     {
-        return attrMapper.selectById(attrId);
+        try {
+            Attr attr = attrMapper.selectById(attrId);
+            AttrVo  attrVo = new AttrVo();
+            BeanUtils.copyProperties(attr,attrVo);
+            Long[] path = categoryService.findCategoryPath(attr.getCatelogId());
+            attrVo.setCatelogPath(path);
+
+            return Result.ok(attrVo);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
 

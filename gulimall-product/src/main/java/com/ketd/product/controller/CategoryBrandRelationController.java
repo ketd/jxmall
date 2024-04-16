@@ -72,7 +72,6 @@ public class CategoryBrandRelationController{
     {
         List<CategoryBrandRelation> list = categoryBrandRelationService.listByIds(Arrays.asList(categoryBrandRelationIds));
             categoryBrandRelationService.export(list, response);
-
     }
 
     /**
@@ -92,7 +91,7 @@ public class CategoryBrandRelationController{
     @PostMapping("/save")
     public Result<?> add(@RequestBody CategoryBrandRelation categoryBrandRelation)
     {
-        return Result.ok(categoryBrandRelationService.insertCategoryBrandRelation(categoryBrandRelation));
+        return categoryBrandRelationService.insertCategoryBrandRelation(categoryBrandRelation);
     }
 
     /**

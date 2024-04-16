@@ -115,7 +115,7 @@ public class CategoryController{
     @PutMapping("/update")
     public Result<?> edit(@RequestBody Category category)
     {
-        return Result.ok(categoryService.updateCategory(category));
+        return categoryService.updateCategory(category);
     }
 
     /**

@@ -103,7 +103,7 @@ public class BrandController{
     @PutMapping("/update")
     public Result<?> edit(@RequestBody Brand brand)
     {
-        return Result.ok(brandService.updateBrand(brand));
+        return brandService.updateBrand(brand);
     }
 
     /**

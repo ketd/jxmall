@@ -2,6 +2,8 @@ package com.ketd.product.service;
 
 
 import java.util.List;
+
+import com.ketd.common.result.Result;
 import jakarta.servlet.http.HttpServletResponse;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ketd.product.domain.Brand;
@@ -44,7 +46,7 @@ public interface IBrandService  extends IService<Brand> {
      * @param brand 品牌
      * @return 结果
      */
-    public int updateBrand(Brand brand);
+    public Result<?> updateBrand(Brand brand);
 
     /**
      * 批量删除品牌

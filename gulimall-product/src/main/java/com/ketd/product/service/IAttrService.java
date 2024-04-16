@@ -2,6 +2,8 @@ package com.ketd.product.service;
 
 
 import java.util.List;
+
+import com.ketd.common.result.Result;
 import jakarta.servlet.http.HttpServletResponse;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ketd.product.domain.Attr;
@@ -20,7 +22,7 @@ public interface IAttrService  extends IService<Attr> {
      * @param attrId 商品属性主键
      * @return 商品属性
      */
-    public Attr selectAttrByAttrId(Long attrId);
+    public Result<?> selectAttrByAttrId(Long attrId);
 
     /**
      * 查询商品属性列表

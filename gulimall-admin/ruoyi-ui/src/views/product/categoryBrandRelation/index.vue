@@ -87,7 +87,7 @@
 
     <el-table v-loading="loading" :data="categoryBrandRelationList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-              <el-table-column label="${comment}" align="center" prop="id" />
+              <el-table-column label="关联id" align="center" prop="id" />
               <el-table-column label="品牌id" align="center" prop="brandId" />
               <el-table-column label="分类id" align="center" prop="catelogId" />
               <el-table-column label="品牌名" align="center" prop="brandName" />
@@ -171,7 +171,7 @@
         // 总条数
         total: 0,
         // 品牌分类关联表格数据
-              categoryBrandRelationList: [],
+        categoryBrandRelationList: [],
         // 弹出层标题
         title: "",
         // 是否显示弹出层

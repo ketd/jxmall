@@ -137,6 +137,13 @@
                 v-hasPermi="['product:group:remove']"
               >删除
               </el-button>
+              <el-button
+                size="mini"
+                type="text"
+                icon="el-icon-s-order"
+                @click="openAttrListDialog(scope.row)"
+              >关联
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -165,8 +172,7 @@
         <el-form-item label="组图标" prop="icon">
           <image-upload v-model="form.icon" @upload-success="handleUploadSuccess"/>
         </el-form-item>
-
-        <el-form-item label="所属分类id" prop="catelogId">
+        <el-form-item label="所属分类" prop="catelogId">
 <!--          <el-input v-model="form.catelogId" placeholder="请输入所属分类id"/>-->
           <el-cascader
             v-model="catelogIds"
@@ -181,6 +187,64 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 属性分组对话框 -->
+    <el-dialog :title="attributeGroupTitle" :visible.sync="isOpenAttrList" width="500px" append-to-body>
+      <el-button
+        :disabled="catelogIds.length===0"
+        style="margin-bottom: 10px"
+        type="primary" icon="el-icon-edit"
+        @click=""
+      >新建关联
+      </el-button>
+      <el-button
+        type="danger"
+        plain
+        icon="el-icon-delete"
+        size="mini"
+        :disabled="multiple"
+        @click="handleDelete"
+      >批量删除
+      </el-button>
+      <!-- TODO 获取品牌分类 -->
+      <el-table v-loading="loading" :data="attrList" @selection-change="handleAttrListSelectionChange">
+        <el-table-column type="selection" width="55" align="center"/>
+        <el-table-column label="#" align="center" prop="attrId" />
+        <el-table-column label="属性名" align="center" prop="attrName" />
+        <el-table-column label="可选值" align="center" prop="valueSelect" />
+        <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+          <template slot-scope="scope">
+            <el-button
+              size="mini"
+              type="text"
+              icon="el-icon-edit"
+              @click="handleUpdate(scope.row)"
+            >修改
+            </el-button>
+            <el-button
+              size="mini"
+              type="text"
+              icon="el-icon-delete"
+              @click="handleDelete(scope.row)"
+            >删除
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+
+      <pagination
+        v-show="attrTotals>0"
+        :total="attrTotals"
+        :page.sync="getAttrListQueryParams.pageNum"
+        :limit.sync="getAttrListQueryParams.pageSize"
+        @pagination="getAttrList"
+      />
+    </el-dialog>
+
+
   </div>
 </template>
 
@@ -195,6 +259,7 @@ import {
 } from "@/api/product/group";
 import tree from "@/views/commoin/tree.vue";
 import {getMenus} from "@/api/commoin/commoin";
+import {listAttrPage} from "@/api/product/attr";
 
 export default {
   components: {
@@ -207,6 +272,7 @@ export default {
       loading: true,
       // 选中数组
       ids: [],
+      attrIds: [],
       // 非单个禁用
       single: true,
       // 非多个禁用
@@ -215,10 +281,15 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
+      // 规格参数条数
+      attrTotals: 0,
       // 属性分组表格数据
       groupList: [],
+      // 商品属性表格数据
+      attrList: [],
       // 弹出层标题
       title: "",
+      attributeGroupTitle: "",
       // 是否显示弹出层
       open: false,
       // 查询参数
@@ -233,23 +304,31 @@ export default {
           catelogId: null,
         }
       },
+      getAttrListQueryParams :{
+        pageNum: 1,
+        pageSize: 10,
+        data:{
+          attrGroupId : null,
+        }
+      },
       // 表单参数
       form: {},
+      attrForm: {},
       // 表单校验
       rules: {},
       options: [],
-       props: {
+      props: {
         value: 'catId',
         label: 'name',
         children: 'children'
       },
-      catelogIds: []
+      catelogIds: [],
+      isOpenAttrList: false,
     };
   },
   created() {
     this.getList();
     this.getMenus();
-
   },
   methods: {
     /** 查询属性分组列表 */
@@ -307,7 +386,6 @@ export default {
       const attrGroupId = row.attrGroupId || this.ids
       getGroup(attrGroupId).then(response => {
         this.form = response.data.data;
-        console.log(response.data.data.catelogPath);
         this.catelogIds = response.data.data.catelogPath;
         this.open = true;
         this.title = "修改属性分组";
@@ -380,7 +458,26 @@ export default {
      }).finally(() => {
 
      });
-
+    },
+    openAttrListDialog(row){
+      this.getAttrListQueryParams.data.attrGroupId = row.attrGroupId;
+      this.isOpenAttrList = true;
+      this.attributeGroupTitle = "规格参数";
+      this.attrList= [];
+      this.getAttrList();
+    },
+    // 多选框选中数据
+    handleAttrListSelectionChange(selection) {
+      this.attrIds = selection.map(item => item.attrGroupId)
+      this.single = selection.length !== 1
+      this.multiple = !selection.length
+    },
+    getAttrList(){
+      console.log(this.getAttrListQueryParams);
+      listAttrPage(this.getAttrListQueryParams).then(response => {
+        this.attrList = response.data.rows;
+        this.attrTotals = response.data.total;
+      });
     }
   }
 };

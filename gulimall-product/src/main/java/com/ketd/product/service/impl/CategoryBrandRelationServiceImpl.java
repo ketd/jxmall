@@ -6,6 +6,11 @@ import java.util.List;
 
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.ketd.common.result.Result;
+import com.ketd.product.domain.Brand;
+import com.ketd.product.domain.Category;
+import com.ketd.product.mapper.BrandMapper;
+import com.ketd.product.mapper.CategoryMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +33,13 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
 
     @Autowired
     private CategoryBrandRelationMapper categoryBrandRelationMapper;
+
+    @Autowired
+    private BrandMapper  brandMapper;
+
+    @Autowired
+
+    private CategoryMapper  categoryMapper;
 
 
 
@@ -66,8 +78,25 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
      */
 
     @Override
-    public int insertCategoryBrandRelation(CategoryBrandRelation categoryBrandRelation) {
-        return categoryBrandRelationMapper.insert(categoryBrandRelation);
+    public Result<?> insertCategoryBrandRelation(CategoryBrandRelation categoryBrandRelation) {
+
+        // 查询
+        // 判断品牌是否存在
+        // 判断分类是否存在
+        if(brandMapper.selectById(categoryBrandRelation.getBrandId()) == null
+         || categoryMapper.selectById(categoryBrandRelation.getCatelogId()) == null){
+            return Result.error("参数错误");
+        }
+        //判断分类id是否相同
+        if(!categoryBrandRelationMapper.selectList(new QueryWrapper<CategoryBrandRelation>().eq("catelog_id", categoryBrandRelation.getBrandId())).isEmpty()){
+            return Result.error("品牌已经关联");
+        }
+        Brand brand =  brandMapper.selectById(categoryBrandRelation.getBrandId());
+        categoryBrandRelation.setBrandName(brand.getName());
+        Category  category =  categoryMapper.selectById(categoryBrandRelation.getCatelogId());
+        categoryBrandRelation.setCatelogName(category.getName());
+        categoryBrandRelationMapper.insert(categoryBrandRelation);
+        return Result.ok("新增成功");
     }
 
 

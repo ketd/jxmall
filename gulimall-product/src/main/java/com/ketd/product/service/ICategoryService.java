@@ -2,6 +2,8 @@ package com.ketd.product.service;
 
 
 import java.util.List;
+
+import com.ketd.common.result.Result;
 import jakarta.servlet.http.HttpServletResponse;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ketd.product.domain.Category;
@@ -44,7 +46,7 @@ public interface ICategoryService  extends IService<Category> {
      * @param category 商品三级分类
      * @return 结果
      */
-    public int updateCategory(Category category);
+    public Result<?> updateCategory(Category category);
 
     /**
      * 批量删除商品三级分类

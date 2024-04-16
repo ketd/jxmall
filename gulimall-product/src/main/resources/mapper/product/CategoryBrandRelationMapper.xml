@@ -11,6 +11,21 @@
             <result property="brandName"    column="brand_name"    />
             <result property="catelogName"    column="catelog_name"    />
     </resultMap>
+    <update id="updateBrandNameById">
+        update pms_category_brand_relation
+        set brand_name = #{brandName,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=NUMERIC}
+    </update>
+    <update id="updateBrandNameByBrandId">
+        update pms_category_brand_relation
+        set brand_name = #{brandName,jdbcType=VARCHAR}
+        where brand_id = #{brandId,jdbcType=NUMERIC}
+    </update>
+    <update id="updateCatelogNameByCatelogId">
+        update pms_category_brand_relation
+        set catelog_name = #{catelogName,jdbcType=VARCHAR}
+        where catelog_id = #{catelogId,jdbcType=NUMERIC}
+    </update>
 
 
 </mapper>

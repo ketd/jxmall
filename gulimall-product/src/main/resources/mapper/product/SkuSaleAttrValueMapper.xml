@@ -4,7 +4,7 @@
 <mapper namespace="com.ketd.product.mapper.SkuSaleAttrValueMapper">
 
     <!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="com.ketd.product.domain.SkuSaleAttrValue" id="${classname}Map">
+    <resultMap type="com.ketd.product.domain.SkuSaleAttrValue" id="BaseResultMap">
             <result property="id"    column="id"    />
             <result property="skuId"    column="sku_id"    />
             <result property="attrId"    column="attr_id"    />
@@ -13,6 +13,9 @@
             <result property="attrSort"    column="attr_sort"    />
     </resultMap>
 
+    <sql id="Base_Column_List">
+id,sku_id,attr_id,attr_name,attr_value,attr_sort
+    </sql>
 
 </mapper>
 

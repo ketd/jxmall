@@ -15,6 +15,8 @@ import ${packageName}.mapper.${ClassName}Mapper;
 import ${packageName}.domain.${ClassName};
 import ${packageName}.service.I${ClassName}Service;
 
+import static com.ketd.common.excel.excel.extracted;
+
 
 /**
  * ${functionName}Service业务层处理
@@ -115,22 +117,7 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
     @Override
     public void export(List<${ClassName}> list, HttpServletResponse response) {
 
-        try {
-            //HttpServletResponse消息头参数设置
-            response.setCharacterEncoding("UTF-8");
-            response.setHeader("Content-Transfer-Encoding", "binary");
-            response.setHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
-            response.setHeader("Pragma", "public");
-            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8");
-            String fileName = "导出列表"+ ".xlsx";
-            fileName = new String(fileName.getBytes(), "ISO-8859-1");
-            response.setHeader("Content-Disposition", "attachment;filename=" + fileName );
-            EasyExcel.write(response.getOutputStream(), ${ClassName}.class)
-                    .autoCloseStream(Boolean.FALSE)
-                    .sheet("导出列表")
-                    .doWrite(list);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        extracted(list, response,${ClassName}.class);
+
     }
 }

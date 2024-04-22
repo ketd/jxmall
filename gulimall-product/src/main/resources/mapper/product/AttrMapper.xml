@@ -4,7 +4,7 @@
 <mapper namespace="com.ketd.product.mapper.AttrMapper">
 
     <!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="com.ketd.product.domain.Attr" id="${classname}Map">
+    <resultMap type="com.ketd.product.domain.Attr" id="BaseResultMap">
             <result property="attrId"    column="attr_id"    />
             <result property="attrName"    column="attr_name"    />
             <result property="searchType"    column="search_type"    />
@@ -14,10 +14,19 @@
             <result property="attrType"    column="attr_type"    />
             <result property="enable"    column="enable"    />
             <result property="catelogId"    column="catelog_id"    />
-            <result property="attrGroupId"    column="attr_group_id"    />
             <result property="showDesc"    column="show_desc"    />
     </resultMap>
 
+    <sql id="Base_Column_List">
+attr_id,attr_name,search_type,value_type,icon,value_select,attr_type,enable,catelog_id,show_desc
+    </sql>
+    <select id="selectAllByAttrGroupId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from pms_attr
+        where
+        attr_group_id = #{attrGroupId,jdbcType=NUMERIC}
+    </select>
 
 </mapper>
 

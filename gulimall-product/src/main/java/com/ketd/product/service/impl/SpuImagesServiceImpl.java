@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Primary;
 import com.ketd.product.mapper.SpuImagesMapper;
 import com.ketd.product.domain.SpuImages;
 import com.ketd.product.service.ISpuImagesService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -133,4 +134,23 @@ public class SpuImagesServiceImpl extends ServiceImpl<SpuImagesMapper, SpuImages
             e.printStackTrace();
         }
     }
+
+    @Transactional
+    @Override
+    public void saveImages(Long id, List<String> images) {
+        if (images == null || images.isEmpty()) {
+            return;
+        }else {
+            List<SpuImages>  spuImagesList = images.stream().map(img -> {
+                    SpuImages spuImages = new SpuImages();
+                    spuImages.setSpuId(id);
+                  /*  spuImages.setDefaultImg(img.equals(images.get(0)) ? 1 : 0);
+                    spuImages.setImgSort(0);*/
+                    spuImages.setImgUrl(img);
+                    return spuImages;
+                }).collect(java.util.stream.Collectors.toList());
+            this.saveBatch(spuImagesList);
+        }
+    }
+
 }

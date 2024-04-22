@@ -3,17 +3,12 @@ package com.ketd.product.controller;
 
 
 
-import java.util.Arrays;
-import java.util.List;
 
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.ketd.product.domain.AttrGroup;
-import com.ketd.product.service.ICategoryService;
+import com.ketd.product.vo.AttrVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +20,9 @@ import com.ketd.common.domain.PageRequest;
 
 import com.ketd.product.domain.Attr;
 import com.ketd.product.service.IAttrService;
+
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -41,30 +39,51 @@ public class AttrController{
     @Autowired
     private IAttrService attrService;
 
-
-
     /**
      * 分页查询商品属性列表
      */
     @Operation(summary ="分页查询商品属性列表")
-    @PostMapping("/list/page")
-    public TableDataInfo list(@RequestBody PageRequest<Attr> pageRequest)
+    @PostMapping("/base/list/page")
+    public Result<?> attrBaseList(@RequestBody PageRequest<Attr> pageRequest)
     {
-
-        Integer pageNum = pageRequest.getPageNum();
-        Integer pageSize = pageRequest.getPageSize();
-
-        // 执行条件查询
-        Attr attr= pageRequest.getData();
-        Page<Attr> page = new Page<>(pageNum, pageSize);
-        QueryWrapper<Attr> queryWrapper = new QueryWrapper<>(attr);
-
-        IPage<Attr> attrPage = attrService.page(page, queryWrapper);
-        return TableDataInfo.getDataTable(attrPage.getRecords(), attrPage.getTotal());
-
-
-
+        return attrService.pageAttrList(pageRequest);
     }
+
+    /**
+     * 分页查询商品属性列表
+     */
+    @Operation(summary ="查询商品销售属性属性列表")
+    @PostMapping("/sale/list/page")
+    public Result<?> attrSaleList(@RequestParam(value = "catalogId") Long catalogId)
+    {
+        return Result.ok(attrService.pageAttrSaleList(catalogId));
+    }
+
+    @Operation(summary ="分页查询为连接的商品属性列表")
+    @PostMapping("/base/list/noBindAttrList/page")
+    public Result<?> noLinkAttrList(@RequestBody PageRequest<Attr> pageRequest)
+    {
+        return attrService.noLinkAttrList(pageRequest);
+    }
+
+    @Operation(summary ="分页查询分组关联的规格参数")
+    @PostMapping("/base/list/findAllAttrByAttrGroupId/page")
+    public Result<?>  findAttrGroupRelation(@RequestBody PageRequest<Long> pageRequest )
+    {
+        List<Attr> attrList = attrService.findAllAttrByAttrGroupId(pageRequest);
+        TableDataInfo tableDataInfo = new TableDataInfo();
+        tableDataInfo.setTotal(attrList.size());
+        tableDataInfo.setRows(attrList);
+        return Result.ok(tableDataInfo);
+    }
+
+    @Operation(summary ="连接商品属性")
+    @PostMapping("/link")
+    public Result<?> linkAttr(@RequestParam(value = "attrId") Long attrGroupId,@RequestBody  Long[] attrId )
+    {
+        return attrService.linkAttr(attrGroupId, attrId);
+    }
+
 
 
     /**
@@ -104,9 +123,9 @@ public class AttrController{
      */
     @Operation(summary = "修改商品属性")
     @PutMapping("/update")
-    public Result<?> edit(@RequestBody Attr attr)
+    public Result<?> edit(@RequestBody AttrVo attrVo)
     {
-        return Result.ok(attrService.updateAttr(attr));
+        return Result.ok(attrService.updateAttr(attrVo));
     }
 
     /**

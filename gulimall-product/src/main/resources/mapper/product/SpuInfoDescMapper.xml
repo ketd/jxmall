@@ -4,11 +4,14 @@
 <mapper namespace="com.ketd.product.mapper.SpuInfoDescMapper">
 
     <!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="com.ketd.product.domain.SpuInfoDesc" id="${classname}Map">
+    <resultMap type="com.ketd.product.domain.SpuInfoDesc" id="BaseResultMap">
             <result property="spuId"    column="spu_id"    />
             <result property="decript"    column="decript"    />
     </resultMap>
 
+    <sql id="Base_Column_List">
+spu_id,decript
+    </sql>
 
 </mapper>
 

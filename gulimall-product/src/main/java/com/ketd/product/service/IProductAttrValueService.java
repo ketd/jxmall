@@ -2,6 +2,8 @@ package com.ketd.product.service;
 
 
 import java.util.List;
+
+import com.ketd.product.vo.SpuSaveVo;
 import jakarta.servlet.http.HttpServletResponse;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ketd.product.domain.ProductAttrValue;
@@ -66,4 +68,8 @@ public interface IProductAttrValueService  extends IService<ProductAttrValue> {
      * 导出spu属性值列表
      */
     void export(List<ProductAttrValue> list, HttpServletResponse response);
+
+    void saveProductAttrValue(Long spuId,List<SpuSaveVo.BaseAttrsVO> baseAttrs);
+
+    List<ProductAttrValue> baseAttrListForSpu(Long id);
 }

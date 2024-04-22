@@ -66,4 +66,6 @@ public interface ISpuImagesService  extends IService<SpuImages> {
      * 导出spu图片列表
      */
     void export(List<SpuImages> list, HttpServletResponse response);
+
+    void saveImages(Long id, List<String> images);
 }

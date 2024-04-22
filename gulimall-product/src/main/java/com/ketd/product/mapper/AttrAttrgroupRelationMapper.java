@@ -1,4 +1,6 @@
 package com.ketd.product.mapper;
+import java.util.List;
+import org.apache.ibatis.annotations.Param;
 
 
 import com.ketd.product.domain.AttrAttrgroupRelation;
@@ -13,5 +15,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface AttrAttrgroupRelationMapper extends BaseMapper<AttrAttrgroupRelation>
 {
+    AttrAttrgroupRelation findOneByAttrId(@Param("attrId") Long attrId);
+
+    List<AttrAttrgroupRelation> findAllByAttrGroupId(@Param("attrGroupId") Long attrGroupId);
 
 }

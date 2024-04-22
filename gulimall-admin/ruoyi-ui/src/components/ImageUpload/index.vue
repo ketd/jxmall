@@ -36,7 +36,7 @@
       <img
         :src="dialogImageUrl"
         style="display: block; max-width: 100%; margin: 0 auto"
-      />
+       alt=""/>
     </el-dialog>
   </div>
 </template>
@@ -59,7 +59,7 @@ export default {
     },
     // 大小限制(MB)
     fileSize: {
-       type: Number,
+      type: Number,
       default: 5,
     },
     // 文件类型, 例如['png', 'jpg', 'jpeg']
@@ -80,12 +80,14 @@ export default {
       dialogImageUrl: "",
       dialogVisible: false,
       hideUpload: false,
-      baseUrl: '/',
+      baseUrl: bucket_url,
       uploadImgUrl: '/', // 上传的图片服务器地址
       headers: {
         Authorization: "Bearer " + getToken(),
       },
-      fileList: []
+      fileList: [],
+      uniqueFileName:'',
+      imgUrl:''
     };
   },
   watch: {
@@ -95,12 +97,13 @@ export default {
           // 首先将值转为数组
           const list = Array.isArray(val) ? val : this.value.split(',');
           // 然后将数组转为对象数组
+          //将file1.jpg转为了http://example.com/file1.jpg
           this.fileList = list.map(item => {
             if (typeof item === "string") {
               if (item.indexOf(this.baseUrl) === -1) {
-                  item = { name: this.baseUrl + item, url: this.baseUrl + item };
+                item = { name: this.baseUrl + item, url: this.baseUrl + item };
               } else {
-                  item = { name: item, url: item };
+                item = { name: item, url: item };
               }
             }
             return item;
@@ -154,26 +157,28 @@ export default {
 
       try {
         // 生成随机唯一文件名
-        const uniqueFileName = generateUniqueFileName(file);
+        this.uniqueFileName = generateUniqueFileName(file);
 
-        this.uniqueFileName = uniqueFileName;
+        this.imgUrl=this.baseUrl+this.uniqueFileName;
 
-        const uploadUrlResponse = await getUploadUrl(uniqueFileName);
+
+        const uploadUrlResponse = await getUploadUrl(this.uniqueFileName);
         this.uploadImgUrl = uploadUrlResponse.data;
-        console.log(this.uploadImgUrl);
+        //console.log(this.uploadImgUrl);
 
 
       } catch (error) {
         console.error('Error getting upload URL or uploading file:', error);
         this.$modal.msgError('获取上传地址失败或上传文件失败，请重试！');
       }
+      this.number++;
       return false;
     },
-    async customUpload(file, filename) {
+    async customUpload(file) {
 
-      console.log('自定义上传方法开始');
+     /* console.log('自定义上传方法开始');
       console.log('待上传文件信息:', file);
-      console.log('上传地址:', this.uploadImgUrl);
+      console.log('上传地址:', this.uploadImgUrl);*/
 
 
       try {
@@ -182,9 +187,9 @@ export default {
         await axios.put(this.uploadImgUrl, file.file, {
 
         }).then(res => {
-          console.log("上传文件信息：", file);
-          console.log(res.status);
-          this.$emit('upload-success',bucket_url + this.uniqueFileName);
+          //console.log("上传文件信息：", file);
+          //console.log(res.status);
+          //this.$emit('upload-success',bucket_url + this.uniqueFileName);
           this.handleUploadSuccess(res, file);
         });
         // 上传成功后关闭 loading 状态
@@ -195,7 +200,7 @@ export default {
         // 上传失败后执行失败回调
         this.handleUploadError();
       }
-      console.log('自定义上传方法结束');
+     // console.log('自定义上传方法结束');
     },
 
 
@@ -206,14 +211,14 @@ export default {
     // 上传成功回调
     handleUploadSuccess(res, file) {
       if (res.status === 200) {
-        //this.uploadList.push({ name: res.fileName, url: res.fileName });
-        //this.$emit('input', this.uniqueFileName);
+        this.uploadList.push({ name: file.file.name, url: this.imgUrl });
+        //console.log(this.imgUrl);
         this.uploadedSuccessfully();
       } else {
         this.number--;
         this.$modal.closeLoading();
-        //this.$modal.msgError(res.msg);
-        //this.$refs.imageUpload.handleRemove(file);
+        this.$modal.msgError(res.msg);
+        this.$refs.imageUpload.handleRemove(file);
         this.uploadedSuccessfully();
       }
     },
@@ -222,8 +227,9 @@ export default {
       const findex = this.fileList.map(f => f.name).indexOf(file.name);
       if (findex > -1) {
         this.fileList.splice(findex, 1);
-        this.$emit("input", this.listToString(this.fileList));
+        this.$emit("input", this.listToString(this.fileList).split(','));
       }
+      //console.log(this.listToString(this.fileList));
     },
     // 上传失败
     handleUploadError() {
@@ -236,7 +242,8 @@ export default {
         this.fileList = this.fileList.concat(this.uploadList);
         this.uploadList = [];
         this.number = 0;
-        this.$emit("input", this.listToString(this.fileList));
+        this.$emit("input", this.listToString(this.fileList).split(','));
+        //console.log(this.listToString(this.fileList));
         this.$modal.closeLoading();
       }
     },
@@ -246,6 +253,7 @@ export default {
       this.dialogVisible = true;
     },
     // 对象转成指定字符串分隔
+    //将http://example.com/file1.jpg转为file1.jpg
     listToString(list, separator) {
       let strs = "";
       separator = separator || ",";
@@ -254,7 +262,7 @@ export default {
           strs += list[i].url.replace(this.baseUrl, "") + separator;
         }
       }
-      return strs != '' ? strs.substr(0, strs.length - 1) : '';
+      return strs !== '' ? strs.substr(0, strs.length - 1) : '';
     }
   }
 
@@ -272,12 +280,12 @@ function generateUniqueFileName(file) {
 <style scoped lang="scss">
 // .el-upload--picture-card 控制加号部分
 ::v-deep.hide .el-upload--picture-card {
-    display: none;
+  display: none;
 }
 // 去掉动画效果
 ::v-deep .el-list-enter-active,
 ::v-deep .el-list-leave-active {
-    transition: all 0s;
+  transition: all 0s;
 }
 
 ::v-deep .el-list-enter, .el-list-leave-active {
@@ -285,4 +293,3 @@ function generateUniqueFileName(file) {
   transform: translateY(0);
 }
 </style>
-

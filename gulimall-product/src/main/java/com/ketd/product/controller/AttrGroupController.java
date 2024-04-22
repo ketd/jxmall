@@ -1,27 +1,26 @@
 package com.ketd.product.controller;
 
 
-import java.util.Arrays;
-import java.util.List;
-
-
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ketd.common.domain.PageRequest;
+import com.ketd.common.domain.TableDataInfo;
+import com.ketd.common.result.Result;
+import com.ketd.product.domain.AttrGroup;
+import com.ketd.product.service.IAttrGroupService;
 import com.ketd.product.service.ICategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-
-import com.ketd.common.result.Result;
-import com.ketd.common.domain.TableDataInfo;
-import com.ketd.common.domain.PageRequest;
-
-import com.ketd.product.domain.AttrGroup;
-import com.ketd.product.service.IAttrGroupService;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -30,6 +29,8 @@ import com.ketd.product.service.IAttrGroupService;
  * @author ketd
  * @date 2024-04-13
  */
+@NoArgsConstructor
+@Data
 @Tag(name = "属性分组Controller")
 @RestController
 @RequestMapping("/product/AttrGroup")
@@ -74,6 +75,16 @@ public class AttrGroupController {
 
     }
 
+
+    @Operation(summary = "获取属性分组详细信息")
+    @GetMapping("/list/withoutAttrs")
+    public Result<?> getAttrGroupWithoutAttrs(@RequestParam("cateLogId") Long cateLogId) {
+
+
+        return Result.ok(attrGroupService.getAttrGroupWithoutAttrs(cateLogId));
+
+    }
+
     /**
      * 获取属性分组详细信息
      */
@@ -112,4 +123,5 @@ public class AttrGroupController {
     public Result<?> remove(@RequestBody Long[] attrGroupIds) {
         return Result.ok(attrGroupService.deleteAttrGroupByAttrGroupIds(attrGroupIds));
     }
+
 }

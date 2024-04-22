@@ -1,0 +1,21 @@
+package com.ketd.common.domain.${moduleName};
+
+
+#foreach ($import in $importList)
+import ${import};
+#end
+import lombok.Data;
+import java.io.Serializable;
+
+
+@Data
+public class ${ClassName}TO  implements Serializable
+{
+
+
+    #foreach ($column in $columns)
+    private $column.javaType $column.javaField;
+    #end
+
+
+}

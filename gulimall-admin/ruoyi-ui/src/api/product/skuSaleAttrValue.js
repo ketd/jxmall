@@ -1,5 +1,5 @@
 import axios from 'axios';
-const baseURL = process.env.VUE_APP_PRODUCT_BASE_API;
+const baseURL = process.env.VUE_APP_GULIMALL_ADMIN_BASE_API;
 
 // 分页查询sku销售属性&值列表
 export function listSkuSaleAttrValuePage(queryParams) {

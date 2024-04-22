@@ -10,7 +10,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
+
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

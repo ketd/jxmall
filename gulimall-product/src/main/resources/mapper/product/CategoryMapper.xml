@@ -4,7 +4,7 @@
 <mapper namespace="com.ketd.product.mapper.CategoryMapper">
 
     <!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="com.ketd.product.domain.Category" id="${classname}Map">
+    <resultMap type="com.ketd.product.domain.Category" id="BaseResultMap">
             <result property="catId"    column="cat_id"    />
             <result property="name"    column="name"    />
             <result property="parentCid"    column="parent_cid"    />
@@ -16,6 +16,9 @@
             <result property="productCount"    column="product_count"    />
     </resultMap>
 
+    <sql id="Base_Column_List">
+cat_id,name,parent_cid,cat_level,show_status,sort,icon,product_unit,product_count
+    </sql>
 
 </mapper>
 

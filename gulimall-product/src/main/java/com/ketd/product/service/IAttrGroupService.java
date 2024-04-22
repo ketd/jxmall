@@ -2,6 +2,9 @@ package com.ketd.product.service;
 
 
 import java.util.List;
+
+import com.ketd.common.result.Result;
+import com.ketd.product.vo.AttrGroupWithAttrsVo;
 import jakarta.servlet.http.HttpServletResponse;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ketd.product.domain.AttrGroup;
@@ -66,4 +69,6 @@ public interface IAttrGroupService  extends IService<AttrGroup> {
      * 导出属性分组列表
      */
     void export(List<AttrGroup> list, HttpServletResponse response);
+
+    List<AttrGroupWithAttrsVo> getAttrGroupWithoutAttrs(Long cateLogId);
 }

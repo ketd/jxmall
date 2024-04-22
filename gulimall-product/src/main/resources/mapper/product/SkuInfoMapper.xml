@@ -4,7 +4,7 @@
 <mapper namespace="com.ketd.product.mapper.SkuInfoMapper">
 
     <!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="com.ketd.product.domain.SkuInfo" id="${classname}Map">
+    <resultMap type="com.ketd.product.domain.SkuInfo" id="BaseResultMap">
             <result property="skuId"    column="sku_id"    />
             <result property="spuId"    column="spu_id"    />
             <result property="skuName"    column="sku_name"    />
@@ -18,6 +18,9 @@
             <result property="saleCount"    column="sale_count"    />
     </resultMap>
 
+    <sql id="Base_Column_List">
+sku_id,spu_id,sku_name,sku_desc,catalog_id,brand_id,sku_default_img,sku_title,sku_subtitle,price,sale_count
+    </sql>
 
 </mapper>
 

@@ -153,7 +153,7 @@
           <el-input v-model="form.name" placeholder="请输入品牌名"/>
         </el-form-item>
         <el-form-item label="品牌logo地址" prop="logo">
-          <image-upload v-model="form.logo" @upload-success="handleUploadSuccess"/>
+          <image-upload v-model="form.logo"/>
         </el-form-item>
         <el-form-item label="介绍" prop="descript">
           <el-input v-model="form.descript" type="textarea" placeholder="请输入内容"/>
@@ -378,12 +378,14 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.form.brandId != null) {
+            this.form.logo = this.form.logo.map(filename => filename).join(", ");
             updateBrand(this.form).then(response => {
               this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
+            this.form.logo = this.form.logo.map(filename => filename).join(", ");
             addBrand(this.form).then(response => {
               this.$modal.msgSuccess("新增成功");
               this.open = false;
@@ -429,9 +431,6 @@ export default {
         console.log("导出失败");
       });
 
-    },
-    handleUploadSuccess(fileName) {
-      this.form.logo = fileName;
     },
     getAttrAttrgroupRelation() {
       this.listCategoryBrandRelationPageParams.data.brandId = this.getAttrAttrgroupRelationBrandId;

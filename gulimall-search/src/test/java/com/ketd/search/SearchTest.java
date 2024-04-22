@@ -68,12 +68,12 @@ public class SearchTest {
 
         User user = new User();
         user.setId(1);
-        user.setName("张三");
+        user.setName("大傻子");
         user.setAge(22);
 
         CreateRequest<User> createRequest = new CreateRequest.Builder<User>()
                 .index("test")
-                .id("1")
+                .id("20")
                 .document(user)
                 .build();
 

@@ -2,6 +2,10 @@ package com.ketd.product.service;
 
 
 import java.util.List;
+
+import com.ketd.common.result.Result;
+import com.ketd.product.domain.SpuInfoDesc;
+import com.ketd.product.vo.SpuSaveVo;
 import jakarta.servlet.http.HttpServletResponse;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ketd.product.domain.SpuInfo;
@@ -66,4 +70,12 @@ public interface ISpuInfoService  extends IService<SpuInfo> {
      * 导出spu信息列表
      */
     void export(List<SpuInfo> list, HttpServletResponse response);
+
+
+    Result<?> saveSpuInfo(SpuSaveVo spuInfo);
+
+    void saveBaseSpuInfo(SpuInfo spuInfo);
+
+
+    Result<?> up(Long[] ids);
 }

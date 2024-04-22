@@ -4,7 +4,7 @@
 <mapper namespace="com.ketd.product.mapper.SpuImagesMapper">
 
     <!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="com.ketd.product.domain.SpuImages" id="${classname}Map">
+    <resultMap type="com.ketd.product.domain.SpuImages" id="BaseResultMap">
             <result property="id"    column="id"    />
             <result property="spuId"    column="spu_id"    />
             <result property="imgName"    column="img_name"    />
@@ -13,6 +13,9 @@
             <result property="defaultImg"    column="default_img"    />
     </resultMap>
 
+    <sql id="Base_Column_List">
+id,spu_id,img_name,img_url,img_sort,default_img
+    </sql>
 
 </mapper>
 

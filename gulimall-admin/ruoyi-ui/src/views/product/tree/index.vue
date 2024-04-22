@@ -3,7 +3,7 @@ import axios from 'axios';
 import {getToken} from "@/utils/auth";
 
 
-const baseURL = process.env.VUE_APP_PRODUCT_BASE_API;
+const baseURL = process.env.VUE_APP_GULIMALL_ADMIN_BASE_API;
 
 export default {
   components:{},

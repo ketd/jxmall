@@ -3,9 +3,12 @@ package com.ketd.product.service.impl;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.ketd.product.domain.Attr;
+import com.ketd.product.vo.SpuSaveVo;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +17,7 @@ import org.springframework.context.annotation.Primary;
 import com.ketd.product.mapper.ProductAttrValueMapper;
 import com.ketd.product.domain.ProductAttrValue;
 import com.ketd.product.service.IProductAttrValueService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -29,6 +33,8 @@ public class ProductAttrValueServiceImpl extends ServiceImpl<ProductAttrValueMap
     @Autowired
     private ProductAttrValueMapper productAttrValueMapper;
 
+    @Autowired
+    private AttrServiceImpl  attrService;
 
 
     /**
@@ -132,5 +138,31 @@ public class ProductAttrValueServiceImpl extends ServiceImpl<ProductAttrValueMap
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Transactional
+    @Override
+    public void saveProductAttrValue(Long id, List<SpuSaveVo.BaseAttrsVO> baseAttrs) {
+        List<ProductAttrValue> collect = baseAttrs.stream().map(attr -> {
+            ProductAttrValue productAttrValue = new ProductAttrValue();
+            productAttrValue.setAttrId(attr.getAttrId());
+            Attr attrId = attrService.getById(attr.getAttrId());
+            productAttrValue.setAttrName(attrId.getAttrName());
+            productAttrValue.setAttrValue(attr.getAttrValues());
+            productAttrValue.setQuickShow(attr.getShowDesc());
+            productAttrValue.setSpuId(id);
+            return productAttrValue;
+        }).collect(Collectors.toList());
+        this.saveBatch(collect);
+
+    }
+
+    @Override
+    public List<ProductAttrValue> baseAttrListForSpu(Long id) {
+
+        ProductAttrValue  productAttrValue = new ProductAttrValue();
+        productAttrValue.setSpuId(id);
+        List<ProductAttrValue> list = this.list(new QueryWrapper<>(productAttrValue));
+        return list;
     }
 }

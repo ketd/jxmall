@@ -133,4 +133,16 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void saveSkuInfo(SkuInfo skuInfo) {
+        skuInfoMapper.insert(skuInfo);
+    }
+
+    @Override
+    public List<SkuInfo> getSkuInfoBySpuId(Long id) {
+        SkuInfo skuInfo = new SkuInfo();
+        skuInfo.setSpuId(id);
+        return this.list(new QueryWrapper<>(skuInfo));
+    }
 }

@@ -36,6 +36,8 @@ import com.ketd.product.service.IAttrAttrgroupRelationService;
 @RequestMapping("/product/AttrAttrgroupRelation")
 public class AttrAttrgroupRelationController{
 
+
+
     @Autowired
     private IAttrAttrgroupRelationService attrAttrgroupRelationService;
 

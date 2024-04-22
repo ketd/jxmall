@@ -24,6 +24,8 @@ import lombok.Data;
 @Data
 public class Attr  implements Serializable
 {
+
+
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -67,9 +69,6 @@ public class Attr  implements Serializable
         @Schema(description =  "所属分类")
         private Long catelogId;
 
-        @ExcelProperty(value = "所属分组id")
-        @Schema(description =  "所属分组id")
-        private Long attrGroupId;
 
         @ExcelProperty(value = "快速展示【是否展示在介绍上；0-否 1-是】，在sku中仍然可以调整")
         @Schema(description =  "快速展示【是否展示在介绍上；0-否 1-是】，在sku中仍然可以调整")

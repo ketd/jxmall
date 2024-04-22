@@ -58,7 +58,14 @@ public class CategoryBrandRelationController{
         IPage<CategoryBrandRelation> categoryBrandRelationPage = categoryBrandRelationService.page(page, queryWrapper);
         return TableDataInfo.getDataTable(categoryBrandRelationPage.getRecords(), categoryBrandRelationPage.getTotal());
 
+    }
 
+    @Operation(summary ="询品牌分类关联列表")
+    @GetMapping("/list/brands")
+    public Result<?>  selectBrandsByCatId(@RequestParam(value = "catId") Long catId)
+    {
+
+        return categoryBrandRelationService.selectBrandsByCatId(catId);
 
     }
 

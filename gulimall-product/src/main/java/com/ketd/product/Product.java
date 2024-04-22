@@ -4,6 +4,8 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 
 /**
@@ -13,10 +15,12 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
  * @Author: ketd
  * @CreateTime: 2024-04-05  13:21
  */
-@SpringBootApplication
-@MapperScan("com.ketd.product.mapper")
-@EnableDiscoveryClient
 
+@MapperScan("com.ketd.product.mapper")
+@SpringBootApplication
+@EnableDiscoveryClient
+@EnableTransactionManagement
+@EnableFeignClients(basePackages = {"com.ketd.common.api"})
 public class Product {
     public static void main(String[] args) {
         SpringApplication.run(Product.class, args);

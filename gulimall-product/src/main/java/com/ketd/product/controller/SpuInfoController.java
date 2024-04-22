@@ -10,6 +10,7 @@ import java.util.List;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.ketd.product.vo.SpuSaveVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -62,6 +63,16 @@ public class SpuInfoController{
 
     }
 
+    /**
+     * 新增spu信息
+     */
+    @Operation(summary = "新增spu信息")
+    @PostMapping("/save/info")
+    public Result<?>  save(@RequestBody SpuSaveVo spuInfoVo)
+    {
+        return spuInfoService.saveSpuInfo(spuInfoVo);
+    }
+
 
     /**
      * 导出spu信息列表
@@ -88,7 +99,7 @@ public class SpuInfoController{
     /**
      * 新增spu信息
      */
-    @Operation(summary = "新增spu信息")
+    @Operation(summary = "保存spu信息")
     @PostMapping("/save")
     public Result<?> add(@RequestBody SpuInfo spuInfo)
     {
@@ -114,4 +125,13 @@ public class SpuInfoController{
     {
         return Result.ok(spuInfoService.deleteSpuInfoByIds(ids));
     }
+
+    @PostMapping
+    public Result<?> up(@RequestBody Long[] ids)
+    {
+       return spuInfoService.up(ids);
+    }
+
+
+
 }

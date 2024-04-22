@@ -13,7 +13,7 @@
 
 <script>
 import { isExternal } from "@/utils/validate";
-
+const bucket_url = process.env.VUE_APP_BUCKET_COS_BASE_URL;
 export default {
   name: "ImagePreview",
   props: {
@@ -39,7 +39,7 @@ export default {
       if (isExternal(real_src)) {
         return real_src;
       }
-      return process.env.VUE_APP_BASE_API + real_src;
+      return bucket_url + real_src;
     },
     realSrcList() {
       if (!this.src) {
@@ -51,7 +51,7 @@ export default {
         if (isExternal(item)) {
           return srcList.push(item);
         }
-        return srcList.push(process.env.VUE_APP_BASE_API + item);
+        return srcList.push(bucket_url + item);
       });
       return srcList;
     },

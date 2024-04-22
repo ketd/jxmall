@@ -58,8 +58,6 @@ public class ProductAttrValueController{
         IPage<ProductAttrValue> productAttrValuePage = productAttrValueService.page(page, queryWrapper);
         return TableDataInfo.getDataTable(productAttrValuePage.getRecords(), productAttrValuePage.getTotal());
 
-
-
     }
 
 

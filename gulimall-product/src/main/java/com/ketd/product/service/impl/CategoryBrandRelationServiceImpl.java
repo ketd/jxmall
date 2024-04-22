@@ -162,4 +162,14 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
             e.printStackTrace();
         }
     }
+
+    @Override
+    public Result<?> selectBrandsByCatId(Long catId) {
+        try {
+            List<CategoryBrandRelation> list = categoryBrandRelationMapper.selectAllByCatelogId(catId);
+            return Result.ok(list);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

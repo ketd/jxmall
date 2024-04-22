@@ -66,4 +66,8 @@ public interface ISkuInfoService  extends IService<SkuInfo> {
      * 导出sku信息列表
      */
     void export(List<SkuInfo> list, HttpServletResponse response);
+
+    void saveSkuInfo(SkuInfo skuInfo);
+
+    List<SkuInfo> getSkuInfoBySpuId(Long id);
 }

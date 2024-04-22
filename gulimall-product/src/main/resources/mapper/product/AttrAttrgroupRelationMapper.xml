@@ -4,13 +4,37 @@
 <mapper namespace="com.ketd.product.mapper.AttrAttrgroupRelationMapper">
 
     <!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="com.ketd.product.domain.AttrAttrgroupRelation" id="${classname}Map">
+    <resultMap type="com.ketd.product.domain.AttrAttrgroupRelation" id="BaseResultMap">
             <result property="id"    column="id"    />
             <result property="attrId"    column="attr_id"    />
             <result property="attrGroupId"    column="attr_group_id"    />
             <result property="attrSort"    column="attr_sort"    />
     </resultMap>
 
+    <sql id="Base_Column_List">
+id,attr_id,attr_group_id,attr_sort
+    </sql>
+    <select id="findOneByAttrId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from pms_attr_attrgroup_relation
+        where
+        attr_id = #{attrId,jdbcType=NUMERIC}
+    </select>
+    <select id="findOneByAttrGroupId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from pms_attr_attrgroup_relation
+        where
+        attr_group_id = #{attrGroupId,jdbcType=NUMERIC}
+    </select>
+    <select id="findAllByAttrGroupId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from pms_attr_attrgroup_relation
+        where
+        attr_group_id = #{attrGroupId,jdbcType=NUMERIC}
+    </select>
 
 </mapper>
 

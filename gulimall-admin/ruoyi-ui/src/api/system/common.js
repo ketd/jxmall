@@ -1,5 +1,5 @@
 import axios from "axios";
-const baseURL = process.env.VUE_APP_PRODUCT_BASE_API;
+const baseURL = process.env.VUE_APP_GULIMALL_ADMIN_BASE_API;
 
 export function getUploadUrl(img) {
   return axios({

@@ -41,11 +41,11 @@ module.exports = {
           ['^' + process.env.VUE_APP_BASE_API]: ''
         }
       },
-      [process.env.VUE_APP_PRODUCT_BASE_API]: {
+      [process.env.VUE_APP_GULIMALL_ADMIN_BASE_API]: {
         target: `http://localhost:8000`, // 在目标地址中添加 "/product"
         changeOrigin: true,
         pathRewrite: {
-          ['^' + process.env.VUE_APP_PRODUCT_BASE_API]: ''
+          ['^' + process.env.VUE_APP_GULIMALL_ADMIN_BASE_API]: ''
         }
       }
     },

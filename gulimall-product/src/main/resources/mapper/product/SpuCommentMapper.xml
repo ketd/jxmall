@@ -4,7 +4,7 @@
 <mapper namespace="com.ketd.product.mapper.SpuCommentMapper">
 
     <!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="com.ketd.product.domain.SpuComment" id="${classname}Map">
+    <resultMap type="com.ketd.product.domain.SpuComment" id="BaseResultMap">
             <result property="id"    column="id"    />
             <result property="skuId"    column="sku_id"    />
             <result property="spuId"    column="spu_id"    />
@@ -23,6 +23,9 @@
             <result property="commentType"    column="comment_type"    />
     </resultMap>
 
+    <sql id="Base_Column_List">
+id,sku_id,spu_id,spu_name,member_nick_name,star,member_ip,create_time,show_status,spu_attributes,likes_count,reply_count,resources,content,member_icon,comment_type
+    </sql>
 
 </mapper>
 

@@ -1,5 +1,5 @@
 import axios from 'axios';
-const baseURL = process.env.VUE_APP_PRODUCT_BASE_API;
+const baseURL = process.env.VUE_APP_GULIMALL_ADMIN_BASE_API;
 
 // 分页查询品牌分类关联列表
 export function listCategoryBrandRelationPage(queryParams) {

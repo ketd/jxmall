@@ -68,4 +68,6 @@ public interface ICategoryBrandRelationService  extends IService<CategoryBrandRe
      * 导出品牌分类关联列表
      */
     void export(List<CategoryBrandRelation> list, HttpServletResponse response);
+
+    Result<?> selectBrandsByCatId(Long catId);
 }

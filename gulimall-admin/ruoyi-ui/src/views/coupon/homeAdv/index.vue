@@ -170,13 +170,13 @@
                           <el-input v-model="form.name" placeholder="请输入名字" />
                         </el-form-item>
                         <el-form-item label="图片地址" prop="pic">
-                          <image-upload v-model="form.pic" @upload-success="handleUploadSuccess"/>
+                          <image-upload v-model="form.pic" />
                         </el-form-item>
                         <el-form-item label="开始时间" prop="startTime">
                           <el-date-picker clearable
                                           v-model="form.startTime"
                                           type="date"
-                                          value-format="yyyy-MM-dd"
+                                          value-format="yyyy-MM-dd HH:mm:ss"
                                           placeholder="请选择开始时间">
                           </el-date-picker>
                         </el-form-item>
@@ -184,7 +184,7 @@
                           <el-date-picker clearable
                                           v-model="form.endTime"
                                           type="date"
-                                          value-format="yyyy-MM-dd"
+                                          value-format="yyyy-MM-dd HH:mm:ss"
                                           placeholder="请选择结束时间">
                           </el-date-picker>
                         </el-form-item>
@@ -345,12 +345,18 @@
         this.$refs["form"].validate(valid => {
           if (valid) {
             if (this.form.id != null) {
+              if (Array.isArray(this.form.pic)) { // 确保 this.form.pic 是数组
+                this.form.pic = this.form.pic.map(filename => filename).join(", ");
+              }
               updateHomeAdv(this.form).then(response => {
                 this.$modal.msgSuccess("修改成功");
                 this.open = false;
                 this.getList();
               });
             } else {
+              if (Array.isArray(this.form.pic)) { // 确保 this.form.pic 是数组
+                this.form.pic = this.form.pic.map(filename => filename).join(", ");
+              }
               addHomeAdv(this.form).then(response => {
                 this.$modal.msgSuccess("新增成功");
                 this.open = false;
@@ -387,10 +393,7 @@
     console.log("导出失败");
     });
 
-  },
-  handleUploadSuccess(fileName) {
-    this.form.authId = fileName;
-  },
+  }
   }
   };
 </script>

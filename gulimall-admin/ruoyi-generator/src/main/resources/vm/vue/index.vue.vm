@@ -42,7 +42,7 @@
                     <el-date-picker clearable
                                     v-model="queryParams.data.${column.javaField}"
                                     type="date"
-                                    value-format="yyyy-MM-dd"
+                                    value-format="yyyy-MM-dd HH:mm:ss"
                                     placeholder="请选择${comment}">
                     </el-date-picker>
                   </el-form-item>
@@ -51,7 +51,7 @@
                     <el-date-picker
                         v-model="daterange${AttrName}"
                         style="width: 240px"
-                        value-format="yyyy-MM-dd"
+                        value-format="yyyy-MM-dd HH:mm:ss"
                         type="daterange"
                         range-separator="-"
                         start-placeholder="开始日期"

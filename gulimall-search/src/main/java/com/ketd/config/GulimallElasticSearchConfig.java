@@ -39,7 +39,7 @@ public class GulimallElasticSearchConfig{
 
     final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
     credentialsProvider.setCredentials(AuthScope.ANY,
-            new UsernamePasswordCredentials("elastic","PmxV-4PT8FAYTj2FZlr6"));
+            new UsernamePasswordCredentials("elastic","sacred624?"));
     Resource resource = new ClassPathResource("certs/http_ca.crt");
     CertificateFactory factory = CertificateFactory.getInstance("X.509");
     Certificate trustedCa;

@@ -85,3 +85,12 @@ export function exportSpuInfo(ids) {
   });
 }
 
+export function upProduct(spuIds) {
+  return axios({
+    baseURL: baseURL,
+    url: '/product/SpuInfo/up',
+    method: 'post',
+    data: spuIds
+  })
+}
+

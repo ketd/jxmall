@@ -126,7 +126,7 @@ public class SpuInfoController{
         return Result.ok(spuInfoService.deleteSpuInfoByIds(ids));
     }
 
-    @PostMapping
+    @PostMapping("/up")
     public Result<?> up(@RequestBody Long[] ids)
     {
        return spuInfoService.up(ids);

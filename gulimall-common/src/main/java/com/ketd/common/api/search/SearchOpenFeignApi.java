@@ -19,6 +19,6 @@ import java.util.List;
  */
 @FeignClient(value = "cloud-search-service")
 public interface SearchOpenFeignApi {
-    @PostMapping("/search/up")
+    @PostMapping("/search/save/product")
     public Result<?> upProduct(@RequestBody List<SkuEsModel> skuInfoTO);
 }

@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.ketd.common.api.coupon.*;
 import com.ketd.common.api.search.SearchOpenFeignApi;
 import com.ketd.common.api.ware.WareSkuOpenFeignApi;
@@ -43,76 +44,40 @@ import static com.ketd.common.excel.excel.extracted;
 @Primary
 public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoMapper, SpuInfo> implements ISpuInfoService {
 
-
-    private final SpuInfoMapper spuInfoMapper;
-
-    private final SpuInfoDescServiceImpl spuInfoDescService;
-
-    private final SpuImagesServiceImpl spuImagesService;
-
-    private final SkuInfoServiceImpl skuInfoServiceImpl;
-
-    private final ProductAttrValueServiceImpl productAttrValueService;
-
-    private final SkuImagesServiceImpl skuImagesService;
-
-    private final SkuSaleAttrValueServiceImpl skuSaleAttrValueService;
-
-    private final SpuBoundsOpenFeignApi spuBoundsOpenFeignApi;
-
-    private final SkuFullReductionOpenFeignApi skuFullReductionOpenFeignApi;
-
-    private final SkuLadderOpenFeignApi skuLadderOpenFeignApi;
-
-    private final MemberPriceOpenFeignApi memberPriceOpenFeignApi;
-
-
-    private final BrandServiceImpl brandService;
-
-    private final  CategoryServiceImpl  categoryService;
-
-    private final  AttrServiceImpl attrService;
-
-    private final WareSkuOpenFeignApi   wareSkuOpenFeignApi;
-
-    private final SearchOpenFeignApi searchOpenFeignApi;
+    @Autowired
+    private SpuInfoMapper spuInfoMapper;
+    @Autowired
+    private SpuInfoDescServiceImpl spuInfoDescService;
+    @Autowired
+    private SpuImagesServiceImpl spuImagesService;
+    @Autowired
+    private SkuInfoServiceImpl skuInfoServiceImpl;
+    @Autowired
+    private ProductAttrValueServiceImpl productAttrValueService;
+    @Autowired
+    private SkuImagesServiceImpl skuImagesService;
+    @Autowired
+    private SkuSaleAttrValueServiceImpl skuSaleAttrValueService;
+    @Autowired
+    private SpuBoundsOpenFeignApi spuBoundsOpenFeignApi;
+    @Autowired
+    private SkuFullReductionOpenFeignApi skuFullReductionOpenFeignApi;
+    @Autowired
+    private SkuLadderOpenFeignApi skuLadderOpenFeignApi;
+    @Autowired
+    private MemberPriceOpenFeignApi memberPriceOpenFeignApi;
 
     @Autowired
-    private SpuInfoServiceImpl(
-            SpuInfoMapper spuInfoMapper,
-            SpuInfoDescServiceImpl spuInfoDescService,
-            SpuImagesServiceImpl spuImagesService,
-            SkuInfoServiceImpl skuInfoServiceImpl,
-            ProductAttrValueServiceImpl productAttrValueService,
-            SkuImagesServiceImpl skuImagesService,
-            SkuSaleAttrValueServiceImpl skuSaleAttrValueService,
-            SpuBoundsOpenFeignApi spuBoundsOpenFeignApi,
-            SkuFullReductionOpenFeignApi skuFullReductionOpenFeignApi,
-            SkuLadderOpenFeignApi skuLadderOpenFeignApi,
-            MemberPriceOpenFeignApi memberPriceOpenFeignApi,
-            BrandServiceImpl brandService,
-            CategoryServiceImpl categoryService,
-            AttrServiceImpl attrService,
-            WareSkuOpenFeignApi wareSkuOpenFeignApi,
-            SearchOpenFeignApi  searchOpenFeignApi
-    ) {
-        this.spuInfoMapper = spuInfoMapper;
-        this.spuInfoDescService = spuInfoDescService;
-        this.spuImagesService = spuImagesService;
-        this.skuInfoServiceImpl = skuInfoServiceImpl;
-        this.productAttrValueService = productAttrValueService;
-        this.skuImagesService = skuImagesService;
-        this.skuSaleAttrValueService = skuSaleAttrValueService;
-        this.spuBoundsOpenFeignApi = spuBoundsOpenFeignApi;
-        this.skuFullReductionOpenFeignApi = skuFullReductionOpenFeignApi;
-        this.skuLadderOpenFeignApi = skuLadderOpenFeignApi;
-        this.memberPriceOpenFeignApi = memberPriceOpenFeignApi;
-        this.brandService = brandService;
-        this.categoryService = categoryService;
-        this.attrService = attrService;
-        this.wareSkuOpenFeignApi = wareSkuOpenFeignApi;
-        this.searchOpenFeignApi = searchOpenFeignApi;
-    }
+    private BrandServiceImpl brandService;
+    @Autowired
+    private CategoryServiceImpl categoryService;
+    @Autowired
+    private AttrServiceImpl attrService;
+    @Autowired
+    private WareSkuOpenFeignApi wareSkuOpenFeignApi;
+
+    @Autowired
+    private SearchOpenFeignApi searchOpenFeignApi;
 
 
     /**
@@ -341,36 +306,36 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoMapper, SpuInfo> impl
     // 这段代码的主要功能是使用搜索微服务（searchOpenFeignApi）将商品数据（SkuEsModel）上架到搜索系统中，下面是加上中文注释后的代码：
     @Override
     public Result<?> up(Long[] supIds) {
+        List<SpuInfo> spuInfoList = this.listByIds(Arrays.asList(supIds));
         for (Long id : supIds) {
             //            查询出 spu 下的所有 sku 信息
             List<SkuInfo> skuInfoList = skuInfoServiceImpl.getSkuInfoBySpuId(id);
             //            查询出 spu 下的基本属性
             List<ProductAttrValue> productBaesAttrValueList = productAttrValueService.baseAttrListForSpu(id);
             //            取出所有属性的 id
-            List<Long> attrIds =  productBaesAttrValueList.stream().map(ProductAttrValue::getAttrId).toList();
+            List<Long> attrIds = productBaesAttrValueList.stream().map(ProductAttrValue::getAttrId).toList();
             //            查询出需要被检索的属性
             List<Long> searchAttrIds = attrService.selectSearchAttrs(attrIds);
             //            利用集合去重，将需要检索的属性 id 集合转换为 set
             Set<Long> idSet = new HashSet<>(searchAttrIds);
             //            查询出所有需要被检索的属性
-            List<SkuEsModel.Attribute>  attributes =   productBaesAttrValueList.stream().filter(productAttrValue -> {
+            List<SkuEsModel.Attribute> attributes = productBaesAttrValueList.stream().filter(productAttrValue -> {
                 //                    判断当前的属性是否在需要检索的属性集合中
                 return idSet.contains(productAttrValue.getAttrId());
             }).map(productAttrValue -> {
                 //                    创建一个新的 SkuEsModel.Attribute 对象
-                SkuEsModel.Attribute  attribute = new SkuEsModel.Attribute();
+                SkuEsModel.Attribute attribute = new SkuEsModel.Attribute();
                 //                    使用 BeanUtils 工具类将当前的 ProductAttrValue 对象中的属性拷贝到新的对象中
                 BeanUtils.copyProperties(productAttrValue, attribute);
                 //                    返回新的对象
-                return   attribute;
+                return attribute;
             }).toList();
 
 
-
             //            查询出所有 sku 的库存信息
-            List<HasStockTo>  hasStockToList =  wareSkuOpenFeignApi.hasStock(skuInfoList.stream().map(SkuInfo::getSkuId).toList()).getData();
+            List<HasStockTo> hasStockToList = wareSkuOpenFeignApi.hasStock(skuInfoList.stream().map(SkuInfo::getSkuId).toList()).getData();
             //            将所有返回的 HasStockTo 对象根据 skuId 进行分组，生成一个 Map，key 为 skuId，value 为库存信息
-            Map<Long, Boolean>  hasStockMap =  hasStockToList.stream().collect(Collectors.toMap(  HasStockTo::getSkuId, HasStockTo::getHasStock));
+            Map<Long, Boolean> hasStockMap = hasStockToList.stream().collect(Collectors.toMap(HasStockTo::getSkuId, HasStockTo::getHasStock));
 
             //            将所有需要上架的 SkuEsModel 对象生成出来
             List<SkuEsModel> skuEsModels = skuInfoList.stream().map(skuInfo -> {
@@ -388,9 +353,8 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoMapper, SpuInfo> impl
                 skuEsModel.setHasStock(hasStockMap.get(skuInfo.getSkuId()));
 
 
-
                 //                    根据当前的 brandId 查询出当前的品牌信息
-                Brand  brand = brandService.getById(skuInfo.getBrandId());
+                Brand brand = brandService.getById(skuInfo.getBrandId());
                 //                    将当前的品牌名称设置为 skuEsModel 的 brandName 属性
                 skuEsModel.setBrandName(brand.getName());
                 //                    将当前的品牌logo设置为 skuEsModel 的 brandImg 属性
@@ -414,13 +378,29 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoMapper, SpuInfo> impl
             }).toList();
 
             //            使用搜索微服务批量上架商品
-            searchOpenFeignApi.upProduct(skuEsModels);
+            Result<?> result = searchOpenFeignApi.upProduct(skuEsModels);
+            if (result.getCode() == 200) {
+
+                for (SpuInfo spuInfo : spuInfoList) {
+                    if (Arrays.asList(supIds).contains(id)) {
+                        // 在这里进行你的操作，spuInfo 是与当前 ID 匹配的对象
+
+                        spuInfo.setPublishStatus(1L);
+                        spuInfo.setUpdateTime(new Date());
+                        this.updateById(spuInfo);
+
+                    }
+                }
+
+            }else {
+                return Result.error(result.getData());
+            }
 
 
         }
 
         //        返回成功
-        return null;
+        return Result.ok(null);
     }
 
 

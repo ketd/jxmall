@@ -19,6 +19,9 @@
     <sql id="Base_Column_List">
 id,spu_name,spu_description,catalog_id,brand_id,weight,publish_status,create_time,update_time
     </sql>
+    <update id="updateSpuStatus">
+
+    </update>
 
 </mapper>
 

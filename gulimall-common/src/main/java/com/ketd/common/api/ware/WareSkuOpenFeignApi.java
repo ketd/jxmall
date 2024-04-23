@@ -41,7 +41,7 @@ public interface WareSkuOpenFeignApi {
     @DeleteMapping("/ware/WareSku/delete")
     public Result<?> remove(@RequestBody Long[] ids);
 
-    @PostMapping("/hasStock")
+    @PostMapping("/ware/WareSku/hasStock")
     public Result<List<HasStockTo>> hasStock(@RequestBody List<Long> skuIds);
 
 }

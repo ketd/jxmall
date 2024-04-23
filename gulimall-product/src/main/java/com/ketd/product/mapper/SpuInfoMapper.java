@@ -3,6 +3,7 @@ package com.ketd.product.mapper;
 
 import com.ketd.product.domain.SpuInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 
 /**
@@ -14,4 +15,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 public interface SpuInfoMapper extends BaseMapper<SpuInfo>
 {
 
+    static void updateSpuStatus(@Param("id") Long id, @Param("i") int i) {
+
+    }
 }

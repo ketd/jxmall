@@ -113,6 +113,17 @@
         >导出
         </el-button>
       </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="warning"
+          plain
+          icon="el-icon-download"
+          size="mini"
+          @click="handleUp"
+          v-hasPermi="['product:skuInfo:export']"
+        >上架
+        </el-button>
+      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -156,6 +167,14 @@
             @click="handleDelete(scope.row)"
             v-hasPermi="['product:spuInfo:remove']"
           >删除
+          </el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-delete"
+            @click="handleUp(scope.row)"
+            v-hasPermi="['product:spuInfo:remove']"
+          >上架
           </el-button>
         </template>
       </el-table-column>
@@ -213,7 +232,7 @@ import {
   delSpuInfo,
   addSpuInfo,
   updateSpuInfo,
-  exportSpuInfo
+  exportSpuInfo, upProduct
 } from "@/api/product/spuInfo";
 import {parseTime} from "../../../utils/ruoyi";
 
@@ -374,6 +393,19 @@ export default {
       });
 
     },
+    handleUp(row){
+      const ids = [].concat(row.id !== undefined ? row.id : [], this.ids); // 将属性ID合并为一个数组
+      this.$modal.confirm('上架商品属性编号为"' + ids.join(', ') + '"的数据项？').then(() => {
+        return upProduct(ids).then((res) => {
+         if(res.data.code === 200){
+           this.$modal.msgSuccess("上架成功");
+           this.getList();
+         }else {
+           this.$modal.msgError("上架失败");
+         }
+        });
+      });
+    }
   }
 };
 </script>

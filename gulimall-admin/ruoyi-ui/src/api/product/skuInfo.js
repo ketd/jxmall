@@ -55,6 +55,8 @@ export function delSkuInfo(skuIds) {
 }
 
 
+
+
 // 导出sku信息属性
 export function exportSkuInfo(skuIds) {
   return axios({

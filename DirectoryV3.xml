@@ -2,21 +2,22 @@
  <trees>
      <tree path="/gilimall-ware" title="8000"/>
      <tree path="/RuoYi-Vue-master" title="8800"/>
-     <tree path="/gulimall-coupon" title="8002"/>
-     <tree path="/gulimall-member" title="8003"/>
-     <tree path="/gulimall-product" title="8001"/>
-     <tree path="/gulimall-order" title="8004"/>
-     <tree path="/gulimall-ware" title="8005"/>
-     <tree path="/gulimall-gateway" title="8000"/>
-     <tree path="/gulimall-search" title="8006"/>
-     <tree path="/gulimall-admin" title="7000"/>
-     <tree path="/gulimall-third-party/src/main/java/com/ketd/utils/GetCosStsClient.java" title="生成临时密钥"/>
-    <tree path="/gulimall-product/src/main/java/com/ketd/product/domain/Attr.java" title="商品属性对象"/>
-    <tree path="/gulimall-product/src/main/java/com/ketd/product/domain/AttrAttrgroupRelation.java"
+     <tree path="/jxmall-coupon" title="8002"/>
+     <tree path="/jxmall-member" title="8003"/>
+     <tree path="/jxmall-product" title="8001"/>
+     <tree path="/jxmall-order" title="8004"/>
+     <tree path="/jxmall-ware" title="8005"/>
+     <tree path="/jxmall-gateway" title="8000"/>
+     <tree path="/jxmall-search" title="8006"/>
+     <tree path="/jxmall-admin" title="7000"/>
+     <tree path="/jxmall-third-party/src/main/java/com/ketd/utils/GetCosStsClient.java" title="生成临时密钥"/>
+    <tree path="/jxmall-product/src/main/java/com/ketd/product/domain/Attr.java" title="商品属性对象"/>
+    <tree path="/jxmall-product/src/main/java/com/ketd/product/domain/AttrAttrgroupRelation.java"
           title="属性&属性分组关联对象"/>
-    <tree path="/gulimall-product/src/main/java/com/ketd/product/domain/AttrGroup.java" title="属性分组对象"/>
-    <tree path="/gulimall-product/src/main/java/com/ketd/product/domain/Brand.java" title="品牌对象"/>
-    <tree path="/gulimall-product/src/main/java/com/ketd/product/domain/Category.java" title="商品三级分类对象"/>
-    <tree path="/gulimall-product/src/main/java/com/ketd/product/domain/CategoryBrandRelation.java"
+    <tree path="/jxmall-product/src/main/java/com/ketd/product/domain/AttrGroup.java" title="属性分组对象"/>
+    <tree path="/jxmall-product/src/main/java/com/ketd/product/domain/Brand.java" title="品牌对象"/>
+    <tree path="/jxmall-product/src/main/java/com/ketd/product/domain/Category.java" title="商品三级分类对象"/>
+    <tree path="/jxmall-product/src/main/java/com/ketd/product/domain/CategoryBrandRelation.java"
           title="品牌分类关联对象"/>
+    <tree path="/jxmall-third-party" title="5000"/>
 </trees>

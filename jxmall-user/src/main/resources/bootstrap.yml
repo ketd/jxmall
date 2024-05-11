@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: cloud-user-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: http://123.57.215.188:8848/nacos
+      config:
+        server-addr: http://123.57.215.188:8848 #Nacos作为配置中心地址
+        file-extension: yaml #指定yaml格式的配置
+    sentinel:
+      transport:
+        dashboard: http://192.168.194.1:8080 #配置Sentinel dashboard控制台服务地址
+        port: 8719 #默认8719端口，假如被占用会自动从8719开始依次+1扫描,直至找到未被占用的端口

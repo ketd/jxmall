@@ -5,20 +5,21 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.ketd</groupId>
-    <artifactId>gulimall</artifactId>
+    <artifactId>jxmall</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
-        <module>gulimall-product</module>
-        <module>gulimall-ware</module>
-        <module>gulimall-order</module>
-        <module>gulimall-coupon</module>
-        <module>gulimall-member</module>
-        <module>gulimall-common</module>
-        <module>gulimall-gateway</module>
-        <module>gulimall-search</module>
-        <module>gulimall-admin</module>
-        <module>gulimall-third-party</module>
+        <module>jxmall-product</module>
+        <module>jxmall-ware</module>
+        <module>jxmall-order</module>
+        <module>jxmall-coupon</module>
+        <module>jxmall-member</module>
+        <module>jxmall-common</module>
+        <module>jxmall-gateway</module>
+        <module>jxmall-search</module>
+        <module>jxmall-admin</module>
+        <module>jxmall-third-party</module>
+        <module>jxmall-user</module>
 
 
     </modules>
@@ -35,6 +36,8 @@
         <druid.version>1.1.20</druid.version>
         <mybatis.springboot.version>3.0.2</mybatis.springboot.version>
         <mysql.version>8.0.11</mysql.version>
+        <redis.version>3.2.3</redis.version>
+        <redisson.version>3.27.2</redisson.version>
         <swagger3.version>2.2.0</swagger3.version>
         <mapper.version>4.2.3</mapper.version>
         <fastjson2.version>2.0.40</fastjson2.version>
@@ -55,6 +58,8 @@
         <poi.version>4.1.2</poi.version>
         <jwt.version>0.9.1</jwt.version>
         <spring-boot-starter-data-elasticsearch.version>3.2.0</spring-boot-starter-data-elasticsearch.version>
+        <spring-security-core-version>6.2.2</spring-security-core-version>
+        <spring-cache-version>3.2.4</spring-cache-version>
     </properties>
 
     <dependencyManagement>
@@ -110,6 +115,20 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid-spring-boot-starter</artifactId>
                 <version>${druid.version}</version>
+            </dependency>
+
+
+            <!-- redis-->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-redis</artifactId>
+                <version>${redis.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson-spring-boot-starter</artifactId>
+                <version>${redisson.version}</version>
             </dependency>
             <!--通用Mapper4之tk.mybatis-->
             <dependency>
@@ -239,6 +258,19 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>easyexcel</artifactId>
                 <version>3.3.4</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-core</artifactId>
+                <version>${spring-security-core-version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-cache</artifactId>
+                <version>${spring-cache-version}</version>
             </dependency>
         </dependencies>
 

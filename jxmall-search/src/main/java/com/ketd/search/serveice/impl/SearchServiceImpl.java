@@ -172,6 +172,7 @@ public class SearchServiceImpl implements SearchService {
                                                 if (StringUtils.hasLength(searchParam.getSkuPrice())) {
                                                     String[] priceRange = searchParam.getSkuPrice().split("(?<=\\d)(?=_)|(?<=_)(?=\\d)");
 
+                                                    System.out.println(priceRange.length);
                                                     if (priceRange.length == 3) {
                                                         filters.add(Query.of(qf -> qf
                                                                 .range(r -> r

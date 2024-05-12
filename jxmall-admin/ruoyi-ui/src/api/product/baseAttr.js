@@ -21,7 +21,6 @@ export function findAttrGroupRelation(queryParams) {
   })
 }
 export function noLinkAttrList(queryParams) {
-  queryParams.data.attrType=1;
   return axios({
     baseURL: baseURL,
     url: '/product/Attr/base/list/noBindAttrList/page',

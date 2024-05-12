@@ -49,11 +49,11 @@
               </el-input-number>
             </el-form-item>
            <el-form-item label="商品介绍" prop="decript">
-              <image-upload v-model="spu.decript"/>
+              <image-upload v-model="spu.decript" returnType="array"/>
             </el-form-item>
 
            <el-form-item label="商品图集" prop="images">
-              <image-upload v-model="spu.images"/>
+              <image-upload v-model="spu.images" returnType="array"/>
             </el-form-item>
             <el-form-item>
               <el-button type="success" @click="collectSpuBaseInfo">下一步：设置基本参数</el-button>
@@ -199,7 +199,7 @@
                 <el-row>
                   <el-col :span="24">
                     <label style="display:block;float:left">选择图集 或</label>
-                    <image-upload v-model="uploadImages"/>
+                    <image-upload v-model="uploadImages" returnType="array"/>
                   </el-col>
                   <el-col :span="24">
                     <el-divider></el-divider>

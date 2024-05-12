@@ -16,6 +16,13 @@
     <sql id="Base_Column_List">
 id,sku_id,attr_id,attr_name,attr_value,attr_sort
     </sql>
+    <select id="findAllBySkuId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from pms_sku_sale_attr_value
+        where
+        sku_id = #{skuId,jdbcType=NUMERIC}
+    </select>
 
 </mapper>
 

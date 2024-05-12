@@ -1,6 +1,7 @@
 package com.ketd.product.service.impl;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -132,5 +133,25 @@ public class SkuSaleAttrValueServiceImpl extends ServiceImpl<SkuSaleAttrValueMap
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public List<SkuSaleAttrValue> getSkuSaleAttrValueBySkuIds(List<Long> skuIds) {
+
+        List<SkuSaleAttrValue> skuSaleAttrValueList=new ArrayList<>();
+        for (Long skuId : skuIds) {
+            List<SkuSaleAttrValue> skuSaleAttrValueList1 =  skuSaleAttrValueMapper.findAllBySkuId(skuId);
+            if(skuSaleAttrValueList1!=null){
+                skuSaleAttrValueList.addAll(skuSaleAttrValueList1);
+            }
+
+        }
+        return skuSaleAttrValueList;
+    }
+
+    @Override
+    public List<SkuSaleAttrValue> getSkuSaleAttrValueBySkuId(Long skuId) {
+        return skuSaleAttrValueMapper.findAllBySkuId(skuId);
+
     }
 }

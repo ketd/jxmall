@@ -66,4 +66,9 @@ public interface ISkuSaleAttrValueService  extends IService<SkuSaleAttrValue> {
      * 导出sku销售属性&值列表
      */
     void export(List<SkuSaleAttrValue> list, HttpServletResponse response);
+
+    List<SkuSaleAttrValue> getSkuSaleAttrValueBySkuIds(List<Long> skuIds);
+
+
+    List<SkuSaleAttrValue> getSkuSaleAttrValueBySkuId(Long skuId);
 }

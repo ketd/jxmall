@@ -3,6 +3,7 @@ package com.ketd.product.service.impl;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -140,15 +141,20 @@ public class SpuImagesServiceImpl extends ServiceImpl<SpuImagesMapper, SpuImages
     public void saveImages(Long id, List<String> images) {
         if (images == null || images.isEmpty()) {
             return;
-        }else {
-            List<SpuImages>  spuImagesList = images.stream().map(img -> {
-                    SpuImages spuImages = new SpuImages();
-                    spuImages.setSpuId(id);
-                  /*  spuImages.setDefaultImg(img.equals(images.get(0)) ? 1 : 0);
-                    spuImages.setImgSort(0);*/
-                    spuImages.setImgUrl(img);
-                    return spuImages;
-                }).collect(java.util.stream.Collectors.toList());
+        } else {
+            AtomicInteger index = new AtomicInteger(0);
+            List<SpuImages> spuImagesList = images.stream().map(img -> {
+                SpuImages spuImages = new SpuImages();
+                spuImages.setSpuId(id);
+                spuImages.setImgUrl(img);
+                if(index.get() == 0) {
+                    spuImages.setDefaultImg(1L); // Set the first image as the default image
+                } else {
+                    spuImages.setDefaultImg(0L); // The rest are not default
+                }
+                spuImages.setImgSort((long) index.getAndIncrement()); // Set the order of the images
+                return spuImages;
+            }).collect(java.util.stream.Collectors.toList());
             this.saveBatch(spuImagesList);
         }
     }

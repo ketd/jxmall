@@ -322,8 +322,8 @@
           >
           </el-cascader>
         </el-form-item>
-        <el-form-item label="所属分组" prop="attrGroupId" >
-          <!--          <el-input v-model="form.attrGroupId" placeholder="请输入所属分组"/>-->
+<!--        <el-form-item label="所属分组" prop="attrGroupId" >
+          &lt;!&ndash;          <el-input v-model="form.attrGroupId" placeholder="请输入所属分组"/>&ndash;&gt;
           <el-select v-model="form.attrGroupId" placeholder="请选择" clearable>
             <el-option
               v-for="item in attrGroupIdOptions"
@@ -332,7 +332,7 @@
               :value="item.value">
             </el-option>
           </el-select>
-        </el-form-item>
+        </el-form-item>-->
         <el-form-item label="快速展示" prop="showDesc" :rules="[{ required: true, message: '请填写快速展示' } ]">
           <el-select v-model="form.showDesc" placeholder="请选择快速展示">
             <el-option

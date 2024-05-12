@@ -60,7 +60,7 @@ export default {
     // 大小限制(MB)
     fileSize: {
       type: Number,
-      default: 5,
+      default: 10,
     },
     // 文件类型, 例如['png', 'jpg', 'jpeg']
     fileType: {
@@ -71,6 +71,10 @@ export default {
     isShowTip: {
       type: Boolean,
       default: true
+    },
+    returnType: {
+      type: String,
+      default: 'string'  // 默认返回字符串
     }
   },
   data() {
@@ -228,7 +232,12 @@ export default {
       if (findex > -1) {
         this.fileList.splice(findex, 1);
        /* this.$emit("input", this.listToString(this.fileList).split(','));*/
-        this.$emit("input", this.listToString(this.fileList));
+        // 根据 returnType 的值，决定是返回字符串还是字符串数组
+        if (this.returnType === 'array') {
+          this.$emit("input", this.listToString(this.fileList).split(','));
+        } else {
+          this.$emit("input", this.listToString(this.fileList));
+        }
       }
       //console.log(this.listToString(this.fileList));
     },
@@ -244,7 +253,12 @@ export default {
         this.uploadList = [];
         this.number = 0;
       /*  this.$emit("input", this.listToString(this.fileList).split(','));*/
-        this.$emit("input", this.listToString(this.fileList));
+        // 根据 returnType 的值，决定是返回字符串还是字符串数组
+        if (this.returnType === 'array') {
+          this.$emit("input", this.listToString(this.fileList).split(','));
+        } else {
+          this.$emit("input", this.listToString(this.fileList));
+        }
         //console.log(this.listToString(this.fileList));
         this.$modal.closeLoading();
       }

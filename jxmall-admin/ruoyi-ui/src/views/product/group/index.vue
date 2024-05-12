@@ -507,14 +507,14 @@ export default {
       },
       attrQueryParams: {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 100,
         data: {
-          attrType: null,
+          catelogId:null
         }
       },
       getAttrListQueryParams :{
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 100,
         data: null
 
 
@@ -700,6 +700,7 @@ export default {
     },
     openAttrListDialog(row){
       this.getAttrListQueryParams.data = row.attrGroupId;
+      this.attrQueryParams.data.catelogId = row.catelogId;
       this.attrGroupId= row.attrGroupId;
       this.isOpenAttrList = true;
       this.attributeGroupTitle = "规格参数";
@@ -795,8 +796,9 @@ export default {
       this.allNoLinkAttrList=[]
       this.allAttrTotals=0
       noLinkAttrList(this.attrQueryParams).then(response => {
+
         response.data.data.rows.forEach(item => {
-          if(item.attrGroupId==null){
+          if(item.attrGroupId!==this.attrGroupId){
             this.allNoLinkAttrList = this.allNoLinkAttrList.concat(item);
             this.allAttrTotals ++
           }
@@ -810,7 +812,6 @@ export default {
       this.inkIds=[]
     },
     submitLinkAttr(){
-
       this.$modal.confirm('是否确认关联属性编号为"' + this.inkIds.join(', ') + '"的数据项？').then(() => {
        return  linkAttr( this.attrGroupId,this.inkIds).then(response => {
           this.isOpenAddLinkAttr = false;

@@ -189,7 +189,7 @@
             </template>
           </el-table-column>
           <el-table-column label="所属分类" align="center" prop="catelogName"/>
-          <el-table-column label="所属分类" align="center" prop="attrGroupName"/>
+          <el-table-column label="所属分组" align="center" prop="attrGroupName"/>
           <el-table-column label="快速展示" align="center" prop="showDesc">
             <template slot-scope="scope">
               <dict-tag :options="dict.type.show_status" :value="scope.row.showDesc"/>
@@ -313,8 +313,8 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="所属分组" prop="attrGroupId" :rules="[{ required: true, message: '请填写所属分组' } ]">
-          <!--          <el-input v-model="form.attrGroupId" placeholder="请输入所属分组"/>-->
+<!--        <el-form-item label="所属分组" prop="attrGroupId" :rules="[{ required: true, message: '请填写所属分组' } ]">
+          &lt;!&ndash;          <el-input v-model="form.attrGroupId" placeholder="请输入所属分组"/>&ndash;&gt;
           <el-select v-model="form.attrGroupId" placeholder="请选择">
             <el-option
               v-for="item in attrGroupIdOptions"
@@ -323,7 +323,7 @@
               :value="item.value">
             </el-option>
           </el-select>
-        </el-form-item>
+        </el-form-item>-->
         <el-form-item label="所属分类" :rules="[{ required: true, message: '请填写所属分类' } ]">
           <!--          <el-input v-model="form.catelogId" placeholder="请输入所属分类"/>-->
           <el-cascader

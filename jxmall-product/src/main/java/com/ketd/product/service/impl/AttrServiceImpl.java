@@ -81,6 +81,10 @@ public class AttrServiceImpl extends ServiceImpl<AttrMapper, Attr> implements IA
         // 执行条件查询
         Attr attr = pageRequest.getData();
         attr.setAttrType(pageRequest.getData().getAttrType());
+        attr.setCatelogId(pageRequest.getData().getCatelogId());
+
+
+
         return getResult(pageNum, pageSize, attr);
     }
 
@@ -92,9 +96,12 @@ public class AttrServiceImpl extends ServiceImpl<AttrMapper, Attr> implements IA
             try {
                 // 修改分组id
                 AttrAttrgroupRelation attrAttrgroupRelation = attrAttrgroupRelationMapper.findOneByAttrId(attrId);
-                attrAttrgroupRelation.setAttrGroupId(attrGroupId);
-                attrAttrgroupRelationMapper.updateById(attrAttrgroupRelation);
-
+                if (attrAttrgroupRelation == null) {
+                    attrAttrgroupRelation = new AttrAttrgroupRelation();
+                    attrAttrgroupRelation.setAttrId(attrId);
+                    attrAttrgroupRelation.setAttrGroupId(attrGroupId);
+                    attrAttrgroupRelationMapper.insert(attrAttrgroupRelation);
+                }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -109,7 +116,6 @@ public class AttrServiceImpl extends ServiceImpl<AttrMapper, Attr> implements IA
         Integer pageSize = pageRequest.getPageSize();
         Page<Attr> page = new Page<>(pageNum, pageSize);
         Attr attrQ = new Attr();
-        attrQ.setAttrType(1L);
         QueryWrapper<Attr> queryWrapper = new QueryWrapper<>(attrQ);
         List<Attr> attrPage = attrMapper.selectPage(page, queryWrapper).getRecords();
 
@@ -193,7 +199,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrMapper, Attr> implements IA
     public List<Long> selectSearchAttrs(List<Long> attrIds) {
         List<Attr> attrEntities = this.listByIds(attrIds);
         return attrEntities.stream().filter(item -> {
-            return item.getAttrType() == 1 && item.getEnable() == 1;
+            return item.getSearchType() == 1 && item.getEnable() == 1;
         }).map(Attr::getAttrId).collect(Collectors.toList());
     }
 
@@ -366,6 +372,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrMapper, Attr> implements IA
 
     @Override
     public int insertAttr(Attr attr) {
+
         return attrMapper.insert(attr);
     }
 

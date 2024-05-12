@@ -54,29 +54,29 @@ public class SearchServiceImpl implements SearchService {
         try {
             Map<String, Aggregation> aggregationsMap = new HashMap<>();
             aggregationsMap.put("brand_agg", Aggregation.of(a -> a
-                    .terms(t -> t.field("brandId").size(10))
+                    .terms(t -> t.field("brandId").size(25))
                     .aggregations("brand_name_agg", aa -> aa
-                            .terms(tt -> tt.field("brandName").size(10))
+                            .terms(tt -> tt.field("brandName").size(25))
                     )
                     .aggregations("brand_img_agg", aa -> aa
-                            .terms(tt -> tt.field("brandImg").size(10))
+                            .terms(tt -> tt.field("brandImg").size(25))
                     )
             ));
             aggregationsMap.put("catalog_agg", Aggregation.of(a -> a
-                    .terms(t -> t.field("catalogId").size(10))
+                    .terms(t -> t.field("catalogId").size(25))
                     .aggregations("catalog_name_agg", aa -> aa
-                            .terms(tt -> tt.field("catalogName").size(10))
+                            .terms(tt -> tt.field("catalogName").size(25))
                     )
             ));
             aggregationsMap.put("attrs_agg", Aggregation.of(a -> a
                     .nested(n -> n.path("attrs"))
                     .aggregations("attr_id_agg", aa -> aa
-                            .terms(tt -> tt.field("attrs.attrId").size(10))
+                            .terms(tt -> tt.field("attrs.attrId").size(25))
                             .aggregations("attr_name_agg", aaa -> aaa
-                                    .terms(ttt -> ttt.field("attrs.attrName").size(10))
+                                    .terms(ttt -> ttt.field("attrs.attrName").size(25))
                             )
                             .aggregations("attr_value_agg", aaa -> aaa
-                                    .terms(ttt -> ttt.field("attrs.attrValue").size(10))
+                                    .terms(ttt -> ttt.field("attrs.attrValue").size(25))
                             )
                     )
             ));
@@ -94,6 +94,7 @@ public class SearchServiceImpl implements SearchService {
                                                                             .query(searchParam.getKeyword())
                                                                     )
                                                             ));
+
                                                         }
                                                         return m.bool(bb -> bb.must(musts));
                                                     }
@@ -172,7 +173,7 @@ public class SearchServiceImpl implements SearchService {
                                                 if (StringUtils.hasLength(searchParam.getSkuPrice())) {
                                                     String[] priceRange = searchParam.getSkuPrice().split("(?<=\\d)(?=_)|(?<=_)(?=\\d)");
 
-                                                    System.out.println(priceRange.length);
+
                                                     if (priceRange.length == 3) {
                                                         filters.add(Query.of(qf -> qf
                                                                 .range(r -> r
@@ -295,6 +296,7 @@ public class SearchServiceImpl implements SearchService {
 
 
         //
+        System.out.println(attrBuckets);
         searchResult.setAttrs(attrs);
         searchResult.setCatalogs(catalogs);
         searchResult.setProducts(skuEsModelList);
@@ -318,7 +320,7 @@ public class SearchServiceImpl implements SearchService {
 
         if (hitList != null && !hitList.isEmpty()) {
             hitList.forEach(hit -> {
-                System.out.println(hit);
+
                 String source;
                 try {
                     source = objectMapper.writeValueAsString(hit.source());

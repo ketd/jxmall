@@ -3,6 +3,7 @@ package com.ketd.product.service.impl;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -171,6 +172,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoMapper, SpuInfo> impl
             BeanUtils.copyProperties(spuSaveVo, spuBaseInfo);
             spuBaseInfo.setCreateTime(new Date());
             spuBaseInfo.setUpdateTime(new Date());
+            spuBaseInfo.setWeight(spuSaveVo.getWeight());
             this.saveBaseSpuInfo(spuBaseInfo);
             //2.1保存spu的描述图片
             List<String> decript = spuSaveVo.getDecript();
@@ -214,6 +216,11 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoMapper, SpuInfo> impl
                     skuInfo.setBrandId(spuBaseInfo.getBrandId());
                     skuInfo.setCatalogId(spuBaseInfo.getCatalogId());
                     skuInfo.setSaleCount(0L);
+
+                    skuInfo.setSkuTitle(item.getSkuTitle());
+                    skuInfo.setSkuSubtitle(item.getSkuSubtitle());
+                    skuInfo.setPrice(item.getPrice());
+                    skuInfo.setSkuName(item.getSkuName());
                     skuInfo.setSpuId(spuBaseInfo.getId());
                     skuInfo.setSkuDefaultImg(defaultImg);
                     skuInfo.setSkuDesc(spuInfoDesc.getDecript());
@@ -223,15 +230,17 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoMapper, SpuInfo> impl
                     Long skuId = skuInfo.getSkuId();
 
 
+                    AtomicInteger index = new AtomicInteger(0);
                     List<SkuImages> skuImages = item.getImages().stream().map(img -> {
                         SkuImages skuImage = new SkuImages();
                         skuImage.setSkuId(skuId);
                         skuImage.setDefaultImg(img.getDefaultImg());
                         skuImage.setImgUrl(img.getImgUrl());
+                        skuImage.setImgSort((long) index.getAndIncrement());  // set the sort value
                         return skuImage;
                     }).filter(img -> {
-                        return !StringUtils.hasLength(img.getImgUrl());
-                    }).toList();
+                        return StringUtils.hasLength(img.getImgUrl());
+                    }).collect(Collectors.toList());
 
                     skuImagesService.saveBatch(skuImages);
 
@@ -312,10 +321,35 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoMapper, SpuInfo> impl
             List<SkuInfo> skuInfoList = skuInfoServiceImpl.getSkuInfoBySpuId(id);
             //            查询出 spu 下的基本属性
             List<ProductAttrValue> productBaesAttrValueList = productAttrValueService.baseAttrListForSpu(id);
+
+
+
+           /* List<Long> SkuIds = skuInfoList.stream().map(SkuInfo::getSkuId).toList();
+            //            查询出 sku 下的基本属性
+            List<SkuSaleAttrValue> skuSaleAttrValueList =  skuSaleAttrValueService.getSkuSaleAttrValueBySkuIds(SkuIds);*/
+
+            //sku属性去重
+
+
+          /*  Set<SkuEsModel.Attribute> uniqueSkuAttributes = new HashSet<>();
+            for(SkuSaleAttrValue skuAttr: skuSaleAttrValueList){
+                SkuEsModel.Attribute attribute = new SkuEsModel.Attribute();
+                attribute.setAttrId(skuAttr.getAttrId());
+                attribute.setAttrName(skuAttr.getAttrName());
+                attribute.setAttrValue(skuAttr.getAttrValue());
+                uniqueSkuAttributes.add(attribute);
+            }*/
+
+
             //            取出所有属性的 id
             List<Long> attrIds = productBaesAttrValueList.stream().map(ProductAttrValue::getAttrId).toList();
+            //            取出所有 sku 的 id
+
+
+
             //            查询出需要被检索的属性
             List<Long> searchAttrIds = attrService.selectSearchAttrs(attrIds);
+
             //            利用集合去重，将需要检索的属性 id 集合转换为 set
             Set<Long> idSet = new HashSet<>(searchAttrIds);
             //            查询出所有需要被检索的属性
@@ -330,6 +364,9 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoMapper, SpuInfo> impl
                 //                    返回新的对象
                 return attribute;
             }).toList();
+            /*attributes.addAll(uniqueSkuAttributes);*/
+
+
 
 
             //            查询出所有 sku 的库存信息
@@ -339,6 +376,8 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoMapper, SpuInfo> impl
 
             //            将所有需要上架的 SkuEsModel 对象生成出来
             List<SkuEsModel> skuEsModels = skuInfoList.stream().map(skuInfo -> {
+
+                List<SkuEsModel.Attribute> uniqueSkuAttributes = new ArrayList<>(attributes);
                 //                    创建一个新的 SkuEsModel 对象
                 SkuEsModel skuEsModel = new SkuEsModel();
                 //                    使用 BeanUtils 工具类将当前的 SkuInfo 对象中的属性拷贝到新的对象中
@@ -370,7 +409,19 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoMapper, SpuInfo> impl
 
 
                 //                    将所有需要检索的属性设置为 skuEsModel 的 attrs 属性
-                skuEsModel.setAttrs(attributes);
+
+
+                List<SkuEsModel.Attribute> finalUniqueSkuAttributes =   new ArrayList<>();
+                List<SkuSaleAttrValue> skuSaleAttrValueList =  skuSaleAttrValueService.getSkuSaleAttrValueBySkuId(skuInfo.getSkuId());
+                for(SkuSaleAttrValue skuAttr: skuSaleAttrValueList){
+                    SkuEsModel.Attribute attribute = new SkuEsModel.Attribute();
+                    attribute.setAttrId(skuAttr.getAttrId());
+                    attribute.setAttrName(skuAttr.getAttrName());
+                    attribute.setAttrValue(skuAttr.getAttrValue());
+                    finalUniqueSkuAttributes.add(attribute);
+                }
+                uniqueSkuAttributes.addAll(finalUniqueSkuAttributes);
+                skuEsModel.setAttrs(uniqueSkuAttributes);
 
 
                 //                    使用搜索微服务将当前的 SkuEsModel 对象上架到搜索系统中

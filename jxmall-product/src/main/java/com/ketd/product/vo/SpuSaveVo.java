@@ -29,7 +29,7 @@ public class SpuSaveVo {
     @JsonProperty("brandId")
     private Long brandId;
     @JsonProperty("weight")
-    private Double weight;
+    private BigDecimal weight;
     @JsonProperty("publishStatus")
     private Integer publishStatus;
     @JsonProperty("decript")

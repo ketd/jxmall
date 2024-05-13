@@ -78,4 +78,6 @@ public interface ISpuInfoService  extends IService<SpuInfo> {
 
 
     Result<?> up(Long[] ids);
+
+    Result<?> getSpuInfo(Long skuId);
 }

@@ -17,6 +17,13 @@
     <sql id="Base_Column_List">
 id,spu_id,attr_id,attr_name,attr_value,attr_sort,quick_show
     </sql>
+    <select id="findAllBySpuId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from pms_product_attr_value
+        where
+        spu_id = #{spuId,jdbcType=NUMERIC}
+    </select>
 
 </mapper>
 

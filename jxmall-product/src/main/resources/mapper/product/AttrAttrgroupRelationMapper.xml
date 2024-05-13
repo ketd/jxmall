@@ -35,6 +35,14 @@ id,attr_id,attr_group_id,attr_sort
         where
         attr_group_id = #{attrGroupId,jdbcType=NUMERIC}
     </select>
+    <select id="selectByAttrGroupIds" resultMap="BaseResultMap">
+        SELECT * FROM pms_attr_attrgroup_relation WHERE attr_group_id IN
+        <foreach item="item" collection="attrGroupIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+
 
 </mapper>
 

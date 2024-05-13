@@ -19,4 +19,6 @@ public interface AttrAttrgroupRelationMapper extends BaseMapper<AttrAttrgroupRel
 
     List<AttrAttrgroupRelation> findAllByAttrGroupId(@Param("attrGroupId") Long attrGroupId);
 
+    List<AttrAttrgroupRelation> selectByAttrGroupIds(@Param("attrGroupIds") List<Long> attrGroupIds);
+
 }

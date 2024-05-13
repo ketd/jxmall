@@ -73,6 +73,14 @@ public class SpuInfoController{
         return spuInfoService.saveSpuInfo(spuInfoVo);
     }
 
+    @Operation(summary = "获取商品的详细信息")
+    @PostMapping("/get/spuInfo")
+    public Result<?>  getSpuInfo(@RequestParam(value = "skuId")Long  skuId)
+    {
+        return spuInfoService.getSpuInfo(skuId);
+    }
+
+
 
     /**
      * 导出spu信息列表

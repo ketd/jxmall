@@ -1,8 +1,8 @@
 package com.ketd.product.service.impl;
 
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.alibaba.excel.EasyExcel;
@@ -10,8 +10,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ketd.common.domain.PageRequest;
 import com.ketd.common.result.Result;
 import com.ketd.product.domain.Attr;
+import com.ketd.product.domain.AttrAttrgroupRelation;
+import com.ketd.product.domain.ProductAttrValue;
+import com.ketd.product.mapper.AttrAttrgroupRelationMapper;
 import com.ketd.product.mapper.AttrMapper;
+import com.ketd.product.mapper.ProductAttrValueMapper;
 import com.ketd.product.vo.AttrGroupWithAttrsVo;
+import com.ketd.product.vo.SkuItemVo;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +46,14 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupMapper, AttrGroup
 
     @Autowired
     private  AttrServiceImpl  attrService;
+
+    @Autowired
+    private ProductAttrValueMapper  productAttrValueMapper;
+
+    @Autowired
+    private AttrAttrgroupRelationMapper  attrAttrgroupRelationMapper;
+
+
 
 
     /**
@@ -174,4 +187,44 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupMapper, AttrGroup
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public List<SkuItemVo.SpuItemBaseAttrVo> getAttrGroupWithSpuId(Long spuId, Long catalogId) {
+        // 一次性查询所有属性值
+        List<ProductAttrValue> productAttrValues = productAttrValueMapper.findAllBySpuId(spuId);
+        Map<Long, ProductAttrValue> attrValueMap = productAttrValues.stream()
+                .collect(Collectors.toMap(ProductAttrValue::getAttrId, Function.identity()));
+
+        // 一次性查询所有分组
+        List<AttrGroup> attrGroups = attrGroupMapper.findAllByCatelogId(catalogId);
+
+        // 一次性查询所有分组关联关系
+        List<AttrAttrgroupRelation> groupRelations = attrAttrgroupRelationMapper.selectByAttrGroupIds(attrGroups.stream()
+                .map(AttrGroup::getAttrGroupId)
+                .collect(Collectors.toList()));
+
+        Map<Long, List<AttrAttrgroupRelation>> groupRelationMap = groupRelations.stream()
+                .collect(Collectors.groupingBy(AttrAttrgroupRelation::getAttrGroupId));
+
+        // 使用Stream API来处理集合
+        return attrGroups.stream().map(group -> {
+            SkuItemVo.SpuItemBaseAttrVo baseAttrVo = new SkuItemVo.SpuItemBaseAttrVo();
+            baseAttrVo.setGroupName(group.getAttrGroupName());
+            baseAttrVo.setAttrs(groupRelationMap.getOrDefault(group.getAttrGroupId(), Collections.emptyList()).stream()
+                    .map(relation -> {
+                        ProductAttrValue attrValue = attrValueMap.get(relation.getAttrId());
+                        if (attrValue != null) {
+                            SkuItemVo.SpuBaseAttrVo spuBaseAttrVo = new SkuItemVo.SpuBaseAttrVo();
+                            spuBaseAttrVo.setAttrName(attrValue.getAttrName());
+                            spuBaseAttrVo.setAttrValues(attrValue.getAttrValue());
+                            return spuBaseAttrVo;
+                        }
+                        return null;
+                    })
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList()));
+            return baseAttrVo;
+        }).collect(Collectors.toList());
+    }
+
 }

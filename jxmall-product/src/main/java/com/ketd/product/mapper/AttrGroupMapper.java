@@ -1,4 +1,6 @@
 package com.ketd.product.mapper;
+import java.util.List;
+import org.apache.ibatis.annotations.Param;
 
 
 import com.ketd.product.domain.AttrGroup;
@@ -13,5 +15,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface AttrGroupMapper extends BaseMapper<AttrGroup>
 {
-
+    List<AttrGroup> findAllByCatelogId(@Param("catelogId") Long catelogId);
 }

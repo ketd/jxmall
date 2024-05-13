@@ -15,6 +15,13 @@
     <sql id="Base_Column_List">
 id,sku_id,img_url,img_sort,default_img
     </sql>
+    <select id="getAllBySkuId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from pms_sku_images
+        where
+        sku_id = #{skuId,jdbcType=NUMERIC}
+    </select>
 
 </mapper>
 

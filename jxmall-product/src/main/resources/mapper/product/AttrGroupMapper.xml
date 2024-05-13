@@ -16,6 +16,13 @@
     <sql id="Base_Column_List">
 attr_group_id,attr_group_name,sort,descript,icon,catelog_id
     </sql>
+    <select id="findAllByCatelogId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from pms_attr_group
+        where
+        catelog_id = #{catelogId,jdbcType=NUMERIC}
+    </select>
 
 </mapper>
 

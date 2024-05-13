@@ -1,4 +1,6 @@
 package com.ketd.product.mapper;
+import java.util.List;
+import org.apache.ibatis.annotations.Param;
 
 
 import com.ketd.product.domain.SkuImages;
@@ -14,4 +16,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 public interface SkuImagesMapper extends BaseMapper<SkuImages>
 {
 
+    List<SkuImages> getAllBySkuId(@Param("skuId") Long skuId);
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.ketd.common.result.Result;
 import com.ketd.product.vo.AttrGroupWithAttrsVo;
+import com.ketd.product.vo.SkuItemVo;
 import jakarta.servlet.http.HttpServletResponse;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ketd.product.domain.AttrGroup;
@@ -71,4 +72,7 @@ public interface IAttrGroupService  extends IService<AttrGroup> {
     void export(List<AttrGroup> list, HttpServletResponse response);
 
     List<AttrGroupWithAttrsVo> getAttrGroupWithoutAttrs(Long cateLogId);
+
+
+    List<SkuItemVo.SpuItemBaseAttrVo> getAttrGroupWithSpuId(Long spuId, Long catalogId);
 }

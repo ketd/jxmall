@@ -19,6 +19,9 @@ import com.ketd.common.domain.search.SkuEsModel;
 import com.ketd.common.domain.ware.HasStockTo;
 import com.ketd.common.result.Result;
 import com.ketd.product.domain.*;
+import com.ketd.product.mapper.SkuImagesMapper;
+import com.ketd.product.mapper.SpuInfoDescMapper;
+import com.ketd.product.vo.SkuItemVo;
 import com.ketd.product.vo.SpuSaveVo;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.BeanUtils;
@@ -79,6 +82,15 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoMapper, SpuInfo> impl
 
     @Autowired
     private SearchOpenFeignApi searchOpenFeignApi;
+
+    @Autowired
+    private SkuImagesMapper  skuImagesMapper;
+
+    @Autowired
+    private SpuInfoDescMapper  spuInfoDescMapper;
+
+    @Autowired
+    private AttrGroupServiceImpl attrGroupService;
 
 
     /**
@@ -387,9 +399,11 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoMapper, SpuInfo> impl
                 //                    将当前的 sku 的默认图片设置为 skuEsModel 的 skuImg 属性
                 skuEsModel.setSkuImg(skuInfo.getSkuDefaultImg());
                 //                    将当前的 sku 的热度分数设置为 0L，表示不hot
-                skuEsModel.setHotScore(0L);
+                skuEsModel.setHotScore((long) new Random().nextInt(10000));
                 //                    根据当前的 skuId，从库存信息中获取对应的库存状态
                 skuEsModel.setHasStock(hasStockMap.get(skuInfo.getSkuId()));
+                //添加随机数0-5000
+                skuEsModel.setSaleCount((long) new Random().nextInt(5000));
 
 
                 //                    根据当前的 brandId 查询出当前的品牌信息
@@ -452,6 +466,24 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoMapper, SpuInfo> impl
 
         //        返回成功
         return Result.ok(null);
+    }
+
+    @Override
+    public Result<?> getSpuInfo(Long skuId) {
+        SkuItemVo  skuItemVo = new SkuItemVo();
+        //1.查询sku的基本信息
+        SkuInfo skuInfo = skuInfoServiceImpl.getById(skuId);
+        skuItemVo.setSkuInfo(skuInfo);
+        //2.查询sku的图片信息
+        List<SkuImages> skuImages = skuImagesMapper.getAllBySkuId(skuId);
+        skuItemVo.setSkuImages(skuImages);
+        //3.查询spu的基本信息
+        SpuInfoDesc  spuInfoDesc =  spuInfoDescMapper.selectById(skuInfo.getSpuId());
+        skuItemVo.setSpuInfoDesc(spuInfoDesc);
+        List<SkuItemVo.SpuItemBaseAttrVo>  spuItemBaseAttrVoList =  attrGroupService.getAttrGroupWithSpuId(skuInfo.getSpuId(), skuInfo.getCatalogId());
+        skuItemVo.setSpuItemBaseAttrVo(spuItemBaseAttrVoList);
+
+        return Result.ok(skuItemVo);
     }
 
 

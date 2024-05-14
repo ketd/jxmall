@@ -169,12 +169,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
 
         RLock lock = redisson.getLock("category_tree_lock");
 
-        // 双重检查，以防在等待锁的期间另一个线程已经更新了缓存
-        categories = redisUtil.getJson(key, new TypeReference<List<Category>>() {
-        });
-        if (categories != null) {
-            return categories;
-        }
 
         lock.lock(30, TimeUnit.SECONDS);
         try {

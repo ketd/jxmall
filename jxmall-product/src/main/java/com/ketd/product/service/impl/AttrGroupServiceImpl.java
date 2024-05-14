@@ -17,6 +17,8 @@ import com.ketd.product.mapper.AttrMapper;
 import com.ketd.product.mapper.ProductAttrValueMapper;
 import com.ketd.product.vo.AttrGroupWithAttrsVo;
 import com.ketd.product.vo.SkuItemVo;
+import com.ketd.product.vo.SpuBaseAttrVo;
+import com.ketd.product.vo.SpuItemBaseAttrVo;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -189,7 +191,7 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupMapper, AttrGroup
     }
 
     @Override
-    public List<SkuItemVo.SpuItemBaseAttrVo> getAttrGroupWithSpuId(Long spuId, Long catalogId) {
+    public List<SpuItemBaseAttrVo> getAttrGroupWithSpuId(Long spuId, Long catalogId) {
         // 一次性查询所有属性值
         List<ProductAttrValue> productAttrValues = productAttrValueMapper.findAllBySpuId(spuId);
         Map<Long, ProductAttrValue> attrValueMap = productAttrValues.stream()
@@ -208,13 +210,13 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupMapper, AttrGroup
 
         // 使用Stream API来处理集合
         return attrGroups.stream().map(group -> {
-            SkuItemVo.SpuItemBaseAttrVo baseAttrVo = new SkuItemVo.SpuItemBaseAttrVo();
+            SpuItemBaseAttrVo baseAttrVo = new SpuItemBaseAttrVo();
             baseAttrVo.setGroupName(group.getAttrGroupName());
             baseAttrVo.setAttrs(groupRelationMap.getOrDefault(group.getAttrGroupId(), Collections.emptyList()).stream()
                     .map(relation -> {
                         ProductAttrValue attrValue = attrValueMap.get(relation.getAttrId());
                         if (attrValue != null) {
-                            SkuItemVo.SpuBaseAttrVo spuBaseAttrVo = new SkuItemVo.SpuBaseAttrVo();
+                            SpuBaseAttrVo spuBaseAttrVo = new SpuBaseAttrVo();
                             spuBaseAttrVo.setAttrName(attrValue.getAttrName());
                             spuBaseAttrVo.setAttrValues(attrValue.getAttrValue());
                             return spuBaseAttrVo;

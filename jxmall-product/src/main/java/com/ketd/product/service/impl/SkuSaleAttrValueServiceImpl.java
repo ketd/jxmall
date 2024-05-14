@@ -1,12 +1,15 @@
 package com.ketd.product.service.impl;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.ketd.product.domain.SkuInfo;
+import com.ketd.product.mapper.SkuInfoMapper;
+import com.ketd.product.vo.SkuItemSaleVo;
+import com.ketd.product.vo.SkuItemVo;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,6 +34,8 @@ public class SkuSaleAttrValueServiceImpl extends ServiceImpl<SkuSaleAttrValueMap
     private SkuSaleAttrValueMapper skuSaleAttrValueMapper;
 
 
+    @Autowired
+    private SkuInfoMapper  skuInfoMapper;
 
     /**
      * 查询sku销售属性&值
@@ -154,4 +159,48 @@ public class SkuSaleAttrValueServiceImpl extends ServiceImpl<SkuSaleAttrValueMap
         return skuSaleAttrValueMapper.findAllBySkuId(skuId);
 
     }
+
+    @Override
+    public List<SkuItemSaleVo> getSkuSaleAttrValueBySpuId(Long spuId) {
+       /* // 第一步：通过spuId获取SKU信息
+        List<SkuInfo> skuInfoList = skuInfoMapper.findSkuIdBySpuId(spuId);
+        if (skuInfoList == null || skuInfoList.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 提取skuIds
+        List<Long> skuIds = skuInfoList.stream()
+                .map(SkuInfo::getSkuId)
+                .collect(Collectors.toList());
+
+        // 第二步：通过skuIds获取销售属性
+        List<SkuSaleAttrValue> skuSaleAttrValueList = skuSaleAttrValueMapper.findSaleAttrBySpuIds(skuIds);
+        if (skuSaleAttrValueList == null || skuSaleAttrValueList.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 第三步：分组并汇总销售属性数据
+        Map<Long, SkuItemVo.SkuItemSaleVo> saleAttrMap = new HashMap<>();
+        for (SkuSaleAttrValue saleAttr : skuSaleAttrValueList) {
+            Long attrId = saleAttr.getAttrId();
+            SkuItemVo.SkuItemSaleVo skuItemSaleVo = saleAttrMap.computeIfAbsent(attrId, id -> {
+                SkuItemVo.SkuItemSaleVo newVo = new SkuItemVo.SkuItemSaleVo();
+                newVo.setAttrId(attrId);
+                newVo.setAttrName(saleAttr.getAttrName());
+                newVo.setAttrValues(new ArrayList<>());
+                return newVo;
+            });
+            // 添加唯一的属性值
+            if (!skuItemSaleVo.getAttrValues().contains(saleAttr.getAttrValue())) {
+                skuItemSaleVo.getAttrValues().add(saleAttr.getAttrValue());
+            }
+        }
+
+        // 转换map的值为列表并返回
+        return new ArrayList<>(saleAttrMap.values());*/
+
+        return skuSaleAttrValueMapper.selectSaleAttrBySpuId(spuId);
+
+    }
+
 }

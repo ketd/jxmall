@@ -19,7 +19,7 @@
         <module>jxmall-search</module>
         <module>jxmall-admin</module>
         <module>jxmall-third-party</module>
-        <module>jxmall-user</module>
+        <module>jxmall-auth</module>
 
 
     </modules>

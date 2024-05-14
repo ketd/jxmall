@@ -2,6 +2,9 @@ package com.ketd.product.service;
 
 
 import java.util.List;
+
+import com.ketd.product.vo.SkuItemSaleVo;
+import com.ketd.product.vo.SkuItemVo;
 import jakarta.servlet.http.HttpServletResponse;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ketd.product.domain.SkuSaleAttrValue;
@@ -71,4 +74,6 @@ public interface ISkuSaleAttrValueService  extends IService<SkuSaleAttrValue> {
 
 
     List<SkuSaleAttrValue> getSkuSaleAttrValueBySkuId(Long skuId);
+
+    List<SkuItemSaleVo> getSkuSaleAttrValueBySpuId(Long spuId);
 }

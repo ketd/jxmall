@@ -3,11 +3,16 @@ package com.ketd.product.service.impl;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.ketd.common.api.coupon.*;
 import com.ketd.common.api.search.SearchOpenFeignApi;
 import com.ketd.common.api.ware.WareSkuOpenFeignApi;
@@ -21,9 +26,14 @@ import com.ketd.common.result.Result;
 import com.ketd.product.domain.*;
 import com.ketd.product.mapper.SkuImagesMapper;
 import com.ketd.product.mapper.SpuInfoDescMapper;
+import com.ketd.product.utils.RedisUtil;
+import com.ketd.product.vo.SkuItemSaleVo;
 import com.ketd.product.vo.SkuItemVo;
+import com.ketd.product.vo.SpuItemBaseAttrVo;
 import com.ketd.product.vo.SpuSaveVo;
 import jakarta.servlet.http.HttpServletResponse;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,6 +101,16 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoMapper, SpuInfo> impl
 
     @Autowired
     private AttrGroupServiceImpl attrGroupService;
+
+    @Autowired
+    private ThreadPoolExecutor  threadPoolExecutor;
+
+    @Autowired
+    private RedisUtil redisUtil;
+
+    @Autowired
+    private RedissonClient redisson;
+
 
 
     /**
@@ -469,22 +489,77 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoMapper, SpuInfo> impl
     }
 
     @Override
-    public Result<?> getSpuInfo(Long skuId) {
-        SkuItemVo  skuItemVo = new SkuItemVo();
-        //1.查询sku的基本信息
-        SkuInfo skuInfo = skuInfoServiceImpl.getById(skuId);
-        skuItemVo.setSkuInfo(skuInfo);
-        //2.查询sku的图片信息
-        List<SkuImages> skuImages = skuImagesMapper.getAllBySkuId(skuId);
-        skuItemVo.setSkuImages(skuImages);
-        //3.查询spu的基本信息
-        SpuInfoDesc  spuInfoDesc =  spuInfoDescMapper.selectById(skuInfo.getSpuId());
-        skuItemVo.setSpuInfoDesc(spuInfoDesc);
-        List<SkuItemVo.SpuItemBaseAttrVo>  spuItemBaseAttrVoList =  attrGroupService.getAttrGroupWithSpuId(skuInfo.getSpuId(), skuInfo.getCatalogId());
-        skuItemVo.setSpuItemBaseAttrVo(spuItemBaseAttrVoList);
+    public Result<?> getSpuInfo(Long skuId) throws ExecutionException, InterruptedException {
+        SkuItemVo[] skuItemVoHolder = new SkuItemVo[1];
+        String key = "skuDetail:" + skuId;
 
-        return Result.ok(skuItemVo);
+        // 尝试从缓存获取
+        SkuItemVo cachedSkuItemVo = redisUtil.getJson(key, new TypeReference<SkuItemVo>() {});
+        if (cachedSkuItemVo != null) {
+            return Result.ok(cachedSkuItemVo);
+        }
+
+        RLock lock = redisson.getLock("getSpuInfo_lock");
+
+        try {
+            lock.lock(30, TimeUnit.SECONDS);
+
+            // 再次尝试从缓存获取，防止缓存穿透
+            cachedSkuItemVo = redisUtil.getJson(key, new TypeReference<SkuItemVo>() {});
+            if (cachedSkuItemVo != null) {
+                return Result.ok(cachedSkuItemVo);
+            }
+
+            skuItemVoHolder[0] = new SkuItemVo();
+
+            CompletableFuture<SkuInfo> skuInfoFuture = CompletableFuture.supplyAsync(() -> {
+                // 1. 查询sku的基本信息
+                SkuInfo skuInfo = skuInfoServiceImpl.getById(skuId);
+                skuItemVoHolder[0].setSkuInfo(skuInfo);
+                return skuInfo;
+            }, threadPoolExecutor);
+
+            CompletableFuture<Void> skuSaleAttrValueFuture = skuInfoFuture.thenApplyAsync((res) -> {
+                // 2. 查询spu的销售属性组合
+                List<SkuItemSaleVo> skuSaleAttrValueList = skuSaleAttrValueService.getSkuSaleAttrValueBySpuId(res.getSpuId());
+                skuItemVoHolder[0].setSkuItemSaleVo(skuSaleAttrValueList);
+                return null;
+            }, threadPoolExecutor);
+
+            CompletableFuture<Void> spuInfoDescFuture = skuInfoFuture.thenApplyAsync((res) -> {
+                // 3. 查询spu的基本信息
+                SpuInfoDesc spuInfoDesc = spuInfoDescMapper.selectById(res.getSpuId());
+                skuItemVoHolder[0].setSpuInfoDesc(spuInfoDesc);
+                return null;
+            }, threadPoolExecutor);
+
+            CompletableFuture<Void> attrGroupFuture = skuInfoFuture.thenApplyAsync((res) -> {
+                List<SpuItemBaseAttrVo> spuItemBaseAttrVoList = attrGroupService.getAttrGroupWithSpuId(res.getSpuId(), res.getCatalogId());
+                skuItemVoHolder[0].setSpuItemBaseAttrVo(spuItemBaseAttrVoList);
+                return null;
+            }, threadPoolExecutor);
+
+            CompletableFuture<Void> skuImagesFuture = CompletableFuture.supplyAsync(() -> {
+                // 4. 查询sku的图片信息
+                List<SkuImages> skuImages = skuImagesMapper.getAllBySkuId(skuId);
+                skuItemVoHolder[0].setSkuImages(skuImages);
+                return null;
+            }, threadPoolExecutor);
+
+            // 等待所有任务完成
+            CompletableFuture.allOf(skuSaleAttrValueFuture, spuInfoDescFuture, attrGroupFuture, skuImagesFuture).get();
+
+            skuItemVoHolder[0].setHasStock(true);
+
+            // 设置缓存
+            redisUtil.setJson(key, skuItemVoHolder[0], TimeUnit.HOURS.toSeconds(1));
+        } finally {
+            lock.unlock();
+        }
+
+        return Result.ok(skuItemVoHolder[0]);
     }
+
 
 
 }

@@ -5,6 +5,7 @@ package com.ketd.product.controller;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -75,8 +76,7 @@ public class SpuInfoController{
 
     @Operation(summary = "获取商品的详细信息")
     @PostMapping("/get/spuInfo")
-    public Result<?>  getSpuInfo(@RequestParam(value = "skuId")Long  skuId)
-    {
+    public Result<?>  getSpuInfo(@RequestParam(value = "skuId")Long  skuId) throws ExecutionException, InterruptedException {
         return spuInfoService.getSpuInfo(skuId);
     }
 

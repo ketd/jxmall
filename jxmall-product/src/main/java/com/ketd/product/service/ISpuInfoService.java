@@ -2,6 +2,7 @@ package com.ketd.product.service;
 
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import com.ketd.common.result.Result;
 import com.ketd.product.domain.SpuInfoDesc;
@@ -79,5 +80,5 @@ public interface ISpuInfoService  extends IService<SpuInfo> {
 
     Result<?> up(Long[] ids);
 
-    Result<?> getSpuInfo(Long skuId);
+    Result<?> getSpuInfo(Long skuId) throws ExecutionException, InterruptedException;
 }

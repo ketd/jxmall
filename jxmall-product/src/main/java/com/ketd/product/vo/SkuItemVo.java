@@ -22,6 +22,9 @@ public class SkuItemVo {
     @Schema(description="商品详情")
     private SkuInfo  skuInfo;
 
+    @Schema(description="sku是否有库存")
+    private Boolean hasStock;
+
     @Schema(description="sku图片")
     private List<SkuImages>  skuImages;
 
@@ -35,33 +38,5 @@ public class SkuItemVo {
 
     @Schema(description="spu介绍")
     private SpuInfoDesc  spuInfoDesc;
-
-
-    @Data
-    public static  class SkuItemSaleVo{
-
-        private Long attrId;
-
-        private String attrName;
-
-        private List<String> attrValues;
-    }
-
-    @Data
-    public static  class SpuItemBaseAttrVo{
-
-        private String GroupName;
-
-        private List<SpuBaseAttrVo> attrs;
-
-
-    }
-
-    @Data
-    public static  class SpuBaseAttrVo{
-        private String attrName;
-
-        private String attrValues;
-
-    }
 }
+

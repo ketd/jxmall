@@ -1,4 +1,4 @@
-package com.ketd.member.dto;
+package com.ketd.auth.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;

@@ -2,11 +2,7 @@ package com.ketd.member.service;
 
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
 
-import com.ketd.common.result.Result;
-import com.ketd.member.vo.MemberVo;
 import jakarta.servlet.http.HttpServletResponse;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ketd.member.domain.Member;
@@ -72,7 +68,5 @@ public interface IMemberService  extends IService<Member> {
      */
     void export(List<Member> list, HttpServletResponse response);
 
-    Result<?> regist(MemberVo memberVo);
 
-    CompletableFuture<Result<?>> sendMailCode(String email);
 }

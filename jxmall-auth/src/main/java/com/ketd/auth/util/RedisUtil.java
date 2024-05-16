@@ -1,4 +1,4 @@
-package com.ketd.util;
+package com.ketd.auth.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;

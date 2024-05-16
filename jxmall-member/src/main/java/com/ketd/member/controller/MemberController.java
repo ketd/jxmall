@@ -5,13 +5,12 @@ package com.ketd.member.controller;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.ketd.member.vo.MemberVo;
+import com.ketd.member.mapper.MemberMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -41,6 +40,9 @@ public class MemberController{
     @Autowired
     private IMemberService memberService;
 
+    @Autowired
+    private MemberMapper  memberMapper;
+
     /**
      * 分页查询会员列表
      */
@@ -66,21 +68,6 @@ public class MemberController{
 
 
 
-    @Operation(summary = "用户注册控制器")
-    @PostMapping()
-    public Result<?> regist(@RequestBody MemberVo memberVo) {//json数据接收加@RequestBody注解
-        return memberService.regist(memberVo);
-    }
-
-    @Operation(summary = "获取注册验证码")
-    @PostMapping(value = "/getEmailCode")
-    public CompletableFuture<Result<?>> getEmailCode(@RequestParam(value = "email") String email) {
-
-        return memberService.sendMailCode(email)
-                .thenApply(result -> result);
-    }
-
-
 
 
     /**
@@ -104,6 +91,40 @@ public class MemberController{
     {
         return Result.ok(memberService.selectMemberById(id));
     }
+
+    /**
+     * 获取会员详细信息
+     */
+    @Operation(summary = "根据手机获取会员详细信息")
+    @GetMapping(value = "/info/mobile")
+    public Result<?> getInfoByMobile(@RequestParam("mobile") String mobile)
+    {
+        Member member=memberMapper.findOneByMobile(mobile);
+        if(member!=null){
+            return Result.ok(member);
+        }else{
+            return Result.error(null);
+        }
+
+    }
+
+    /**
+     * 获取会员详细信息
+     */
+    @Operation(summary = "根据邮箱获取会员详细信息")
+    @GetMapping(value = "/info/email")
+    public Result<?> getInfoByEmail(@RequestParam("email") String email)
+    {
+        Member member=memberMapper.findOneByEmail(email);
+        if(member!=null){
+            return Result.ok(member);
+        }else{
+            return Result.error(null);
+        }
+
+    }
+
+
 
     /**
      * 新增会员

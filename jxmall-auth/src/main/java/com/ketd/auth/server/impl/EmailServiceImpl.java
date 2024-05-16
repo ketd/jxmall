@@ -1,12 +1,13 @@
-package com.ketd.member.service.impl;
+package com.ketd.auth.server.impl;
 
 import cn.hutool.extra.mail.Mail;
 import cn.hutool.extra.mail.MailAccount;
-import com.ketd.member.dto.EmailDto;
-import com.ketd.member.service.EmailService;
+import com.ketd.auth.dto.EmailDto;
+import com.ketd.auth.server.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,8 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
-@Transactional(propagation = Propagation.SUPPORTS, readOnly = true, rollbackFor = Exception.class)
+@Primary
 public class EmailServiceImpl implements EmailService {
 
     @Value("${spring.mail.email}")

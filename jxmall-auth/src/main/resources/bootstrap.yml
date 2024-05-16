@@ -1,6 +1,6 @@
 spring:
   application:
-    name: cloud-user-service
+    name: cloud-auth-service
   cloud:
     nacos:
       discovery:

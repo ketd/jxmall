@@ -1,36 +1,20 @@
 package com.ketd.member.service.impl;
 
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-
-import cn.hutool.core.lang.Dict;
-import cn.hutool.core.util.RandomUtil;
-import cn.hutool.extra.template.Template;
-import cn.hutool.extra.template.TemplateConfig;
-import cn.hutool.extra.template.TemplateEngine;
-import cn.hutool.extra.template.TemplateUtil;
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.ketd.common.result.Result;
-import com.ketd.common.result.ResultCodeEnum;
-import com.ketd.member.dto.EmailDto;
-import com.ketd.member.service.EmailService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ketd.member.domain.Member;
+import com.ketd.member.mapper.MemberMapper;
+import com.ketd.member.service.IMemberService;
 import com.ketd.member.util.RedisUtil;
-import com.ketd.member.vo.MemberVo;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.bcrypt.BCrypt;
-import org.springframework.stereotype.Service;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.context.annotation.Primary;
-import com.ketd.member.mapper.MemberMapper;
-import com.ketd.member.domain.Member;
-import com.ketd.member.service.IMemberService;
+import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -46,17 +30,6 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     @Autowired
     private MemberMapper memberMapper;
 
-    @Autowired
-    private RedisUtil  redisUtil;
-
-    @Autowired
-    private EmailService  emailService;
-
-
-
-    // 验证码放入redis缓存过期时间
-    @Value("${code.expiration}")
-    private Long expiration;
 
 
 
@@ -163,70 +136,5 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         }
     }
 
-    @Override
-    public Result<?> regist(MemberVo memberVo) {
 
-        if (memberMapper.findOneByMobile(memberVo.getMobile()) !=null) {
-            return Result.build(null, ResultCodeEnum.USER_MOBILE_EXISTENCE);
-        }
-        if(memberMapper.findOneByEmail(memberVo.getEmail()) !=null){
-            return Result.build(null, ResultCodeEnum.EMAIL_EXISTENCE);
-        }
-
-        // 通过email获取redis中的code
-        Object value = redisUtil.get("regist-Code:"+"Email-"+memberVo.getEmail());
-        if (value == null || !value.toString().equals(memberVo.getCode())) {
-
-            return Result.build(null, ResultCodeEnum.INVALID_VERIFICATION_CODE);
-        } else {
-            redisUtil.del("regist-Code:"+"Email-"+memberVo.getEmail());
-        }
-
-        Member member = new Member();
-        member.setLevelId(1L);
-        member.setUsername(memberVo.getUsername());
-        member.setNickname(memberVo.getNickname());
-        member.setMobile(memberVo.getMobile());
-        member.setEmail(memberVo.getEmail());
-        member.setHeader(null);
-        member.setCreateTime(new Date());
-
-
-
-
-        //加密
-        String encodedPassword = BCrypt.hashpw( memberVo.getPassword(), BCrypt.gensalt());
-        member.setPassword(encodedPassword);
-        memberMapper.insert(member);
-        return Result.build(null, ResultCodeEnum.REGISTER_SUCCESS);
-
-    }
-
-    @Override
-    public CompletableFuture<Result<?>> sendMailCode(String email) {
-
-
-        // 查看注册邮箱是否存在
-        if (memberMapper.findOneByEmail(email)!=null) {
-            return CompletableFuture.completedFuture(Result.build(null,ResultCodeEnum.EMAIL_EXISTENCE));
-        }
-
-        // 获取发送邮箱验证码的HTML模板
-        TemplateEngine engine = TemplateUtil.createEngine(new TemplateConfig("templates", TemplateConfig.ResourceMode.CLASSPATH));
-        Template template = engine.getTemplate("email-code.ftl");
-
-        // 从redis缓存中尝试获取验证码
-        String code = redisUtil.get("regist-Code:"+"Email-"+email);
-        if (code == null) {
-            // 如果在缓存中未获取到验证码，则产生6位随机数，放入缓存中
-            code = RandomUtil.randomNumbers(6);
-            redisUtil.set("regist-Code:"+"Email-"+email, code, expiration);
-
-
-        }
-        emailService.send(new EmailDto(Collections.singletonList(email),
-                "京西商城||邮箱验证码", template.render(Dict.create().set("code", code))));
-
-        return CompletableFuture.completedFuture(Result.build(null,ResultCodeEnum.SUCCESS));
-    }
 }

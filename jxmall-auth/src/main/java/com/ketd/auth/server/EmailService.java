@@ -1,7 +1,7 @@
-package com.ketd.member.service;
+package com.ketd.auth.server;
 
 
-import com.ketd.member.dto.EmailDto;
+import com.ketd.auth.dto.EmailDto;
 
 public interface EmailService {
 

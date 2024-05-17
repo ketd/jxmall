@@ -9,7 +9,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ketd.common.result.Result;
 import com.ketd.product.domain.CategoryBrandRelation;
 import com.ketd.product.mapper.CategoryBrandRelationMapper;
-import com.ketd.product.mapper.CategoryMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

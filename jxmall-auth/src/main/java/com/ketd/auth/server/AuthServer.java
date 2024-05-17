@@ -1,7 +1,7 @@
 package com.ketd.auth.server;
 
 import com.ketd.auth.vo.LoginVo;
-import com.ketd.auth.vo.MemberVo;
+import com.ketd.auth.vo.MemberRegisterVo;
 import com.ketd.common.result.Result;
 
 /**
@@ -13,7 +13,7 @@ import com.ketd.common.result.Result;
  */
 public interface AuthServer {
 
-    Result<?> register(MemberVo memberVo);
+    Result<?> register(MemberRegisterVo memberRegisterVo);
 
     Result<?> sendMailCode(String email);
 

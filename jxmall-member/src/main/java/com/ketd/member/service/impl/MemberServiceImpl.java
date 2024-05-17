@@ -4,6 +4,7 @@ package com.ketd.member.service.impl;
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ketd.common.result.Result;
 import com.ketd.member.domain.Member;
 import com.ketd.member.mapper.MemberMapper;
 import com.ketd.member.service.IMemberService;
@@ -40,9 +41,14 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
      * @return 会员
      */
     @Override
-    public Member selectMemberById(Long id)
+    public Result<?> selectMemberById(Long id)
     {
-        return memberMapper.selectById(id);
+        try {
+         Member member = memberMapper.selectById(id);
+          return Result.ok(member);
+        }catch (Exception e) {
+            return Result.error(null);
+        }
     }
 
 
@@ -68,8 +74,9 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
      */
 
     @Override
-    public int insertMember(Member member) {
-        return memberMapper.insert(member);
+    public Result<?> insertMember(Member member) {
+         memberMapper.insert(member);
+        return Result.ok(member);
     }
 
 

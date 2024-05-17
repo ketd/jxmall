@@ -89,7 +89,7 @@ public class MemberController{
     @GetMapping(value = "/info")
     public Result<?> getInfo(@RequestParam("id") Long id)
     {
-        return Result.ok(memberService.selectMemberById(id));
+        return memberService.selectMemberById(id);
     }
 
     /**
@@ -133,7 +133,9 @@ public class MemberController{
     @PostMapping("/save")
     public Result<?> add(@RequestBody Member member)
     {
-        return Result.ok(memberService.insertMember(member));
+        // 增加日志
+        System.out.println("Received Member: " + member);
+        return memberService.insertMember(member);
     }
 
     /**

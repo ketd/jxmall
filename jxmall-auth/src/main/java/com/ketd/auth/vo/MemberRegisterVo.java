@@ -1,6 +1,5 @@
 package com.ketd.auth.vo;
 
-import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -12,7 +11,7 @@ import lombok.Data;
  * @CreateTime: 2024-05-08  15:31
  */
 @Data
-public class MemberVo {
+public class MemberRegisterVo {
 
     @Schema(description =  "用户名")
     private String username;

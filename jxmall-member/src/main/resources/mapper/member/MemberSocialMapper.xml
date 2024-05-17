@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ketd.member.mapper.MemberSocialMapper">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.ketd.member.domain.MemberSocial" id="BaseResultMap">
+        <result property="memberId"    column="member_id"    />
+        <result property="socialUid"    column="social_uid"    />
+        <result property="accessToken"    column="access_token"    />
+        <result property="exporesIn"    column="expores_in"    />
+        <result property="avatarUrl"    column="avatar_url"    />
+        <result property="name"    column="name"    />
+        <result property="type"    column="type"    />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        member_id,social_uid,access_token,expores_in,avatar_url,name,type
+    </sql>
+    <select id="findOneBySocialUidAndType" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from ums_member_social
+        where
+        social_uid = #{socialUid,jdbcType=VARCHAR}
+        AND type = #{type,jdbcType=NUMERIC}
+    </select>
+
+</mapper>
+

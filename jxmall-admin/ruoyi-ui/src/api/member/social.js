@@ -1,70 +1,70 @@
 import axios from 'axios';
 const baseURL = process.env.VUE_APP_JXMALL_ADMIN_BASE_API;
 
-// 分页查询${functionName}列表
-export function list${BusinessName}Page(queryParams) {
+// 分页查询单点登录用户信息关联列表
+export function listSocialPage(queryParams) {
   return axios({
     baseURL: baseURL,
-    url: '/${moduleName}/${ClassName}/list/page',
+    url: '/member/MemberSocial/list/page',
     method: 'post',
     data: queryParams
   })
 }
 
 
-// 查询${functionName}详细
-export function get${BusinessName}(${pkColumn.javaField}) {
+// 查询单点登录用户信息关联详细
+export function getSocial(memberId) {
   return axios({
     baseURL: baseURL,
-    url: `/${moduleName}/${ClassName}/info`,
+    url: `/member/MemberSocial/info`,
     method: 'get',
     params: {
-        ${pkColumn.javaField}: ${pkColumn.javaField}
+        memberId: memberId
     }
   })
 }
 
-// 新增${functionName}
-export function add${BusinessName}(data) {
+// 新增单点登录用户信息关联
+export function addSocial(data) {
   return axios({
     baseURL: baseURL,
-    url: '/${moduleName}/${ClassName}/save',
+    url: '/member/MemberSocial/save',
     method: 'post',
     data: data
   })
 }
 
-// 修改${functionName}
-export function update${BusinessName}(data) {
+// 修改单点登录用户信息关联
+export function updateSocial(data) {
   return axios({
     baseURL: baseURL,
-    url: '/${moduleName}/${ClassName}/update',
+    url: '/member/MemberSocial/update',
     method: 'put',
     data: data
   })
 }
 
-// 删除${functionName}
-export function del${BusinessName}(${pkColumn.javaField}s) {
+// 删除单点登录用户信息关联
+export function delSocial(memberIds) {
   return axios({
     baseURL: baseURL,
-    url: '/${moduleName}/${ClassName}/delete',
+    url: '/member/MemberSocial/delete',
     method: 'delete',
-    data: ${pkColumn.javaField}s
+    data: memberIds
   })
 }
 
 
-// 导出${functionName}属性
-export function export${BusinessName}(${pkColumn.javaField}s) {
+// 导出单点登录用户信息关联属性
+export function exportSocial(memberIds) {
   return axios({
     baseURL: baseURL,
-    url: '/${moduleName}/${ClassName}/export',
+    url: '/member/MemberSocial/export',
     method: 'post',
-    data: ${pkColumn.javaField}s,
+    data: memberIds,
     responseType: 'blob' // 设置响应类型为 blob
   }).then(response => {
-    const filename = '导出${businessName}数据.xlsx';
+    const filename = '导出social数据.xlsx';
     const blob = new Blob([response.data], { type: 'application/octet-stream' });
 
     // 使用 FileSaver.js 来触发下载

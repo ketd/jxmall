@@ -2,14 +2,12 @@ package com.ketd.auth.controller;
 
 import com.ketd.auth.server.AuthServer;
 import com.ketd.auth.vo.LoginVo;
-import com.ketd.auth.vo.MemberVo;
+import com.ketd.auth.vo.MemberRegisterVo;
 import com.ketd.common.result.Result;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
 /**
  * @Description:
@@ -21,7 +19,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 @Tag(name = "用户注册中心")
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/auth/auth")
 public class AuthController {
 
     @Autowired
@@ -30,8 +28,8 @@ public class AuthController {
 
     @Operation(summary = "用户注册控制器")
     @PostMapping(value = "/register")
-    public Result<?> register(@RequestBody MemberVo memberVo) {//json数据接收加@RequestBody注解
-        return authServer.register(memberVo);
+    public Result<?> register(@RequestBody MemberRegisterVo memberRegisterVo) {//json数据接收加@RequestBody注解
+        return authServer.register(memberRegisterVo);
     }
 
     @Operation(summary = "获取注册验证码")
@@ -46,6 +44,7 @@ public class AuthController {
     public Result<?> Login(@RequestBody LoginVo loginVo) {
         return authServer.login(loginVo);
     }
+
 
 
 

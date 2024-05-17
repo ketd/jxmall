@@ -3,6 +3,7 @@ package com.ketd.member.service;
 
 import java.util.List;
 
+import com.ketd.common.result.Result;
 import jakarta.servlet.http.HttpServletResponse;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ketd.member.domain.Member;
@@ -21,7 +22,7 @@ public interface IMemberService  extends IService<Member> {
      * @param id 会员主键
      * @return 会员
      */
-    public Member selectMemberById(Long id);
+    public Result<?> selectMemberById(Long id);
 
     /**
      * 查询会员列表
@@ -37,7 +38,7 @@ public interface IMemberService  extends IService<Member> {
      * @param member 会员
      * @return 结果
      */
-    public int insertMember(Member member);
+    public Result<?> insertMember(Member member);
 
     /**
      * 修改会员

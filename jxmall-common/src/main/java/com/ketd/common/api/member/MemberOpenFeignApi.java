@@ -19,7 +19,7 @@ public interface MemberOpenFeignApi {
      * 获取会员详细信息
      */
     @GetMapping(value = "/member/Member/info")
-    public Result<?> getInfo(@RequestParam("id") Long id);
+    public Result<MemberTO> getInfo(@RequestParam("id") Long id);
 
     @GetMapping(value = "/member/Member/info/mobile")
     public Result<MemberTO> getInfoByMobile(@RequestParam("mobile") String mobile);
@@ -29,8 +29,8 @@ public interface MemberOpenFeignApi {
     /**
      * 新增会员
      */
-    @PostMapping("/member/Member/save")
-    public Result<?> add(@RequestBody MemberTO memberTO);
+    @PostMapping(value ="/member/Member/save")
+    public Result<MemberTO> add(@RequestBody MemberTO memberTO);
 
     /**
      * 修改会员

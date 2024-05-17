@@ -11,7 +11,6 @@ import com.ketd.common.result.Result;
 import com.ketd.product.utils.RedisUtil;
 import com.ketd.product.mapper.CategoryBrandRelationMapper;
 import jakarta.servlet.http.HttpServletResponse;
-import org.redisson.Redisson;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;

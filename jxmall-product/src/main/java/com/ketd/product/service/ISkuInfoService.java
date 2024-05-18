@@ -18,11 +18,11 @@ import com.ketd.product.domain.SkuInfo;
 public interface ISkuInfoService  extends IService<SkuInfo> {
     /**
      * 查询sku信息
-     * 
+     *
      * @param skuId sku信息主键
      * @return sku信息
      */
-    public SkuInfo selectSkuInfoBySkuId(Long skuId);
+    public Result<?> selectSkuInfoBySkuId(Long skuId);
 
     /**
      * 查询sku信息列表

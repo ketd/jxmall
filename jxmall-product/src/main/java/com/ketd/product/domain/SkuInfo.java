@@ -76,5 +76,9 @@ public class SkuInfo  implements Serializable
         @Schema(description =  "销量")
         private Long saleCount;
 
+        @ExcelProperty(value = "销售属性")
+        @Schema(description =  "销售属性")
+        private String skuAttrValues;
+
 
 }

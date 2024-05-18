@@ -19,7 +19,7 @@ public interface BrandOpenFeignApi {
      * 获取品牌详细信息
      */
     @GetMapping(value = "/product/Brand/info")
-    public Result<?> getInfo(@RequestParam("brandId") Long brandId);
+    public Result<BrandTO> getInfo(@RequestParam("brandId") Long brandId);
     /**
      * 新增品牌
      */

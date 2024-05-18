@@ -22,6 +22,7 @@ public class SkuInfoTO  implements Serializable
     private String skuSubtitle;
     private BigDecimal price;
     private Long saleCount;
+    private String skuAttrValues;
 
 
 }

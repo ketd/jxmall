@@ -81,7 +81,7 @@ public class SkuInfoController{
     @GetMapping(value = "/info")
     public Result<?> getInfo(@RequestParam("skuId") Long skuId)
     {
-        return Result.ok(skuInfoService.selectSkuInfoBySkuId(skuId));
+        return skuInfoService.selectSkuInfoBySkuId(skuId);
     }
     @Operation(summary = "获取多条sku信息")
     @PostMapping(value = "/info/batch")

@@ -20,6 +20,7 @@
         <module>jxmall-admin</module>
         <module>jxmall-third-party</module>
         <module>jxmall-auth</module>
+        <module>jxmall-cart</module>
 
 
     </modules>

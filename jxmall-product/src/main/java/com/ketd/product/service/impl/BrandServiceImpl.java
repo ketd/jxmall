@@ -3,13 +3,19 @@ package com.ketd.product.service.impl;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.ketd.common.result.Result;
 import com.ketd.product.domain.CategoryBrandRelation;
+import com.ketd.product.domain.SkuInfo;
 import com.ketd.product.mapper.CategoryBrandRelationMapper;
+import com.ketd.product.utils.RedisUtil;
 import jakarta.servlet.http.HttpServletResponse;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -32,6 +38,12 @@ public class BrandServiceImpl extends ServiceImpl<BrandMapper, Brand> implements
     @Autowired
     private BrandMapper brandMapper;
 
+    @Autowired
+    private RedisUtil redisUtil;
+
+    @Autowired
+    private RedissonClient redisson;
+
 
     @Autowired
     private CategoryBrandRelationMapper  categoryBrandRelationMapper;
@@ -45,9 +57,29 @@ public class BrandServiceImpl extends ServiceImpl<BrandMapper, Brand> implements
      * @return 品牌
      */
     @Override
-    public Brand selectBrandByBrandId(Long brandId)
+    public Result<?> selectBrandByBrandId(Long brandId)
     {
-        return brandMapper.selectById(brandId);
+        String key = "brandInfo:" + brandId;
+
+        Brand brand;
+        brand = redisUtil.getJson(key, new TypeReference<>() {
+        });
+        RLock lock = redisson.getLock("getBrandInfo_lock"+brandId);
+
+
+        if (brand != null) {
+            return Result.ok(brand);
+        } else {
+            lock.lock(30, TimeUnit.SECONDS);
+            try {
+
+                brand = brandMapper.selectById(brandId);
+                redisUtil.setJson(key, brand, 10000);
+            } finally {
+                lock.unlock();
+            }
+        }
+        return Result.ok(brand);
     }
 
 

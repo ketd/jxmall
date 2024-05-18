@@ -18,11 +18,11 @@ import com.ketd.product.domain.Brand;
 public interface IBrandService  extends IService<Brand> {
     /**
      * 查询品牌
-     * 
+     *
      * @param brandId 品牌主键
      * @return 品牌
      */
-    public Brand selectBrandByBrandId(Long brandId);
+    public Result<?> selectBrandByBrandId(Long brandId);
 
     /**
      * 查询品牌列表

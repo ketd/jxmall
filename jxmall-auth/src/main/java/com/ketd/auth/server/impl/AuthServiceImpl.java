@@ -7,10 +7,9 @@ import cn.hutool.extra.template.TemplateConfig;
 import cn.hutool.extra.template.TemplateEngine;
 import cn.hutool.extra.template.TemplateUtil;
 import com.ketd.auth.dto.EmailDto;
-import com.ketd.auth.server.AuthServer;
+import com.ketd.auth.server.AuthService;
 import com.ketd.auth.server.EmailService;
 import com.ketd.auth.util.JXJwtTokenUtil;
-import com.ketd.auth.util.RedisUtil;
 import com.ketd.auth.vo.LoginVo;
 import com.ketd.auth.vo.MemberInfoVo;
 import com.ketd.auth.vo.MemberRegisterVo;
@@ -18,7 +17,8 @@ import com.ketd.common.api.member.MemberOpenFeignApi;
 import com.ketd.common.domain.member.MemberTO;
 import com.ketd.common.result.Result;
 import com.ketd.common.result.ResultCodeEnum;
-import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,10 +26,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.SecretKey;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -42,7 +40,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 @Service
 @Primary
-public class AuthServerImpl implements AuthServer {
+public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private EmailService emailService;
@@ -60,6 +58,8 @@ public class AuthServerImpl implements AuthServer {
 
     @Autowired
     private JXJwtTokenUtil jwtTokenUtil;
+
+
 
 
 
@@ -91,7 +91,7 @@ public class AuthServerImpl implements AuthServer {
         MemberTO member = new MemberTO();
         member.setLevelId(1L);
         member.setUsername(memberRegisterVo.getUsername());
-        member.setNickname(memberRegisterVo.getNickname());
+        member.setNickname(memberRegisterVo.getUsername());
         member.setMobile(memberRegisterVo.getMobile());
         member.setEmail(memberRegisterVo.getEmail());
         member.setHeader(null);
@@ -139,46 +139,44 @@ public class AuthServerImpl implements AuthServer {
         // 使用supplyAsync处理异步发送邮件操作
         return Result.ok(null);
     }
-
     @Override
-    public Result<?> login(LoginVo loginVo) {
-        MemberTO  foundUser=null;
-        if(loginVo.getEmail()==null|| loginVo.getEmail().isEmpty()){
+    public Result<?> login(HttpServletRequest request, LoginVo loginVo) {
+        // 获取用户信息
+        MemberTO foundUser = null;
+        if (loginVo.getEmail() != null && !loginVo.getEmail().isEmpty()) {
+            foundUser = memberOpenFeignApi.getInfoByEmail(loginVo.getEmail()).getData();
+        } else if (loginVo.getMobile() != null && !loginVo.getMobile().isEmpty()) {
             foundUser = memberOpenFeignApi.getInfoByMobile(loginVo.getMobile()).getData();
         }
-        if(loginVo.getMobile()==null|| loginVo.getMobile().isEmpty()){
-            foundUser = memberOpenFeignApi.getInfoByEmail(loginVo.getEmail()).getData();
 
+        // 验证用户是否存在
+        if (foundUser == null) {
+            return Result.build(null, ResultCodeEnum.PASSWORD_ERROR);
         }
-        if(foundUser==null){
-            // 登录失败
-            return Result.build(null,ResultCodeEnum.PASSWORD_ERROR);
-        }
+
+        // 检查密码
         boolean flag = BCrypt.checkpw(loginVo.getPassword(), foundUser.getPassword());
-        if (flag) {
-
-    /*        String token=jwtHelper.createToken(foundUser.getUserId());
-            redisUtil.set(COOKIE_NAME_TOKEN + ":" + "user-"+foundUser.getUserId(), token, TOKEN_EXPIRE);
-
-*/
-            MemberInfoVo memberInfoVo = new MemberInfoVo();
-            //对拷
-            BeanUtils.copyProperties(foundUser,memberInfoVo);
-
-            String token= jwtTokenUtil.generatorToken(memberInfoVo.getId());
-
-            memberInfoVo.setToken(token);
-
-            String  redisKey = "jxmall:auth:token:"+memberInfoVo.getId();
-
-            redisUtil.setJson(redisKey,token,expiration);
-
-            // 登录成功
-            return Result.build(memberInfoVo,ResultCodeEnum.LOGIN_SUCCESS);
-        } else {
-            // 登录失败
-            return Result.build(null,ResultCodeEnum.PASSWORD_ERROR);
+        if (!flag) {
+            return Result.build(null, ResultCodeEnum.PASSWORD_ERROR);
         }
+
+        // 登录成功，生成Token
+        MemberInfoVo memberInfoVo = new MemberInfoVo();
+        BeanUtils.copyProperties(foundUser, memberInfoVo);
+        String token = jwtTokenUtil.generatorToken(memberInfoVo.getId());
+        memberInfoVo.setToken(token);
+
+        // 缓存Token到Redis
+        String redisKey = "jxmall:auth:token:" + memberInfoVo.getId();
+        redisUtil.setJson(redisKey, token, expiration);
+
+        // 设置Session
+        HttpSession session = request.getSession(true);
+        session.setAttribute("loginUser", memberInfoVo);
+
+
+        return Result.build(memberInfoVo, ResultCodeEnum.LOGIN_SUCCESS);
     }
+
 
 }

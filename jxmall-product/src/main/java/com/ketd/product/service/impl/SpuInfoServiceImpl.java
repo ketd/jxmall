@@ -93,23 +93,22 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoMapper, SpuInfo> impl
     private SearchOpenFeignApi searchOpenFeignApi;
 
     @Autowired
-    private SkuImagesMapper  skuImagesMapper;
+    private SkuImagesMapper skuImagesMapper;
 
     @Autowired
-    private SpuInfoDescMapper  spuInfoDescMapper;
+    private SpuInfoDescMapper spuInfoDescMapper;
 
     @Autowired
     private AttrGroupServiceImpl attrGroupService;
 
     @Autowired
-    private ThreadPoolExecutor  threadPoolExecutor;
+    private ThreadPoolExecutor threadPoolExecutor;
 
     @Autowired
     private RedisUtil redisUtil;
 
     @Autowired
     private RedissonClient redisson;
-
 
 
     /**
@@ -377,7 +376,6 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoMapper, SpuInfo> impl
             //            取出所有 sku 的 id
 
 
-
             //            查询出需要被检索的属性
             List<Long> searchAttrIds = attrService.selectSearchAttrs(attrIds);
 
@@ -396,8 +394,6 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoMapper, SpuInfo> impl
                 return attribute;
             }).toList();
             /*attributes.addAll(uniqueSkuAttributes);*/
-
-
 
 
             //            查询出所有 sku 的库存信息
@@ -444,9 +440,9 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoMapper, SpuInfo> impl
                 //                    将所有需要检索的属性设置为 skuEsModel 的 attrs 属性
 
 
-                List<SkuEsModel.Attribute> finalUniqueSkuAttributes =   new ArrayList<>();
-                List<SkuSaleAttrValue> skuSaleAttrValueList =  skuSaleAttrValueService.getSkuSaleAttrValueBySkuId(skuInfo.getSkuId());
-                for(SkuSaleAttrValue skuAttr: skuSaleAttrValueList){
+                List<SkuEsModel.Attribute> finalUniqueSkuAttributes = new ArrayList<>();
+                List<SkuSaleAttrValue> skuSaleAttrValueList = skuSaleAttrValueService.getSkuSaleAttrValueBySkuId(skuInfo.getSkuId());
+                for (SkuSaleAttrValue skuAttr : skuSaleAttrValueList) {
                     SkuEsModel.Attribute attribute = new SkuEsModel.Attribute();
                     attribute.setAttrId(skuAttr.getAttrId());
                     attribute.setAttrName(skuAttr.getAttrName());
@@ -476,7 +472,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoMapper, SpuInfo> impl
                     }
                 }
 
-            }else {
+            } else {
                 return Result.error(result.getData());
             }
 
@@ -493,7 +489,8 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoMapper, SpuInfo> impl
         String key = "skuDetail:" + skuId;
 
         // 尝试从缓存获取
-        SkuItemVo cachedSkuItemVo = redisUtil.getJson(key, new TypeReference<SkuItemVo>() {});
+        SkuItemVo cachedSkuItemVo = redisUtil.getJson(key, new TypeReference<SkuItemVo>() {
+        });
         if (cachedSkuItemVo != null) {
             return Result.ok(cachedSkuItemVo);
         }
@@ -504,7 +501,8 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoMapper, SpuInfo> impl
             lock.lock(30, TimeUnit.SECONDS);
 
             // 再次尝试从缓存获取，防止缓存穿透
-            cachedSkuItemVo = redisUtil.getJson(key, new TypeReference<SkuItemVo>() {});
+            cachedSkuItemVo = redisUtil.getJson(key, new TypeReference<SkuItemVo>() {
+            });
             if (cachedSkuItemVo != null) {
                 return Result.ok(cachedSkuItemVo);
             }
@@ -558,7 +556,6 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoMapper, SpuInfo> impl
 
         return Result.ok(skuItemVoHolder[0]);
     }
-
 
 
 }

@@ -614,6 +614,7 @@ export default {
             fullPrice: 0.0,
             reducePrice: 0.0,
             priceStatus: 0,
+            skuAttrValues: descar.join(" "),
             memberPrice: [].concat(memberPrices)
           });
         } else {

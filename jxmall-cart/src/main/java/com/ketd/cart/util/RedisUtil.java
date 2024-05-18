@@ -1,4 +1,4 @@
-package com.ketd.auth.util;
+package com.ketd.cart.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -268,6 +268,29 @@ public class RedisUtil {
         } catch (JsonProcessingException e) {
             System.err.println("Error serializing object to JSON for Redis: " + e.getMessage());
         }
+    }
+
+    //哈希
+
+    public void hsetJson(String key, String field, Object value) {
+        try {
+            String json = objectMapper.writeValueAsString(value);
+            redisTemplate.opsForHash().put(key, field, json);
+        } catch (JsonProcessingException e) {
+            System.err.println("Error serializing object to JSON for Redis: " + e.getMessage());
+        }
+    }
+
+    public <T> T hgetJson(String key, String field, Class<T> clazz) {
+        String value = (String) redisTemplate.opsForHash().get(key, field);
+        if (value != null) {
+            try {
+                return objectMapper.readValue(value, clazz);
+            } catch (IOException e) {
+                throw new RuntimeException("Error while reading JSON: " + e.getMessage(), e);
+            }
+        }
+        return null;
     }
 
 

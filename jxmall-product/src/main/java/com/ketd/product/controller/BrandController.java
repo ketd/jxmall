@@ -92,7 +92,7 @@ public class BrandController{
     @GetMapping(value = "/info")
     public Result<?> getInfo(@RequestParam("brandId") Long brandId)
     {
-        return Result.ok(brandService.selectBrandByBrandId(brandId));
+        return brandService.selectBrandByBrandId(brandId);
     }
 
     /**

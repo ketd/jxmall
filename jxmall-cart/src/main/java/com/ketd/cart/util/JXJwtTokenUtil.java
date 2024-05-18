@@ -1,15 +1,11 @@
-package com.ketd.auth.util;
+package com.ketd.cart.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.bcrypt.BCrypt;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -101,7 +97,7 @@ public class JXJwtTokenUtil
      * @param token token
      * @return 用户id
      */
-    public Long getUserNameFromToken(String token){
+    public Long getUserIdFromToken(String token){
         Long userId;
         try
         {
@@ -133,7 +129,7 @@ public class JXJwtTokenUtil
      * @return
      */
     public boolean validateToken(String token,Long userId){
-        return getUserNameFromToken(token).equals(String.valueOf(userId)) && !isTokenExpired(token);
+        return getUserIdFromToken(token).equals(String.valueOf(userId)) && !isTokenExpired(token);
     }
 
     /**
@@ -141,7 +137,7 @@ public class JXJwtTokenUtil
      * @param token 需要被验证的token
      * @return true/false
      */
-    private boolean isTokenExpired(String token)
+    public boolean isTokenExpired(String token)
     {
         //判断预设时间是否在当前时间之前，如果在当前时间之前，就表示过期了，会返回true
         return getExpiredDateFromToken(token).before(new Date());

@@ -18,6 +18,14 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
+      <el-form-item label="sku销售属性" prop="skuDesc">
+        <el-input
+          v-model="queryParams.data.skuAttrValues"
+          placeholder="请输入sku销售属性"
+          clearable
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
       <el-form-item label="所属分类id" prop="catalogId">
         <el-input
           v-model="queryParams.data.catalogId"
@@ -120,6 +128,7 @@
       <el-table-column label="spuId" align="center" prop="spuId"/>
       <el-table-column label="sku名称" align="center" prop="skuName"/>
       <el-table-column label="sku介绍描述" align="center" prop="skuDesc"/>
+      <el-table-column label="sku销售属性" align="center" prop="skuAttrValues"/>
       <el-table-column label="所属分类id" align="center" prop="catalogId"/>
       <el-table-column label="品牌id" align="center" prop="brandId"/>
       <el-table-column label="默认图片" align="center" prop="skuDefaultImg" width="100">
@@ -172,6 +181,9 @@
         </el-form-item>
         <el-form-item label="sku介绍描述" prop="skuDesc">
           <el-input v-model="form.skuDesc" type="textarea" placeholder="请输入内容"/>
+        </el-form-item>
+        <el-form-item label="sku销售属性" prop="skuAttrValues">
+          <el-input v-model="form.skuAttrValues" type="textarea" placeholder="请输入内容"/>
         </el-form-item>
         <el-form-item label="所属分类id" prop="catalogId">
           <el-input v-model="form.catalogId" placeholder="请输入所属分类id"/>
@@ -249,7 +261,8 @@ export default {
           skuTitle: null,
           skuSubtitle: null,
           price: null,
-          saleCount: null
+          saleCount: null,
+          skuAttrValues: null
         }
       },
       // 表单参数
@@ -289,7 +302,8 @@ export default {
         skuTitle: null,
         skuSubtitle: null,
         price: null,
-        saleCount: null
+        saleCount: null,
+        skuAttrValues: null
       };
       this.resetForm("form");
     },

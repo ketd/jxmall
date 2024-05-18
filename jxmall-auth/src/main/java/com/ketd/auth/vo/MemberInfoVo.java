@@ -5,6 +5,7 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -15,7 +16,7 @@ import java.util.Date;
  * @CreateTime: 2024-05-17  17:42
  */
 @Data
-public class MemberInfoVo {
+public class MemberInfoVo implements Serializable {
 
 
     @Schema(description =  "id")

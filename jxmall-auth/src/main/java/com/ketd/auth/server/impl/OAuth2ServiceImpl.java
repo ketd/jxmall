@@ -6,16 +6,14 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.ketd.auth.constant.TypeConstant;
-import com.ketd.auth.server.OAuth2Server;
+import com.ketd.auth.server.OAuth2Service;
 import com.ketd.auth.util.JXJwtTokenUtil;
-import com.ketd.auth.util.RedisUtil;
 import com.ketd.auth.vo.MemberInfoVo;
 import com.ketd.common.api.member.MemberOpenFeignApi;
 import com.ketd.common.api.member.MemberSocialOpenFeignApi;
 import com.ketd.common.domain.member.MemberSocialTO;
 import com.ketd.common.domain.member.MemberTO;
 import com.ketd.common.result.Result;
-import com.ketd.common.result.ResultCodeEnum;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class OAuth2ServerImpl implements OAuth2Server {
+public class OAuth2ServiceImpl implements OAuth2Service {
 
     @Autowired
     private MemberSocialOpenFeignApi memberSocialOpenFeignApi;
@@ -182,6 +180,7 @@ public class OAuth2ServerImpl implements OAuth2Server {
         MemberTO member = new MemberTO();
         member.setLevelId(1L);
         member.setUsername(jsonUserResponse.getString("name"));
+        member.setNickname(member.getUsername());
         member.setCreateTime(new Date());
 
         MemberTO memberTO = memberOpenFeignApi.add(member).getData();

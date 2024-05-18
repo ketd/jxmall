@@ -3,6 +3,7 @@ package com.ketd.auth.server;
 import com.ketd.auth.vo.LoginVo;
 import com.ketd.auth.vo.MemberRegisterVo;
 import com.ketd.common.result.Result;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * @Description:
@@ -11,11 +12,11 @@ import com.ketd.common.result.Result;
  * @Author: ketd
  * @CreateTime: 2024-05-15  15:36
  */
-public interface AuthServer {
+public interface AuthService {
 
     Result<?> register(MemberRegisterVo memberRegisterVo);
 
     Result<?> sendMailCode(String email);
 
-    Result<?> login(LoginVo loginVo);
+    Result<?> login(HttpServletRequest request, LoginVo loginVo);
 }

@@ -3,13 +3,19 @@ package com.ketd.product.service.impl;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.ketd.common.result.Result;
 import com.ketd.product.mapper.BrandMapper;
+import com.ketd.product.utils.RedisUtil;
 import com.ketd.product.vo.SkuInfoVo;
+import com.ketd.product.vo.SkuItemVo;
 import jakarta.servlet.http.HttpServletResponse;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,7 +39,13 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
     @Autowired
     private SkuInfoMapper skuInfoMapper;
     @Autowired
-    private BrandMapper  brandMapper;
+    private BrandMapper brandMapper;
+
+    @Autowired
+    private RedisUtil redisUtil;
+
+    @Autowired
+    private RedissonClient redisson;
 
     /**
      * 查询sku信息
@@ -42,11 +54,30 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
      * @return sku信息
      */
     @Override
-    public SkuInfo selectSkuInfoBySkuId(Long skuId)
-    {
-        return skuInfoMapper.selectById(skuId);
-    }
+    public Result<?> selectSkuInfoBySkuId(Long skuId) {
+        String key = "skuInfo:" + skuId;
 
+        SkuInfo skuInfo;
+        skuInfo = redisUtil.getJson(key, new TypeReference<>() {
+        });
+        RLock lock = redisson.getLock("getSkuInfo_lock"+skuId);
+
+
+        if (skuInfo != null) {
+            return Result.ok(skuInfo);
+        } else {
+            lock.lock(30, TimeUnit.SECONDS);
+            try {
+
+                skuInfo = skuInfoMapper.selectById(skuId);
+                redisUtil.setJson(key, skuInfo, 10000);
+            } finally {
+                lock.unlock();
+            }
+        }
+
+        return Result.ok(skuInfo);
+    }
 
 
     /**
@@ -56,8 +87,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
      * @return sku信息
      */
     @Override
-    public List<SkuInfo> selectSkuInfoList(SkuInfo skuInfo)
-    {
+    public List<SkuInfo> selectSkuInfoList(SkuInfo skuInfo) {
         QueryWrapper<SkuInfo> queryWrapper = new QueryWrapper<>(skuInfo);
         return skuInfoMapper.selectList(queryWrapper);
     }
@@ -73,9 +103,6 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
     public int insertSkuInfo(SkuInfo skuInfo) {
         return skuInfoMapper.insert(skuInfo);
     }
-
-
-
 
 
     /**
@@ -126,9 +153,9 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
             response.setHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
             response.setHeader("Pragma", "public");
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8");
-            String fileName = "导出列表"+ ".xlsx";
+            String fileName = "导出列表" + ".xlsx";
             fileName = new String(fileName.getBytes(), "ISO-8859-1");
-            response.setHeader("Content-Disposition", "attachment;filename=" + fileName );
+            response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
             EasyExcel.write(response.getOutputStream(), SkuInfo.class)
                     .autoCloseStream(Boolean.FALSE)
                     .sheet("导出列表")
@@ -152,16 +179,16 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
 
     @Override
     public Result<?> getSkuInfos(Long[] skuIds) {
-       List<SkuInfo> skuInfoList= skuInfoMapper.selectBatchIds(Arrays.asList(skuIds));
-       List<Long> branIds = skuInfoList.stream().map(SkuInfo::getBrandId).distinct().toList();
-       List<String> brandNames = brandMapper.selectBatchIds(branIds).stream().map(com.ketd.product.domain.Brand::getName).toList();
-       List<SkuInfoVo>  skuInfoVoList = skuInfoList.stream().map(skuInfo -> {
+        List<SkuInfo> skuInfoList = skuInfoMapper.selectBatchIds(Arrays.asList(skuIds));
+        List<Long> branIds = skuInfoList.stream().map(SkuInfo::getBrandId).distinct().toList();
+        List<String> brandNames = brandMapper.selectBatchIds(branIds).stream().map(com.ketd.product.domain.Brand::getName).toList();
+        List<SkuInfoVo> skuInfoVoList = skuInfoList.stream().map(skuInfo -> {
             SkuInfoVo skuInfoVo = new SkuInfoVo();
-            BeanUtils.copyProperties(skuInfo,skuInfoVo);
+            BeanUtils.copyProperties(skuInfo, skuInfoVo);
             skuInfoVo.setBrandName(brandNames.get(branIds.indexOf(skuInfo.getBrandId())));
             return skuInfoVo;
         }).toList();
-       return Result.ok(skuInfoVoList);
+        return Result.ok(skuInfoVoList);
     }
 
 }

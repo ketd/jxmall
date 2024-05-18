@@ -1,15 +1,11 @@
 package com.ketd.auth.controller;
 
-import com.ketd.auth.server.OAuth2Server;
-import com.ketd.common.api.member.MemberOpenFeignApi;
-import com.ketd.common.domain.member.MemberTO;
+import com.ketd.auth.server.OAuth2Service;
 import com.ketd.common.result.Result;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
 /**
  * @Description:
@@ -23,18 +19,18 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/auth/oauth2")
 public class OAuth2Controller {
     @Autowired
-    private OAuth2Server oAuth2Server;
+    private OAuth2Service oAuth2Service;
 
     @Operation(summary = "Github授权")
     @GetMapping("/github")
     public Result<?> github(@RequestParam(value = "code") String code) {
-        return oAuth2Server.github(code);
+        return oAuth2Service.github(code);
     }
 
     @Operation(summary = "Gitee授权")
     @GetMapping("/gitee")
     public Result<?> gitee(@RequestParam(value = "code") String code) {
-        return oAuth2Server.gitee(code);
+        return oAuth2Service.gitee(code);
     }
 
 

@@ -63,3 +63,7 @@ gen
 /gulimall-ware/src/main/resources/bootstrap.yml
 /gulimall-third-party/src/main/resources/application.yml
 /gulimall-third-party/src/main/resources/bootstrap.yml
+/jxmall-auth/src/main/resources/bootstrap.yml
+/jxmall-auth/src/main/resources/application.yml
+/jxmall-cart/src/main/resources/application.yml
+/jxmall-cart/src/main/resources/bootstrap.yml

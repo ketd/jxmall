@@ -16,10 +16,11 @@
             <result property="skuSubtitle"    column="sku_subtitle"    />
             <result property="price"    column="price"    />
             <result property="saleCount"    column="sale_count"    />
+        <result property="skuAttrValues"    column="sku_attr_values"    />
     </resultMap>
 
     <sql id="Base_Column_List">
-sku_id,spu_id,sku_name,sku_desc,catalog_id,brand_id,sku_default_img,sku_title,sku_subtitle,price,sale_count
+sku_id,spu_id,sku_name,sku_desc,catalog_id,brand_id,sku_default_img,sku_title,sku_subtitle,price,sale_count,sku_attr_values
     </sql>
     <select id="findSkuIdBySpuId" resultMap="BaseResultMap">
         select sku_id

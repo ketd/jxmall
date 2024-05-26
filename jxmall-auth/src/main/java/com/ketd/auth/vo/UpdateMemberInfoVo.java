@@ -1,7 +1,5 @@
 package com.ketd.auth.vo;
 
-import com.alibaba.excel.annotation.ExcelIgnore;
-import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -13,30 +11,14 @@ import java.util.Date;
  * @BelongsProject: jxmall
  * @BelongsPackage: com.ketd.auth.vo
  * @Author: ketd
- * @CreateTime: 2024-05-17  17:42
+ * @CreateTime: 2024-05-21  17:43
  */
 @Data
-public class MemberInfoVo implements Serializable {
-
-
-    @Schema(description =  "id")
-    private Long id;
-
-    @Schema(description =  "会员等级id")
-    private Long levelId;
-
-    @Schema(description =  "用户名")
-    private String username;
+public class UpdateMemberInfoVo implements Serializable {
 
 
     @Schema(description =  "昵称")
     private String nickname;
-
-    @Schema(description =  "手机号码")
-    private String mobile;
-
-    @Schema(description =  "邮箱")
-    private String email;
 
     @Schema(description =  "头像")
     private String header;
@@ -55,13 +37,5 @@ public class MemberInfoVo implements Serializable {
 
     @Schema(description =  "个性签名")
     private String sign;
-
-    @Schema(description =  "积分")
-    private Long integration;
-
-    @Schema(description =  "成长值")
-    private Long growth;
-
-
 
 }

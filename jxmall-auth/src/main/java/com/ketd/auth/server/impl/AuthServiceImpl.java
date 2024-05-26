@@ -10,8 +10,8 @@ import com.ketd.auth.dto.EmailDto;
 import com.ketd.auth.server.AuthService;
 import com.ketd.auth.server.EmailService;
 import com.ketd.auth.util.JXJwtTokenUtil;
+import com.ketd.auth.util.RedisUtil;
 import com.ketd.auth.vo.LoginVo;
-import com.ketd.auth.vo.MemberInfoVo;
 import com.ketd.auth.vo.MemberRegisterVo;
 import com.ketd.common.api.member.MemberOpenFeignApi;
 import com.ketd.common.domain.member.MemberTO;
@@ -139,6 +139,8 @@ public class AuthServiceImpl implements AuthService {
         // 使用supplyAsync处理异步发送邮件操作
         return Result.ok(null);
     }
+
+
     @Override
     public Result<?> login(HttpServletRequest request, LoginVo loginVo) {
         // 获取用户信息
@@ -160,22 +162,23 @@ public class AuthServiceImpl implements AuthService {
             return Result.build(null, ResultCodeEnum.PASSWORD_ERROR);
         }
 
-        // 登录成功，生成Token
-        MemberInfoVo memberInfoVo = new MemberInfoVo();
-        BeanUtils.copyProperties(foundUser, memberInfoVo);
-        String token = jwtTokenUtil.generatorToken(memberInfoVo.getId());
-        memberInfoVo.setToken(token);
+        String token = jwtTokenUtil.generatorToken(foundUser.getId());
+
 
         // 缓存Token到Redis
-        String redisKey = "jxmall:auth:token:" + memberInfoVo.getId();
+        String redisKey = "jxmall:auth:token:" + foundUser.getId();
         redisUtil.setJson(redisKey, token, expiration);
 
-        // 设置Session
+
+
+        String userKey = "jxmall:userInfo:user-" + foundUser.getId();
+        redisUtil.setJson(userKey,foundUser,expiration);
+       /* // 设置Session
         HttpSession session = request.getSession(true);
-        session.setAttribute("loginUser", memberInfoVo);
+        session.setAttribute("loginUser", foundUser);*/
 
 
-        return Result.build(memberInfoVo, ResultCodeEnum.LOGIN_SUCCESS);
+        return Result.build(token, ResultCodeEnum.LOGIN_SUCCESS);
     }
 
 

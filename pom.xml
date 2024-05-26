@@ -149,6 +149,11 @@
                 <artifactId>fastjson2</artifactId>
                 <version>${fastjson2.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>2.16.1</version>
+            </dependency>
             <!-- swagger3 调用方式 http://你的主机IP地址:5555/swagger-ui/index.html -->
             <dependency>
                 <groupId>org.springdoc</groupId>
@@ -287,9 +292,18 @@
                 <artifactId>spring-boot-starter-cache</artifactId>
                 <version>${spring-cache-version}</version>
             </dependency>
+
+<!--AMQP依赖  包含RabbitMQ-->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-amqp</artifactId>
+                <version>3.2.5</version>
+            </dependency>
+
         </dependencies>
 
-
     </dependencyManagement>
+
+
 
 </project>

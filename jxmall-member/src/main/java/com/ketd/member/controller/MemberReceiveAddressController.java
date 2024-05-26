@@ -62,6 +62,13 @@ public class MemberReceiveAddressController{
 
     }
 
+    @Operation(summary ="分页查询会员收货地址列表")
+    @PostMapping("/list/getMemberAddressById")
+    public Result<?> getMemberAddressById(@RequestParam("id")  Long id)
+    {
+        return memberReceiveAddressService.getMemberAddressById(id);
+
+    }
 
     /**
      * 导出会员收货地址列表

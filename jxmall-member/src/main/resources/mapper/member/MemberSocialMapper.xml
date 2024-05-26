@@ -5,6 +5,7 @@
 
     <!-- 可根据自己的需求，是否要使用 -->
     <resultMap type="com.ketd.member.domain.MemberSocial" id="BaseResultMap">
+        <result property="Id"    column="id"    />
         <result property="memberId"    column="member_id"    />
         <result property="socialUid"    column="social_uid"    />
         <result property="accessToken"    column="access_token"    />
@@ -15,7 +16,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        member_id,social_uid,access_token,expores_in,avatar_url,name,type
+        id,member_id,social_uid,access_token,expores_in,avatar_url,name,type
     </sql>
     <select id="findOneBySocialUidAndType" resultMap="BaseResultMap">
         select

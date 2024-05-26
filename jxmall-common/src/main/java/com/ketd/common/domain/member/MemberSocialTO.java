@@ -10,6 +10,7 @@ public class MemberSocialTO  implements Serializable
 {
 
 
+    private Long Id;
     private Long memberId;
     private String socialUid;
     private String accessToken;

@@ -9,17 +9,21 @@ import com.ketd.common.domain.TableDataInfo;
 import com.ketd.common.domain.PageRequest;
 import com.ketd.common.domain.member.MemberReceiveAddressTO;
 
+import java.util.List;
+
 @FeignClient(value = "cloud-gateway-service")
 public interface MemberReceiveAddressOpenFeignApi {
 
     @PostMapping("/member/MemberReceiveAddress/list/page")
     public TableDataInfo list(@RequestBody PageRequest<MemberReceiveAddressTO> pageRequest);
 
+    @PostMapping("/member/MemberReceiveAddress/list/getMemberAddressById")
+    public Result<List<MemberReceiveAddressTO>> getMemberAddressById(@RequestParam("id")  Long id);
     /**
      * 获取会员收货地址详细信息
      */
     @GetMapping(value = "/member/MemberReceiveAddress/info")
-    public Result<?> getInfo(@RequestParam("id") Long id);
+    public Result<MemberReceiveAddressTO> getInfo(@RequestParam("id") Long id);
     /**
      * 新增会员收货地址
      */

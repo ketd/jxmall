@@ -27,6 +27,10 @@ public class MemberSocial implements Serializable {
 
     @TableId
     @ExcelIgnore
+    @ExcelProperty(value = "id")
+    @Schema(description = "id")
+    private Long Id;
+
     @ExcelProperty(value = "用户id")
     @Schema(description = "用户id")
     private Long memberId;

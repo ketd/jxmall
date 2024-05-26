@@ -2,6 +2,8 @@ package com.ketd.member.service;
 
 
 import java.util.List;
+
+import com.ketd.common.result.Result;
 import jakarta.servlet.http.HttpServletResponse;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ketd.member.domain.MemberReceiveAddress;
@@ -66,4 +68,6 @@ public interface IMemberReceiveAddressService  extends IService<MemberReceiveAdd
      * 导出会员收货地址列表
      */
     void export(List<MemberReceiveAddress> list, HttpServletResponse response);
+
+    Result<?> getMemberAddressById(Long id);
 }

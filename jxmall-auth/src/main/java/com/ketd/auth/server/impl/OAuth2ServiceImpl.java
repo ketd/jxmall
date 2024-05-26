@@ -8,6 +8,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.ketd.auth.constant.TypeConstant;
 import com.ketd.auth.server.OAuth2Service;
 import com.ketd.auth.util.JXJwtTokenUtil;
+import com.ketd.auth.util.RedisUtil;
 import com.ketd.auth.vo.MemberInfoVo;
 import com.ketd.common.api.member.MemberOpenFeignApi;
 import com.ketd.common.api.member.MemberSocialOpenFeignApi;
@@ -160,16 +161,18 @@ public class OAuth2ServiceImpl implements OAuth2Service {
         Result<MemberTO> result = memberOpenFeignApi.getInfo(memberId);
         MemberTO memberTO = result.getData();
         if (memberTO != null && result.getCode() == 200) {
-            MemberInfoVo memberInfoVo = new MemberInfoVo();
-            BeanUtils.copyProperties(memberTO, memberInfoVo);
 
-            String token = jwtTokenUtil.generatorToken(memberInfoVo.getId());
-            memberInfoVo.setToken(token);
+            String token = jwtTokenUtil.generatorToken(memberTO.getId());
 
-            String redisKey = "jxmall:auth:token-" + memberInfoVo.getId();
+
+            String redisKey = "jxmall:auth:token-" + memberTO.getId();
             redisUtil.setJson(redisKey, token, expiration);
 
-            return Result.ok(memberInfoVo);
+
+            String userKey = "jxmall:userInfo:user-" + memberTO.getId();
+            redisUtil.setJson(userKey,memberTO,expiration);
+
+            return Result.ok(token);
         } else {
             return Result.error(null);
         }
@@ -193,15 +196,15 @@ public class OAuth2ServiceImpl implements OAuth2Service {
         memberSocial.setExporesIn(Long.valueOf(expiresIn));
         memberSocialOpenFeignApi.add(memberSocial);
 
-        MemberInfoVo memberInfoVo = new MemberInfoVo();
-        BeanUtils.copyProperties(memberTO, memberInfoVo);
 
-        String token = jwtTokenUtil.generatorToken(memberInfoVo.getId());
-        memberInfoVo.setToken(token);
+        String token = jwtTokenUtil.generatorToken(memberTO.getId());
 
-        String redisKey = "jxmall:auth:token:" + memberInfoVo.getId();
+        String redisKey = "jxmall:auth:token:" + memberTO.getId();
         redisUtil.setJson(redisKey, token, expiration);
 
-        return Result.ok(memberInfoVo);
+
+        String userKey = "jxmall:userInfo:user-" + memberTO.getId();
+        redisUtil.setJson(userKey,memberTO,expiration);
+        return Result.ok(token);
     }
 }

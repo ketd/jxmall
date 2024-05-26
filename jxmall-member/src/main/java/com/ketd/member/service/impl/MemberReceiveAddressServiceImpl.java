@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.ketd.common.result.Result;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -131,6 +132,16 @@ public class MemberReceiveAddressServiceImpl extends ServiceImpl<MemberReceiveAd
                     .doWrite(list);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public Result<?> getMemberAddressById(Long id) {
+        try {
+            List<MemberReceiveAddress> list = memberReceiveAddressMapper.selectList(new QueryWrapper<MemberReceiveAddress>().eq("member_id",id));
+            return Result.ok(list);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }

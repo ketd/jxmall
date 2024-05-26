@@ -1,4 +1,4 @@
-package com.ketd.auth.util;
+package com.ketd.order.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

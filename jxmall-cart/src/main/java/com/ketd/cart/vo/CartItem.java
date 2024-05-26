@@ -42,6 +42,12 @@ public class CartItem {
     @Schema(description =  "sku销售属性")
     private String skuAttr;
 
+
+
+    @Schema(description =  "是否选中")
+    private Boolean check;
+
+
     @Schema(description =  "优惠详情")
     private List<promotionInfo> promotionMessages;
 

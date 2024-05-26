@@ -10,8 +10,6 @@ import java.io.Serializable;
 @Data
 public class MemberTO  implements Serializable
 {
-
-
     private Long id;
     private Long levelId;
     private String username;

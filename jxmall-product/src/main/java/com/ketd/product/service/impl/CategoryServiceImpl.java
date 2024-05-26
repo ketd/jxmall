@@ -160,8 +160,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         List<Category> categories;
 
         // 使用TypeReference来避免"未检查的赋值"警告
-        categories = redisUtil.getJson(key, new TypeReference<List<Category>>() {
-        });
+        categories = redisUtil.getJson(key, new TypeReference<List<Category>>() {});
         if (categories != null) {
             return categories;
         }

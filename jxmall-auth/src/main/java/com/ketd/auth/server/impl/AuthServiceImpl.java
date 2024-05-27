@@ -68,6 +68,9 @@ public class AuthServiceImpl implements AuthService {
     private Long expiration;
 
 
+    @Value("${jwt.expiration}")
+    private Long jwtExpiration;
+
     @Override
     public Result<?> register(MemberRegisterVo memberRegisterVo) {
 
@@ -96,6 +99,7 @@ public class AuthServiceImpl implements AuthService {
         member.setEmail(memberRegisterVo.getEmail());
         member.setHeader(null);
         member.setCreateTime(new Date());
+        member.setIntegration(100L);
 
 
 
@@ -167,12 +171,12 @@ public class AuthServiceImpl implements AuthService {
 
         // 缓存Token到Redis
         String redisKey = "jxmall:auth:token:" + foundUser.getId();
-        redisUtil.setJson(redisKey, token, expiration);
+        redisUtil.setJson(redisKey, token, jwtExpiration);
 
 
 
         String userKey = "jxmall:userInfo:user-" + foundUser.getId();
-        redisUtil.setJson(userKey,foundUser,expiration);
+        redisUtil.setJson(userKey,foundUser,jwtExpiration);
        /* // 设置Session
         HttpSession session = request.getSession(true);
         session.setAttribute("loginUser", foundUser);*/

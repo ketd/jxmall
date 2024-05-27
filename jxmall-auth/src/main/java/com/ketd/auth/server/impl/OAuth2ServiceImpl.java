@@ -58,6 +58,9 @@ public class OAuth2ServiceImpl implements OAuth2Service {
     @Value("${jwt.expiration}")
     private Long expiration;
 
+    @Value("${jwt.expiration}")
+    private Long jwtExpiration;
+
     @Override
     public Result<?> github(String code) {
         return processOAuth("https://github.com/login/oauth/access_token", "https://api.github.com/user/repos", code,
@@ -166,11 +169,11 @@ public class OAuth2ServiceImpl implements OAuth2Service {
 
 
             String redisKey = "jxmall:auth:token-" + memberTO.getId();
-            redisUtil.setJson(redisKey, token, expiration);
+            redisUtil.setJson(redisKey, token, jwtExpiration);
 
 
             String userKey = "jxmall:userInfo:user-" + memberTO.getId();
-            redisUtil.setJson(userKey,memberTO,expiration);
+            redisUtil.setJson(userKey,memberTO,jwtExpiration);
 
             return Result.ok(token);
         } else {
@@ -200,11 +203,11 @@ public class OAuth2ServiceImpl implements OAuth2Service {
         String token = jwtTokenUtil.generatorToken(memberTO.getId());
 
         String redisKey = "jxmall:auth:token:" + memberTO.getId();
-        redisUtil.setJson(redisKey, token, expiration);
+        redisUtil.setJson(redisKey, token, jwtExpiration);
 
 
         String userKey = "jxmall:userInfo:user-" + memberTO.getId();
-        redisUtil.setJson(userKey,memberTO,expiration);
+        redisUtil.setJson(userKey,memberTO,jwtExpiration);
         return Result.ok(token);
     }
 }

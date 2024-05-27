@@ -84,8 +84,9 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Result<?> deleteMemberAddress(Long[] ids) {
+    public Result<?> deleteMemberAddress(Long id) {
         try {
+            Long[]  ids = {id};
             Long memberId = getCurrentMemberId();
             List<MemberReceiveAddressTO> memberReceiveAddressToList = memberReceiveAddressOpenFeignApi.getMemberAddressById(memberId).getData();
             if (memberReceiveAddressToList.stream().anyMatch(item -> item.getMemberId().equals(memberId))) {

@@ -20,7 +20,7 @@ public interface MemberService {
 
     Result<?> addMemberAddress(MemberReceiveAddressVo memberReceiveAddressVo);
 
-    Result<?> deleteMemberAddress(Long[] ids);
+    Result<?> deleteMemberAddress(Long id);
 
     Result<?> updateMemberAddress(MemberReceiveAddressVo memberReceiveAddressVo);
 }

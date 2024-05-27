@@ -44,8 +44,8 @@ public class MemberController {
     }
 
     @DeleteMapping("address")
-    public Result<?> deleteMemberAddress(@RequestBody Long[] ids){
-        return memberService.deleteMemberAddress(ids);
+    public Result<?> deleteMemberAddress(@RequestParam("id") Long id){
+        return memberService.deleteMemberAddress(id);
     }
 
     @PutMapping("/address")

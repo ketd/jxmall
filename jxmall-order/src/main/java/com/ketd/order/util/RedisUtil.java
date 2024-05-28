@@ -5,14 +5,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -293,5 +291,17 @@ public class RedisUtil {
         return null;
     }
 
+
+
+    public Long execute(String script, String keys, String args) {
+
+
+        DefaultRedisScript<Long>  redisScript = new DefaultRedisScript<>(script, Long.class);
+        // Convert varargs to List
+
+        List<String> keysList = Arrays.asList(keys);
+
+        return redisTemplate.execute(redisScript, keysList, args);
+    }
 
 }

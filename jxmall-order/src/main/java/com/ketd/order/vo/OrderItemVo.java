@@ -8,6 +8,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @Description:
@@ -19,63 +20,25 @@ import java.math.BigDecimal;
 @Data
 public class OrderItemVo implements Serializable {
 
-    @Schema(description =  "id")
-    private Long id;
-
-    @Schema(description =  "order_id")
-    private Long orderId;
-
-    @Schema(description =  "order_sn")
-    private String orderSn;
-
-    @Schema(description =  "spu_id")
-    private Long spuId;
-
-    @Schema(description =  "spu_name")
-    private String spuName;
-
-    @Schema(description =  "spu_pic")
-    private String spuPic;
-
-    @Schema(description =  "品牌")
-    private String spuBrand;
-
-    @Schema(description =  "商品分类id")
-    private Long categoryId;
-
-    @Schema(description =  "商品sku编号")
     private Long skuId;
 
-    @Schema(description =  "商品sku名字")
-    private String skuName;
 
-    @Schema(description =  "商品sku图片")
-    private String skuPic;
+    private String title;
 
-    @Schema(description =  "商品sku价格")
-    private BigDecimal skuPrice;
+    private String image;
 
-    @Schema(description =  "商品购买的数量")
-    private Long skuQuantity;
+    /**
+     * 商品套餐属性
+     */
+    private String skuAttrValues;
 
-    @Schema(description =  "商品销售属性组合（JSON）")
-    private String skuAttrsVals;
+    private BigDecimal price;
 
-    @Schema(description =  "商品促销分解金额")
-    private BigDecimal promotionAmount;
+    private Integer count;
 
-    @Schema(description =  "优惠券优惠分解金额")
-    private BigDecimal couponAmount;
+    private Boolean hasStock;
 
-    @Schema(description =  "积分优惠分解金额")
-    private BigDecimal integrationAmount;
 
-    @Schema(description =  "该商品经过优惠后的分解金额")
-    private BigDecimal realAmount;
-
-    @Schema(description =  "赠送积分")
-    private Long giftIntegration;
-
-    @Schema(description =  "赠送成长值")
-    private Long giftGrowth;
+    /** 商品重量 **/
+    private BigDecimal weight = new BigDecimal("0.085");
 }

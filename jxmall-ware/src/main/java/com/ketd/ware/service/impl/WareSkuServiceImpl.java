@@ -44,11 +44,9 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuMapper, WareSku> impl
      * @return 商品库存
      */
     @Override
-    public WareSku selectWareSkuById(Long id)
-    {
+    public WareSku selectWareSkuById(Long id) {
         return wareSkuMapper.selectById(id);
     }
-
 
 
     /**
@@ -58,8 +56,7 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuMapper, WareSku> impl
      * @return 商品库存
      */
     @Override
-    public List<WareSku> selectWareSkuList(WareSku wareSku)
-    {
+    public List<WareSku> selectWareSkuList(WareSku wareSku) {
         QueryWrapper<WareSku> queryWrapper = new QueryWrapper<>(wareSku);
         return wareSkuMapper.selectList(queryWrapper);
     }
@@ -75,9 +72,6 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuMapper, WareSku> impl
     public int insertWareSku(WareSku wareSku) {
         return wareSkuMapper.insert(wareSku);
     }
-
-
-
 
 
     /**
@@ -121,20 +115,20 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuMapper, WareSku> impl
     @Override
     public void export(List<WareSku> list, HttpServletResponse response) {
 
-        extracted(list, response,WareSku.class);
+        extracted(list, response, WareSku.class);
 
     }
 
     @Transactional
     @Override
     public void addStock(Long skuId, Long wareId, Long skuNum) {
-        WareSku wareSku =new WareSku();
+        WareSku wareSku = new WareSku();
         wareSku.setSkuId(skuId);
         wareSku.setWareId(wareId);
-        QueryWrapper<WareSku> wrapper=new QueryWrapper<>(wareSku);
-        List<WareSku> wareSkus= wareSkuMapper.selectList(wrapper);
+        QueryWrapper<WareSku> wrapper = new QueryWrapper<>(wareSku);
+        List<WareSku> wareSkus = wareSkuMapper.selectList(wrapper);
 
-        if(wareSkus.isEmpty()){
+        if (wareSkus.isEmpty()) {
             wareSku.setStock(skuNum);
             wareSku.setStockLocked(0L);
             try {
@@ -144,7 +138,7 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuMapper, WareSku> impl
             }
             wareSkuMapper.insert(wareSku);
 
-        }else{
+        } else {
             wareSkuMapper.addStock(skuId, wareId, skuNum);
         }
 
@@ -152,22 +146,37 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuMapper, WareSku> impl
 
     @Override
     public Result<?> hasStock(List<Long> skuIds) {
-      List<HasStockTo> hasStockTos=  skuIds.stream().map(skuId -> {
-           HasStockTo hasStockTo=new HasStockTo();
-           hasStockTo.setSkuId(skuId);
-           hasStockTo.setHasStock(false);
-           WareSku  queryWareSku= wareSkuMapper.selectById(skuId);
-           QueryWrapper<WareSku> wrapper=new QueryWrapper<>(queryWareSku);
-           List<WareSku> wareSkus= wareSkuMapper.selectList(wrapper);
-           wareSkus.forEach(wareSku -> {
-                if(wareSku.getStock()>0){
+        List<HasStockTo> hasStockTos = skuIds.stream().map(skuId -> {
+            HasStockTo hasStockTo = new HasStockTo();
+            hasStockTo.setSkuId(skuId);
+            hasStockTo.setHasStock(false);
+            WareSku queryWareSku = wareSkuMapper.selectById(skuId);
+            QueryWrapper<WareSku> wrapper = new QueryWrapper<>(queryWareSku);
+            List<WareSku> wareSkus = wareSkuMapper.selectList(wrapper);
+            wareSkus.forEach(wareSku -> {
+                if (wareSku.getStock() > 0) {
                     hasStockTo.setHasStock(true);
                 }
-           });
+            });
 
-           return hasStockTo;
+            return hasStockTo;
 
-       }).toList();
-       return Result.ok(hasStockTos);
+        }).toList();
+        return Result.ok(hasStockTos);
+    }
+
+    @Override
+    public Result<?> hasStockByCount(Long skuId, Integer count) {
+        WareSku queryWareSku = wareSkuMapper.selectById(skuId);
+        if(queryWareSku == null){
+            return Result.ok(false);
+        }else{
+            if (queryWareSku.getStock() >= count) {
+                return Result.ok(true);
+            } else {
+                return Result.ok(false);
+            }
+        }
+
     }
 }

@@ -2,6 +2,10 @@ package com.ketd.order.service;
 
 
 import java.util.List;
+
+import com.ketd.common.result.Result;
+import com.ketd.order.vo.SkuCountVo;
+import com.ketd.order.vo.SubmitOrderVo;
 import jakarta.servlet.http.HttpServletResponse;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ketd.order.domain.Order;
@@ -66,4 +70,8 @@ public interface IOrderService  extends IService<Order> {
      * 导出订单列表
      */
     void export(List<Order> list, HttpServletResponse response);
+
+    Result<?> toTrade(List<SkuCountVo> skuCountVo);
+
+    Result<?> submitOrder(SubmitOrderVo submitOrderVo);
 }

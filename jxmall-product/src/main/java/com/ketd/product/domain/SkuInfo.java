@@ -56,6 +56,10 @@ public class SkuInfo  implements Serializable
         @Schema(description =  "品牌id")
         private Long brandId;
 
+        @ExcelProperty(value = "品牌名称")
+        @Schema(description =  "品牌名称")
+        private String brandName;
+
         @ExcelProperty(value = "默认图片")
         @Schema(description =  "默认图片")
         private String skuDefaultImg;

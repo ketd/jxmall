@@ -122,4 +122,12 @@ public class WareSkuController{
     {
         return wareSkuService.hasStock(skuIds);
     }
+
+    //查询是否有库存
+    @Operation(summary = "查询库存是否足够")
+    @GetMapping("/hasStockByCount")
+    public Result<?> hasStockByCount(@RequestParam(value = "skuId") Long skuId,@RequestParam(value = "count") Integer count)
+    {
+        return wareSkuService.hasStockByCount(skuId,count);
+    }
 }

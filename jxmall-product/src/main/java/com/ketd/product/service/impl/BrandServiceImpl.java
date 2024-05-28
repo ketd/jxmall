@@ -62,8 +62,7 @@ public class BrandServiceImpl extends ServiceImpl<BrandMapper, Brand> implements
         String key = "brandInfo:" + brandId;
 
         Brand brand;
-        brand = redisUtil.getJson(key, new TypeReference<>() {
-        });
+        brand = redisUtil.getJson(key, new TypeReference<>() {});
         RLock lock = redisson.getLock("getBrandInfo_lock"+brandId);
 
 

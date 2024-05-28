@@ -86,15 +86,15 @@ public class Order  implements Serializable
 
         @ExcelProperty(value = "支付方式【1-&gt;支付宝；2-&gt;微信；3-&gt;银联； 4-&gt;货到付款；】")
         @Schema(description =  "支付方式【1-&gt;支付宝；2-&gt;微信；3-&gt;银联； 4-&gt;货到付款；】")
-        private Long payType;
+        private Integer payType;
 
         @ExcelProperty(value = "订单来源[0-&gt;PC订单；1-&gt;app订单]")
         @Schema(description =  "订单来源[0-&gt;PC订单；1-&gt;app订单]")
-        private Long sourceType;
+        private Integer sourceType;
 
         @ExcelProperty(value = "订单状态【0-&gt;待付款；1-&gt;待发货；2-&gt;已发货；3-&gt;已完成；4-&gt;已关闭；5-&gt;无效订单】")
         @Schema(description =  "订单状态【0-&gt;待付款；1-&gt;待发货；2-&gt;已发货；3-&gt;已完成；4-&gt;已关闭；5-&gt;无效订单】")
-        private Long status;
+        private Integer status;
 
         @ExcelProperty(value = "物流公司(配送方式)")
         @Schema(description =  "物流公司(配送方式)")
@@ -106,7 +106,7 @@ public class Order  implements Serializable
 
         @ExcelProperty(value = "自动确认时间（天）")
         @Schema(description =  "自动确认时间（天）")
-        private Long autoConfirmDay;
+        private Integer autoConfirmDay;
 
         @ExcelProperty(value = "可以获得的积分")
         @Schema(description =  "可以获得的积分")
@@ -118,7 +118,7 @@ public class Order  implements Serializable
 
         @ExcelProperty(value = "发票类型[0-&gt;不开发票；1-&gt;电子发票；2-&gt;纸质发票]")
         @Schema(description =  "发票类型[0-&gt;不开发票；1-&gt;电子发票；2-&gt;纸质发票]")
-        private Long billType;
+        private Integer billType;
 
         @ExcelProperty(value = "发票抬头")
         @Schema(description =  "发票抬头")
@@ -170,11 +170,11 @@ public class Order  implements Serializable
 
         @ExcelProperty(value = "确认收货状态[0-&gt;未确认；1-&gt;已确认]")
         @Schema(description =  "确认收货状态[0-&gt;未确认；1-&gt;已确认]")
-        private Long confirmStatus;
+        private Integer confirmStatus;
 
         @ExcelProperty(value = "删除状态【0-&gt;未删除；1-&gt;已删除】")
         @Schema(description =  "删除状态【0-&gt;未删除；1-&gt;已删除】")
-        private Long deleteStatus;
+        private Integer deleteStatus;
 
         @ExcelProperty(value = "下单时使用的积分")
         @Schema(description =  "下单时使用的积分")

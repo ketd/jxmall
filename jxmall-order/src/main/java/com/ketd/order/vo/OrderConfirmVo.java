@@ -1,5 +1,7 @@
 package com.ketd.order.vo;
 
+import com.alibaba.excel.annotation.ExcelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -20,9 +22,15 @@ public class OrderConfirmVo implements Serializable {
 
     private List<OrderItemVo> items;
 
-    private Integer integration;
+    @Schema(description =  "会员积分")
+    private Long integration;
 
-    private BigDecimal total;
+    @Schema(description ="防止重复提交令牌")
+    private String orderToken;
 
+    @Schema(description = "总支付金额")
+    private BigDecimal totalPayAmount;
+
+    @Schema(description = "实际支付金额")
     private BigDecimal payPrice;
 }

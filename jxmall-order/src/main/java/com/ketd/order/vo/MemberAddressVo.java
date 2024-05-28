@@ -18,33 +18,26 @@ import java.io.Serializable;
 @Data
 public class MemberAddressVo implements Serializable {
 
-    @TableId
-    @ExcelIgnore
-    @ExcelProperty(value = "id")
+
+
     @Schema(description =  "id")
     private Long id;
 
-    @ExcelProperty(value = "member_id")
     @Schema(description =  "member_id")
     private Long memberId;
 
-    @ExcelProperty(value = "收货人姓名")
     @Schema(description =  "收货人姓名")
     private String name;
 
-    @ExcelProperty(value = "电话")
     @Schema(description =  "电话")
     private String phone;
 
-    @ExcelProperty(value = "邮政编码")
     @Schema(description =  "邮政编码")
     private String postCode;
 
-    @ExcelProperty(value = "省份/直辖市")
     @Schema(description =  "省份/直辖市")
     private String province;
 
-    @ExcelProperty(value = "城市")
     @Schema(description =  "城市")
     private String city;
 

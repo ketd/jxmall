@@ -44,4 +44,7 @@ public interface WareSkuOpenFeignApi {
     @PostMapping("/ware/WareSku/hasStock")
     public Result<List<HasStockTo>> hasStock(@RequestBody List<Long> skuIds);
 
+    @GetMapping("/ware/WareSku/hasStockByCount")
+    public Result<Boolean> hasStockByCount(@RequestParam(value = "skuId") Long skuId,@RequestParam(value = "count") Integer count);
+
 }

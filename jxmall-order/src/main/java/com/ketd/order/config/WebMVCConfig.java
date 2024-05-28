@@ -15,6 +15,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebMVCConfig implements WebMvcConfigurer {
 
+
     private final LoginProtectedInterceptor loginProtectedInterceptor;
 
     @Autowired

@@ -10,6 +10,7 @@
             <result property="spuDescription"    column="spu_description"    />
             <result property="catalogId"    column="catalog_id"    />
             <result property="brandId"    column="brand_id"    />
+        <result property="brandName"    column="brand_name"    />
             <result property="weight"    column="weight"    />
             <result property="publishStatus"    column="publish_status"    />
             <result property="createTime"    column="create_time"    />
@@ -17,7 +18,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-id,spu_name,spu_description,catalog_id,brand_id,weight,publish_status,create_time,update_time
+id,spu_name,spu_description,catalog_id,brand_id,brand_name,weight,publish_status,create_time,update_time
     </sql>
     <update id="updateSpuStatus">
 

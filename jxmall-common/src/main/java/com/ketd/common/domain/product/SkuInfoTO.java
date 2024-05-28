@@ -17,6 +17,7 @@ public class SkuInfoTO  implements Serializable
     private String skuDesc;
     private Long catalogId;
     private Long brandId;
+    private String brandName;
     private String skuDefaultImg;
     private String skuTitle;
     private String skuSubtitle;

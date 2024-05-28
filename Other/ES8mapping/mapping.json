@@ -1,0 +1,117 @@
+{
+
+  "mappings": {
+
+    "properties": {
+
+      "attrs": {
+
+        "type": "nested",
+
+        "properties": {
+
+          "attrId": {
+
+            "type": "long"
+
+          },
+
+          "attrName": {
+
+            "type": "keyword"
+
+          },
+
+          "attrValue": {
+
+            "type": "keyword"
+
+          }
+
+        }
+
+      },
+
+      "brandId": {
+
+        "type": "long"
+
+      },
+
+      "brandImg": {
+
+        "type": "keyword"
+
+      },
+
+      "brandName": {
+
+        "type": "keyword"
+
+      },
+
+      "catelogId": {
+
+        "type": "long"
+
+      },
+
+      "catelogName": {
+
+        "type": "keyword"
+
+      },
+
+      "hasStock": {
+
+        "type": "boolean"
+
+      },
+
+      "hotScore": {
+
+        "type": "long"
+
+      },
+
+      "saleCount": {
+
+        "type": "long"
+
+      },
+
+      "skuId": {
+
+        "type": "long"
+
+      },
+
+      "skuImg": {
+
+        "type": "keyword"
+
+      },
+
+      "skuPrice": {
+
+        "type": "keyword"
+
+      },
+
+      "skuTitle": {
+
+        "type": "text"
+
+      },
+
+      "spuId": {
+
+        "type": "keyword"
+
+      }
+
+    }
+
+  }
+
+}

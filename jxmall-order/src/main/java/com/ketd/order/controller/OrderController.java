@@ -10,6 +10,8 @@ import java.util.List;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.ketd.order.vo.SkuCountVo;
+import com.ketd.order.vo.SubmitOrderVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -62,6 +64,17 @@ public class OrderController{
 
     }
 
+    @Operation(summary = "生成订单")
+    @PostMapping("toTrade")
+    public Result<?> toTrade(@RequestBody List<SkuCountVo> skuCountVos){
+        return orderService.toTrade(skuCountVos);
+    }
+
+    @Operation(summary = "提交订单")
+    @PostMapping("submit")
+    public Result<?> submitOrder(@RequestBody SubmitOrderVo submitOrderVo){
+        return orderService.submitOrder(submitOrderVo);
+    }
 
     /**
      * 导出订单列表

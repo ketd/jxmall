@@ -11,6 +11,7 @@
             <result property="skuDesc"    column="sku_desc"    />
             <result property="catalogId"    column="catalog_id"    />
             <result property="brandId"    column="brand_id"    />
+        <result property="brandName"    column="brand_name"    />
             <result property="skuDefaultImg"    column="sku_default_img"    />
             <result property="skuTitle"    column="sku_title"    />
             <result property="skuSubtitle"    column="sku_subtitle"    />
@@ -20,7 +21,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-sku_id,spu_id,sku_name,sku_desc,catalog_id,brand_id,sku_default_img,sku_title,sku_subtitle,price,sale_count,sku_attr_values
+sku_id,spu_id,sku_name,sku_desc,catalog_id,brand_id,brand_name,sku_default_img,sku_title,sku_subtitle,price,sale_count,sku_attr_values
     </sql>
     <select id="findSkuIdBySpuId" resultMap="BaseResultMap">
         select sku_id

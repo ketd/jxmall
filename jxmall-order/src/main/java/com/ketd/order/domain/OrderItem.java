@@ -98,6 +98,10 @@ public class OrderItem  implements Serializable
         @Schema(description =  "积分优惠分解金额")
         private BigDecimal integrationAmount;
 
+        @ExcelProperty(value = "订单总分解金额")
+        @Schema(description =  "订单总分解金额")
+        private BigDecimal totalAmount;
+
         @ExcelProperty(value = "该商品经过优惠后的分解金额")
         @Schema(description =  "该商品经过优惠后的分解金额")
         private BigDecimal realAmount;

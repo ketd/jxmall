@@ -2,7 +2,6 @@ package com.ketd.order.Interceptors;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.ketd.common.domain.member.MemberTO;
 import com.ketd.common.result.Result;
 import com.ketd.common.result.ResultCodeEnum;
@@ -16,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -53,6 +53,8 @@ public class LoginProtectedInterceptor implements HandlerInterceptor {
             if (!isExpired) {
                 Long userId = jXJwtTokenUtil.getUserIdFromToken(token);
                 String userKey = "jxmall:userInfo:user-" + userId;
+
+
                 MemberTO memberTO = redisUtil.getJson(userKey,new TypeReference<>(){});
                 threadLocal.set(memberTO);
                 return true;

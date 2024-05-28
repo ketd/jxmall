@@ -17,6 +17,7 @@ public class SpuInfoTO  implements Serializable
     private String spuDescription;
     private Long catalogId;
     private Long brandId;
+    private String brandName;
     private BigDecimal weight;
     private Long publishStatus;
     private Date createTime;

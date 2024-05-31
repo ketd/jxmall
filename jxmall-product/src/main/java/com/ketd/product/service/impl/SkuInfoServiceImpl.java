@@ -1,13 +1,17 @@
 package com.ketd.product.service.impl;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.ketd.common.api.ware.WareSkuOpenFeignApi;
+import com.ketd.common.domain.ware.WareSkuTO;
 import com.ketd.common.result.Result;
 import com.ketd.product.mapper.BrandMapper;
 import com.ketd.product.utils.RedisUtil;
@@ -46,6 +50,9 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
 
     @Autowired
     private RedissonClient redisson;
+
+    @Autowired
+    private WareSkuOpenFeignApi  wareSkuOpenFeignApi;
 
     /**
      * 查询sku信息
@@ -189,6 +196,29 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
             return skuInfoVo;
         }).toList();
         return Result.ok(skuInfoVoList);
+    }
+
+    @Override
+    public Result<?> addTest(Long spuId) {
+        try {
+            List<SkuInfo> skuInfoList = this.getSkuInfoBySpuId(spuId);
+            List<WareSkuTO>  wareSkuTOList = new ArrayList<>();
+            Random random = new Random();
+            for(SkuInfo skuInfo : skuInfoList){
+                WareSkuTO wareSkuTO=new WareSkuTO();
+                wareSkuTO.setSkuId(skuInfo.getSkuId());
+                wareSkuTO.setWareId(1L);
+                wareSkuTO.setStock((long) (random.nextInt(9999) + 1));
+                wareSkuTO.setSkuName(skuInfo.getSkuName());
+                wareSkuTO.setStockLocked(1L);
+                wareSkuTOList.add(wareSkuTO);
+            }
+
+            wareSkuOpenFeignApi.addList(wareSkuTOList);
+            return Result.ok(null);
+        } catch (Exception e) {
+            return Result.error(e);
+        }
     }
 
 }

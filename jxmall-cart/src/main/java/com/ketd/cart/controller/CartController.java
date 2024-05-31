@@ -43,5 +43,6 @@ public class CartController {
     @DeleteMapping("/delete")
     public Result<?> delete(@RequestBody Long[] skuIds){
         return cartService.delete(skuIds);
+
     }
 }

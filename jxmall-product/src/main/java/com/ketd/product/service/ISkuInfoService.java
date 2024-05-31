@@ -74,4 +74,6 @@ public interface ISkuInfoService  extends IService<SkuInfo> {
     List<SkuInfo> getSkuInfoBySpuId(Long id);
 
     Result<?> getSkuInfos(Long[] skuIds);
+
+    Result<?> addTest(Long spuId);
 }

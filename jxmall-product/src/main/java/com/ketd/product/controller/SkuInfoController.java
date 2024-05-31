@@ -62,6 +62,14 @@ public class SkuInfoController{
 
     }
 
+    @Operation(summary = "测试入库")
+    @PostMapping("/test")
+    public Result<?> addTest(@RequestParam(value = "spuId") Long spuId)
+    {
+        return skuInfoService.addTest(spuId);
+    }
+
+
 
     /**
      * 导出sku信息列表

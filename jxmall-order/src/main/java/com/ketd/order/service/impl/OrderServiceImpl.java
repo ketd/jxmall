@@ -7,19 +7,21 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.lang.UUID;
-import com.alibaba.excel.annotation.ExcelProperty;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import com.ketd.common.api.cart.CartOpenFeignApi;
 import com.ketd.common.api.member.MemberReceiveAddressOpenFeignApi;
 import com.ketd.common.api.product.SkuInfoOpenFeignApi;
+import com.ketd.common.api.product.SpuInfoOpenFeignApi;
 import com.ketd.common.api.ware.WareSkuOpenFeignApi;
 import com.ketd.common.domain.member.MemberReceiveAddressTO;
 import com.ketd.common.domain.member.MemberTO;
+import com.ketd.common.domain.order.LockStickResult;
 import com.ketd.common.domain.product.SkuInfoTO;
+import com.ketd.common.domain.product.SpuInfoTO;
 import com.ketd.common.result.Result;
 import com.ketd.order.Interceptors.LoginProtectedInterceptor;
 import com.ketd.order.domain.OrderItem;
@@ -28,16 +30,13 @@ import com.ketd.order.mapper.OrderItemMapper;
 import com.ketd.order.service.IOrderItemService;
 import com.ketd.order.util.RedisUtil;
 import com.ketd.order.vo.*;
-import io.swagger.v3.oas.annotations.media.Schema;
+import io.seata.spring.annotation.GlobalTransactional;
 import jakarta.servlet.http.HttpServletResponse;
-import org.redisson.Redisson;
-import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.context.annotation.Primary;
@@ -74,7 +73,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private SkuInfoOpenFeignApi skuInfoOpenFeignApi;
 
     @Autowired
-    private WareSkuOpenFeignApi wareskuOpenFeignApi;
+    private SpuInfoOpenFeignApi spuInfoOpenFeignApi;
+
+    @Autowired
+    private WareSkuOpenFeignApi wareSkuOpenFeignApi;
+
+    @Autowired
+    private CartOpenFeignApi cartOpenFeignApi;
 
     @Autowired
     private ThreadPoolExecutor executor;
@@ -180,43 +185,40 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         try {
             OrderConfirmVo orderConfirmVo = new OrderConfirmVo();
 
-            // 在主线程中获取当前用户信息
+            // 获取当前用户信息
             MemberTO currentMember = getCurrentMember();
+            Long memberId = currentMember.getId();
+            Long memberIntegration = currentMember.getIntegration();
 
             // 启动异步任务来获取地址列表
             CompletableFuture<Void> addressFuture = CompletableFuture.runAsync(() -> {
-                // 获取成员地址列表
-                List<MemberReceiveAddressTO> memberAddress = getMemberAddress(currentMember.getId());
+                List<MemberReceiveAddressTO> memberAddress = getMemberAddress(memberId);
 
-                // 创建目标列表
-                List<MemberAddressVo> memberAddressVos = new ArrayList<>();
-
-                if (memberAddress != null) {
-                    // 遍历源列表，并复制属性到目标列表中的每个对象
-                    for (MemberReceiveAddressTO addressTO : memberAddress) {
-                        MemberAddressVo addressVo = new MemberAddressVo();
-                        BeanUtils.copyProperties(addressTO, addressVo);
-                        memberAddressVos.add(addressVo);
-                    }
-                } else {
-                    System.err.println("memberAddress is null");
-                }
+                List<MemberAddressVo> memberAddressVos = Optional.ofNullable(memberAddress)
+                        .orElseGet(Collections::emptyList)
+                        .stream()
+                        .map(addressTO -> {
+                            MemberAddressVo addressVo = new MemberAddressVo();
+                            BeanUtils.copyProperties(addressTO, addressVo);
+                            return addressVo;
+                        })
+                        .collect(Collectors.toList());
 
                 orderConfirmVo.setAddresses(memberAddressVos);
             }, executor);
 
             // 设置当前用户的积分
-            orderConfirmVo.setIntegration(currentMember.getIntegration());
+            orderConfirmVo.setIntegration(memberIntegration);
 
             // 启动异步任务来处理订单项
-            CompletableFuture<Void> orderItemVosFuture = CompletableFuture.runAsync(() -> {
+            CompletableFuture<Void> orderItemVosFuture = CompletableFuture.supplyAsync(() -> {
                 List<OrderItemVo> orderItemVos = new ArrayList<>();
                 BigDecimal totalPayAmount = BigDecimal.ZERO;
 
                 for (SkuCountVo orderContVo : skuCountVos) {
-                    // 创建订单项
                     OrderItemVo orderItemVo = new OrderItemVo();
                     SkuInfoTO skuInfoTO = skuInfoOpenFeignApi.getInfo(orderContVo.getSkuId()).getData();
+
                     orderItemVo.setSkuId(skuInfoTO.getSkuId());
                     orderItemVo.setTitle(skuInfoTO.getSkuTitle());
                     orderItemVo.setImage(skuInfoTO.getSkuDefaultImg());
@@ -225,28 +227,29 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                     orderItemVo.setCount(orderContVo.getSkuCont());
 
                     orderItemVos.add(orderItemVo);
-                    // 计算此商品的总价
                     BigDecimal itemTotalPrice = skuInfoTO.getPrice().multiply(new BigDecimal(orderContVo.getSkuCont()));
-                    // 添加到总付款金额
                     totalPayAmount = totalPayAmount.add(itemTotalPrice);
                 }
 
                 orderConfirmVo.setItems(orderItemVos);
                 orderConfirmVo.setTotalPayAmount(totalPayAmount);
                 orderConfirmVo.setPayPrice(totalPayAmount);
-            }, executor).thenRunAsync(() -> {
-                List<OrderItemVo> orderItemVos = orderConfirmVo.getItems();
+
+                return orderItemVos;
+            }, executor).thenAcceptAsync(orderItemVos -> {
                 for (OrderItemVo orderItemVo : orderItemVos) {
                     Long skuId = orderItemVo.getSkuId();
                     Integer count = orderItemVo.getCount();
-                    Boolean hasStock = wareskuOpenFeignApi.hasStockByCount(skuId, count).getData();
+                    Boolean hasStock = wareSkuOpenFeignApi.hasStockByCount(skuId, count).getData();
                     orderItemVo.setHasStock(Objects.requireNonNullElse(hasStock, false));
                 }
             }, executor);
 
+            // 生成并设置订单令牌
             String token = UUID.randomUUID().toString().replaceAll("-", "");
-            redisUtil.set("order-token:"+ getCurrentMember().getId(), token,300);
+            redisUtil.set("order-token:" + memberId, token, 300);
             orderConfirmVo.setOrderToken(token);
+
             // 等待所有异步任务完成
             CompletableFuture.allOf(addressFuture, orderItemVosFuture).get();
             return Result.ok(orderConfirmVo);
@@ -255,74 +258,104 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         }
     }
 
-    @Override
-    public Result<?> submitOrder(SubmitOrderVo submitOrderVo) {
 
-        OrderCreateTo  orderCreateTo =new OrderCreateTo();
+    @Override
+    @GlobalTransactional
+    public Result<?> submitOrder(SubmitOrderVo submitOrderVo) {
+        OrderCreateTo orderCreateTo = new OrderCreateTo();
         MemberTO currentMember = getCurrentMember();
         String orderToken = submitOrderVo.getOrderToken();
 
-       /* String script = "local token = redis.call('get', KEYS[1]);" +
-                "if token == ARGV[1] then " +
-                "    redis.call('del', KEYS[1]);" +
-                "    return 1;" +
-                "else " +
-                "    return 0;" +
-                "end";*/
-
-        //1、验证令牌是否合法【令牌的对比和删除必须保证原子性】
+        // 验证令牌是否合法【令牌的对比和删除必须保证原子性】
         String script = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
-
 
         try {
             Long result = redisUtil.execute(script, "order-token:" + currentMember.getId(), orderToken);
-            if (result==0L){
-                // Token did not match or was not found
+            if (result == 0L) {
+                // 令牌不匹配或未找到
                 return Result.error("订单已过期");
-            } else {
-                // Token matched and was deleted
-                Order order = creteOrder(submitOrderVo);
-
-                //获取订单项
-                List<OrderItem> orderItemList=  createOrderItems(submitOrderVo.getSkuCountVoList(),order);
-
-                //验证价格
-                BigDecimal totalAmount= computeTotalAmount(order,orderItemList);
-                BigDecimal payAmount= computePayAmount(order,orderItemList);
-                order.setTotalAmount(totalAmount);
-                order.setPayAmount(payAmount.add(order.getFreightAmount()));
-
-                Long integration = 0L;
-                Long growth = 0L;
-                for (OrderItem orderItem : orderItemList) {
-                    integration += (orderItem.getGiftIntegration());
-                    growth += (orderItem.getGiftGrowth());
-                }
-                //积分&成长值
-                order.setIntegration(integration);
-                order.setGrowth(growth);
-
-
-
-                //保存订单
-                orderCreateTo.setOrder(order);
-                orderCreateTo.setOrderItemList(orderItemList);
-                orderCreateTo.setPayAmount(payAmount);
-                orderCreateTo.setFare(order.getFreightAmount());
-
-                SaveOrder(orderCreateTo);
-
-
-                return Result.ok(orderCreateTo);
-
             }
+
+            // 令牌匹配并已删除
+            Order order = createOrder(submitOrderVo);
+            List<OrderItem> orderItemList = createOrderItems(submitOrderVo.getSkuCountVoList(), order);
+
+
+            com.ketd.common.domain.order.WareSkuLockTo wareSkuLockTo = getWareSkuLockTo(submitOrderVo, order);
+            List<LockStickResult> lockStickResultList=  wareSkuOpenFeignApi.orderLockStock(wareSkuLockTo).getData();
+
+
+            // 验证价格
+            BigDecimal totalAmount = computeTotalAmount(orderItemList);
+            BigDecimal payAmount = computePayAmount(orderItemList);
+            order.setTotalAmount(totalAmount);
+            order.setPayAmount(payAmount.add(order.getFreightAmount()));
+
+            BigDecimal weight = orderItemList.stream().map(OrderItem::getWeight).reduce(BigDecimal.ZERO, BigDecimal::add);
+            order.setWeight(weight);
+
+            Long integration = orderItemList.stream().mapToLong(OrderItem::getGiftIntegration).sum();
+            Long growth = orderItemList.stream().mapToLong(OrderItem::getGiftGrowth).sum();
+
+            // 积分&成长值
+            order.setIntegration(integration);
+            order.setGrowth(growth);
+
+            // 保存订单
+            orderCreateTo.setOrder(order);
+            orderCreateTo.setOrderItemList(orderItemList);
+            orderCreateTo.setPayAmount(payAmount);
+            orderCreateTo.setFare(order.getFreightAmount());
+
+
+
+            boolean lockStock=true;
+            for (LockStickResult lockStickResult : lockStickResultList) {
+                if (!lockStickResult.getLockStock()) {
+                    lockStock=false;
+                    break;
+                }
+            }
+            if (lockStock) {
+                saveOrder(orderCreateTo);
+                List<SkuCountVo> skuCountVoList = submitOrderVo.getSkuCountVoList();
+                Long[] skuIds = new Long[skuCountVoList.size()];
+
+                for (int i = 0; i < skuCountVoList.size(); i++) {
+                    skuIds[i] = skuCountVoList.get(i).getSkuId();
+                }
+
+
+                cartOpenFeignApi.delete(skuIds);
+                /*return   Result.ok(orderCreateTo);*/
+                return   Result.ok(order.getId());
+            }else {
+                return Result.error("库存不足");
+            }
+
         } catch (Exception e) {
-            System.out.println(e);
+            System.err.println(e);
             return Result.error("系统异常");
         }
     }
 
-    private void SaveOrder(OrderCreateTo  orderCreateTo) {
+
+
+    private static com.ketd.common.domain.order.WareSkuLockTo getWareSkuLockTo(SubmitOrderVo submitOrderVo, Order order) {
+        com.ketd.common.domain.order.WareSkuLockTo  wareSkuLockTo = new com.ketd.common.domain.order.WareSkuLockTo();
+        wareSkuLockTo.setOrderSn(order.getOrderSn());
+        List<com.ketd.common.domain.order.SkuCountVo>  skuCountVoList = new ArrayList<>();
+        for(SkuCountVo skuCountVo: submitOrderVo.getSkuCountVoList()){
+            com.ketd.common.domain.order.SkuCountVo  skuCountVo1 = new com.ketd.common.domain.order.SkuCountVo();
+            skuCountVo1.setSkuId(skuCountVo.getSkuId());
+            skuCountVo1.setSkuCont(skuCountVo.getSkuCont());
+            skuCountVoList.add(skuCountVo1);
+        }
+        wareSkuLockTo.setLocks(skuCountVoList);
+        return wareSkuLockTo;
+    }
+
+    private void saveOrder(OrderCreateTo orderCreateTo) {
         Order order = orderCreateTo.getOrder();
         order.setCreateTime(new Date());
         orderMapper.insert(order);
@@ -333,98 +366,107 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         orderItemService.saveBatch(orderCreateTo.getOrderItemList());
     }
 
-
-
-    private BigDecimal computePayAmount(Order order, List<OrderItem> orderItemList) {
-        return orderItemList.stream().map(OrderItem::getTotalAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+    private BigDecimal computePayAmount(List<OrderItem> orderItemList) {
+        return orderItemList.stream()
+                .map(OrderItem::getTotalAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    private BigDecimal computeTotalAmount(Order order, List<OrderItem> orderItemList) {
-        return orderItemList.stream().map(OrderItem::getRealAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+    private BigDecimal computeTotalAmount(List<OrderItem> orderItemList) {
+        return orderItemList.stream()
+                .map(OrderItem::getRealAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    private List<OrderItem> createOrderItems(List<SkuCountVo> skuCountVoList,  Order order) {
+
+    private List<OrderItem> createOrderItems(List<SkuCountVo> skuCountVoList, Order order) {
         return skuCountVoList.stream()
-                .map(skuCountVo -> {
-                    SkuInfoTO skuInfoTO = skuInfoOpenFeignApi.getInfo(skuCountVo.getSkuId()).getData();
-                    if (skuInfoTO != null) {
-                        OrderItem orderItem = new OrderItem();
-
-                        orderItem.setOrderSn(order.getOrderSn());
-                        // Mapping SkuInfoTO to OrderItem
-                        orderItem.setSkuId(skuInfoTO.getSkuId());
-                        orderItem.setSpuId(skuInfoTO.getSpuId());
-                        orderItem.setSkuName(skuInfoTO.getSkuName());
-                        orderItem.setSkuPic(skuInfoTO.getSkuDefaultImg());
-                        orderItem.setSkuPrice(skuInfoTO.getPrice());
-                        orderItem.setCategoryId(skuInfoTO.getCatalogId());
-                        orderItem.setSpuBrand(skuInfoTO.getBrandName());
-                        orderItem.setSkuAttrsVals(skuInfoTO.getSkuAttrValues());
-
-                        // SkuCountVo 中的其他字段
-                        orderItem.setSkuQuantity(Long.valueOf(skuCountVo.getSkuCont()));
-                        //优惠详细
-                        BigDecimal promotionAmount=new BigDecimal("1.00");
-                        orderItem.setPromotionAmount(promotionAmount);
-                        BigDecimal couponAmount= new BigDecimal("2.00");
-                        orderItem.setCouponAmount(couponAmount);
-                        BigDecimal integrationAmount= new BigDecimal("3.00");
-                        orderItem.setIntegrationAmount(integrationAmount);
-                        // Calculate realAmount as skuPrice * skuQuantity
-
-                        BigDecimal totalAmount = skuInfoTO.getPrice()
-                                .multiply(new BigDecimal(skuCountVo.getSkuCont()));
-
-
-                        orderItem.setTotalAmount(totalAmount);
-
-                        BigDecimal realAmount = totalAmount
-                                .subtract(promotionAmount)
-                                .subtract(couponAmount)
-                                .subtract(integrationAmount);
-                        orderItem.setRealAmount(realAmount);
-
-
-                        orderItem.setGiftIntegration(realAmount.divide(new BigDecimal("100"), 0, RoundingMode.DOWN).longValue());
-                        orderItem.setGiftGrowth(realAmount.divide(new BigDecimal("10"), 0, RoundingMode.DOWN).longValue());
-
-                        return orderItem;
-                    }
-                    return null;
-                })
+                .map(skuCountVo -> createOrderItem(skuCountVo, order))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
+    private OrderItem createOrderItem(SkuCountVo skuCountVo, Order order) {
+        SkuInfoTO skuInfoTO = skuInfoOpenFeignApi.getInfo(skuCountVo.getSkuId()).getData();
+        if (skuInfoTO == null) {
+            return null;
+        }
+        SpuInfoTO  spuInfoTO = spuInfoOpenFeignApi.getInfo(skuInfoTO.getSpuId()).getData();
+
+        if (spuInfoTO == null) {
+            return null;
+        }
+        OrderItem orderItem = new OrderItem();
+        orderItem.setOrderSn(order.getOrderSn());
+
+        // 将 SkuInfoTO 映射到 OrderItem
+        orderItem.setSkuId(skuInfoTO.getSkuId());
+
+        orderItem.setSkuName(skuInfoTO.getSkuName());
+        orderItem.setSkuPic(skuInfoTO.getSkuDefaultImg());
+        orderItem.setSkuPrice(skuInfoTO.getPrice());
+        orderItem.setCategoryId(skuInfoTO.getCatalogId());
+
+        orderItem.setSkuAttrsVals(skuInfoTO.getSkuAttrValues());
+
+        orderItem.setSpuId(skuInfoTO.getSpuId());
+        orderItem.setSpuName(spuInfoTO.getSpuName());
+        orderItem.setSpuBrand(spuInfoTO.getBrandName());
+        // SkuCountVo 中的其他字段
+        orderItem.setSkuQuantity((long) skuCountVo.getSkuCont());
+
+        // 设置折扣金额（这些值可以是常量或计算值）
+        BigDecimal promotionAmount = BigDecimal.ONE;
+        BigDecimal couponAmount = new BigDecimal("2.00");
+        BigDecimal integrationAmount = new BigDecimal("3.00");
+        orderItem.setPromotionAmount(promotionAmount);
+        orderItem.setCouponAmount(couponAmount);
+        orderItem.setIntegrationAmount(integrationAmount);
+
+        BigDecimal weight = spuInfoTO.getWeight();
+        orderItem.setWeight(weight.multiply(BigDecimal.valueOf(skuCountVo.getSkuCont())));
+
+        // 计算 totalAmount 和 realAmount
+        BigDecimal totalAmount = skuInfoTO.getPrice().multiply(BigDecimal.valueOf(skuCountVo.getSkuCont()));
+        orderItem.setTotalAmount(totalAmount);
+
+        BigDecimal realAmount = totalAmount
+                .subtract(promotionAmount)
+                .subtract(couponAmount)
+                .subtract(integrationAmount);
+        orderItem.setRealAmount(realAmount);
+
+        // 计算礼物整合和增长
+        orderItem.setGiftIntegration(realAmount.divide(BigDecimal.valueOf(100), RoundingMode.DOWN).longValue());
+        orderItem.setGiftGrowth(realAmount.divide(BigDecimal.valueOf(10), RoundingMode.DOWN).longValue());
+
+        return orderItem;
+    }
 
 
-    private Order creteOrder(SubmitOrderVo submitOrderVo) {
-
-        Order order = new Order();
 
 
-        //雪花算法生成订单号
-        String orderSn= IdWorker.getTimeId();
-        order.setOrderSn(orderSn);
-       // 获取当前用户的地址列表
-        List<MemberReceiveAddressTO> addressList =getMemberAddress(getCurrentMember().getId());
+    private Order createOrder(SubmitOrderVo submitOrderVo) {
+        // 获取当前用户信息和地址列表
+        MemberTO currentMember = getCurrentMember();
+        List<MemberReceiveAddressTO> addressList = getMemberAddress(currentMember.getId());
 
-        // 查找ID为addrId的地址
+        // 查找提交订单中的地址
         MemberReceiveAddressTO address = addressList.stream()
                 .filter(addr -> addr.getId().equals(submitOrderVo.getAddrId()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Address not found for id: " + submitOrderVo.getAddrId()));
 
-        //
-        order.setMemberId(getCurrentMember().getId());
-        order.setCouponId(14L);
-
+        // 创建订单
+        Order order = new Order();
+        String orderSn = IdWorker.getTimeId(); // 雪花算法生成订单号
+        order.setOrderSn(orderSn);
+        order.setMemberId(currentMember.getId());
+        order.setCouponId(14L); // 示例固定值，可根据实际情况调整
         order.setCreateTime(new Date());
+        order.setMemberUsername(currentMember.getUsername());
 
-        order.setMemberUsername(getCurrentMember().getUsername());
-
-
-        //地址
+        // 设置收货地址信息
         order.setReceiverName(address.getName());
         order.setReceiverPhone(address.getPhone());
         order.setReceiverPostCode(address.getPostCode());
@@ -433,17 +475,17 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         order.setReceiverRegion(address.getRegion());
         order.setReceiverDetailAddress(address.getDetailAddress());
 
-        //备注
+        // 设置订单备注和运费
         order.setNote(submitOrderVo.getRemark());
-        //运费
-        order.setFreightAmount(new BigDecimal(10));
+        order.setFreightAmount(BigDecimal.TEN); // 示例运费固定值10，可根据实际情况调整
 
-
+        // 设置订单状态和自动确认天数
         order.setStatus(OrderStatusEnum.CREATE_NEW.getCode());
-        order.setAutoConfirmDay(7);
+        order.setAutoConfirmDay(7); // 示例自动确认天数
 
         return order;
     }
+
 
     // 修改 getMemberAddress 方法，传递当前用户信息
     public List<MemberReceiveAddressTO> getMemberAddress(Long memberId) {
@@ -452,6 +494,40 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         } catch (Exception e) {
             return null;
         }
+    }
+
+    @Override
+    public Result<?> getMemberOrders(Integer status) {
+        if (status == null) {
+            Long memberId = getCurrentMember().getId();
+            List<OrdersVo> ordersVoList = new ArrayList<>();
+            List<Order> orders = orderMapper.selectAllByMemberId(memberId);
+            getOrderItems(ordersVoList, orders);
+            return Result.ok(ordersVoList);
+        } else {
+            return   Result.ok(getOrdersVoList(getCurrentMember().getId(), status));
+        }
+    }
+    private List<OrdersVo>  getOrdersVoList(Long memberId,Integer status){
+        List<OrdersVo> ordersVoList  = new ArrayList<>();
+        List<Order> orders = orderMapper.selectAllByMemberIdAndStatus(memberId,status);
+        getOrderItems(ordersVoList, orders);
+        return ordersVoList;
+    }
+
+    private void getOrderItems(List<OrdersVo> ordersVoList, List<Order> orders) {
+        for(Order order:orders){
+            OrdersVo ordersVo=new OrdersVo();
+            List<OrderItem> orderItemList = orderItemMapper.selectAllByOrderId(order.getId());
+            ordersVo.setOrder(order);
+            ordersVo.setOrderItem(orderItemList);
+            ordersVoList.add(ordersVo);
+        }
+    }
+
+    @Override
+    public Object getMemberOrderInfo(Long id) {
+        return orderMapper.selectOneByIdAndMemberId(id,getCurrentMember().getId());
     }
 
     private MemberTO getCurrentMember() {

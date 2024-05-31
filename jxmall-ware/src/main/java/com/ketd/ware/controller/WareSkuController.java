@@ -10,6 +10,8 @@ import java.util.List;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.ketd.common.domain.order.WareSkuLockTo;
+import com.ketd.common.domain.ware.WareSkuTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -75,6 +77,8 @@ public class WareSkuController{
 
     }
 
+
+
     /**
      * 获取商品库存详细信息
      */
@@ -94,6 +98,14 @@ public class WareSkuController{
     {
         return Result.ok(wareSkuService.insertWareSku(wareSku));
     }
+
+    @Operation(summary = "批量新增商品库存")
+    @PostMapping("/save/list")
+    public Result<?> addList(@RequestBody List<WareSkuTO>  wareSkuTOList)
+    {
+        return wareSkuService.addList(wareSkuTOList);
+    }
+
 
     /**
      * 修改商品库存
@@ -129,5 +141,11 @@ public class WareSkuController{
     public Result<?> hasStockByCount(@RequestParam(value = "skuId") Long skuId,@RequestParam(value = "count") Integer count)
     {
         return wareSkuService.hasStockByCount(skuId,count);
+    }
+
+
+    @PostMapping("lockStock/order")
+    public  Result<?> orderLockStock(@RequestBody WareSkuLockTo wareSkuLockTo){
+        return wareSkuService.orderLockStock(wareSkuLockTo);
     }
 }

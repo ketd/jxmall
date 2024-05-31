@@ -26,6 +26,7 @@ public class OrderTO  implements Serializable
     private BigDecimal integrationAmount;
     private BigDecimal couponAmount;
     private BigDecimal discountAmount;
+    private BigDecimal weight;
     private Long payType;
     private Long sourceType;
     private Long status;

@@ -29,6 +29,7 @@ public class OrderItemTO  implements Serializable
     private BigDecimal couponAmount;
     private BigDecimal integrationAmount;
     private BigDecimal realAmount;
+    private BigDecimal weight;
     private Long giftIntegration;
     private Long giftGrowth;
 

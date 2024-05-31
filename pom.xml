@@ -300,6 +300,13 @@
                 <version>3.2.5</version>
             </dependency>
 
+
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
+                <version>2023.0.1.0</version>
+            </dependency>
+
         </dependencies>
 
     </dependencyManagement>

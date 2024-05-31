@@ -5,20 +5,39 @@
 
     <!-- 可根据自己的需求，是否要使用 -->
     <resultMap type="com.ketd.ware.domain.WareSku" id="BaseResultMap">
-            <result property="id"    column="id"    />
-            <result property="skuId"    column="sku_id"    />
-            <result property="wareId"    column="ware_id"    />
-            <result property="stock"    column="stock"    />
-            <result property="skuName"    column="sku_name"    />
-            <result property="stockLocked"    column="stock_locked"    />
+        <result property="id" column="id"/>
+        <result property="skuId" column="sku_id"/>
+        <result property="wareId" column="ware_id"/>
+        <result property="stock" column="stock"/>
+        <result property="skuName" column="sku_name"/>
+        <result property="stockLocked" column="stock_locked"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-id,sku_id,ware_id,stock,sku_name,stock_locked
+        id,sku_id,ware_id,stock,sku_name,stock_locked
     </sql>
     <update id="addStock">
-        UPDATE `wms_ware_sku` SET stock=stock+#{skuNum} WHERE sku_id=#{skuId} AND ware_id=#{wareId}
+        UPDATE `wms_ware_sku`
+        SET stock=stock + #{skuNum}
+        WHERE sku_id = #{skuId}
+          AND ware_id = #{wareId}
     </update>
+    <update id="lockSkuStock">
+        UPDATE `wms_ware_sku`
+        SET stock_locked=stock_locked+#{count}
+        WHERE sku_id =#{skuId}
+          AND ware_id=#{wareId}
+          AND stock-stock_locked>=#{count}
+    </update>
+
+
+    <select id="listWareIdsHasSku" resultType="java.lang.Long">
+        SELECT ware_id
+        FROM `wms_ware_sku`
+        WHERE sku_id = #{skuId}
+          AND stock - stock_locked > 0
+    </select>
+
 
 </mapper>
 

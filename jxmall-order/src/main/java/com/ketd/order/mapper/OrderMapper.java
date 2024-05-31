@@ -1,4 +1,6 @@
 package com.ketd.order.mapper;
+import java.util.List;
+import org.apache.ibatis.annotations.Param;
 
 
 import com.ketd.order.domain.Order;
@@ -14,4 +16,10 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 public interface OrderMapper extends BaseMapper<Order>
 {
 
+    List<Order> selectAllByMemberId(@Param("memberId") Long memberId);
+
+    Order selectOneByIdAndMemberId(@Param("id") Long id, @Param("memberId") Long memberId);
+
+
+    List<Order> selectAllByMemberIdAndStatus(@Param("memberId") Long memberId, @Param("status") Integer status);
 }

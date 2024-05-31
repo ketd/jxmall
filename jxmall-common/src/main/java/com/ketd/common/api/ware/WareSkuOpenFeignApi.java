@@ -1,5 +1,7 @@
 package com.ketd.common.api.ware;
 
+import com.ketd.common.domain.order.LockStickResult;
+import com.ketd.common.domain.order.WareSkuLockTo;
 import com.ketd.common.domain.ware.HasStockTo;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -23,11 +25,16 @@ public interface WareSkuOpenFeignApi {
      */
     @GetMapping(value = "/ware/WareSku/info")
     public Result<?> getInfo(@RequestParam("id") Long id);
+
+
     /**
      * 新增商品库存
      */
     @PostMapping("/ware/WareSku/save")
     public Result<?> add(@RequestBody WareSkuTO wareSkuTO);
+
+    @PostMapping("/ware/WareSku/save/list")
+    public Result<?> addList(@RequestBody List<WareSkuTO>  wareSkuTOList);
 
     /**
      * 修改商品库存
@@ -47,4 +54,7 @@ public interface WareSkuOpenFeignApi {
     @GetMapping("/ware/WareSku/hasStockByCount")
     public Result<Boolean> hasStockByCount(@RequestParam(value = "skuId") Long skuId,@RequestParam(value = "count") Integer count);
 
+
+    @PostMapping("/ware/WareSku/lockStock/order")
+    public  Result<List<LockStickResult>> orderLockStock(@RequestBody WareSkuLockTo wareSkuLockTo);
 }

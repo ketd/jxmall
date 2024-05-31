@@ -18,6 +18,7 @@
             <result property="integrationAmount"    column="integration_amount"    />
             <result property="couponAmount"    column="coupon_amount"    />
             <result property="discountAmount"    column="discount_amount"    />
+            <result property="weight"    column="weight"    />
             <result property="payType"    column="pay_type"    />
             <result property="sourceType"    column="source_type"    />
             <result property="status"    column="status"    />
@@ -50,8 +51,31 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-id,member_id,order_sn,coupon_id,create_time,member_username,total_amount,pay_amount,freight_amount,promotion_amount,integration_amount,coupon_amount,discount_amount,pay_type,source_type,status,delivery_company,delivery_sn,auto_confirm_day,integration,growth,bill_type,bill_header,bill_content,bill_receiver_phone,bill_receiver_email,receiver_name,receiver_phone,receiver_post_code,receiver_province,receiver_city,receiver_region,receiver_detail_address,note,confirm_status,delete_status,use_integration,payment_time,delivery_time,receive_time,comment_time,modify_time
+id,member_id,order_sn,coupon_id,create_time,member_username,total_amount,pay_amount,weight,freight_amount,promotion_amount,integration_amount,coupon_amount,discount_amount,pay_type,source_type,status,delivery_company,delivery_sn,auto_confirm_day,integration,growth,bill_type,bill_header,bill_content,bill_receiver_phone,bill_receiver_email,receiver_name,receiver_phone,receiver_post_code,receiver_province,receiver_city,receiver_region,receiver_detail_address,note,confirm_status,delete_status,use_integration,payment_time,delivery_time,receive_time,comment_time,modify_time
     </sql>
+    <select id="selectAllByMemberId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from oms_order
+        where
+        member_id = #{memberId,jdbcType=NUMERIC}
+    </select>
+    <select id="selectOneByIdAndMemberId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from oms_order
+        where
+        id = #{id,jdbcType=NUMERIC}
+        AND member_id = #{memberId,jdbcType=NUMERIC}
+    </select>
+    <select id="selectAllByMemberIdAndStatus" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from oms_order
+        where
+        member_id = #{memberId,jdbcType=NUMERIC}
+        AND status = #{status,jdbcType=NUMERIC}
+    </select>
 
 </mapper>
 

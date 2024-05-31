@@ -1,5 +1,6 @@
 package com.ketd.common.api.order;
 
+import com.ketd.common.domain.order.WareSkuLockTo;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -37,5 +38,8 @@ public interface RefundInfoOpenFeignApi {
      */
     @DeleteMapping("/order/RefundInfo/delete")
     public Result<?> remove(@RequestBody Long[] ids);
+
+
+
 
 }

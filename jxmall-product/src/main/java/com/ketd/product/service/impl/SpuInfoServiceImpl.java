@@ -21,6 +21,7 @@ import com.ketd.common.domain.coupon.SkuLadderTO;
 import com.ketd.common.domain.coupon.SpuBoundsTO;
 import com.ketd.common.domain.search.SkuEsModel;
 import com.ketd.common.domain.ware.HasStockTo;
+import com.ketd.common.domain.ware.WareSkuTO;
 import com.ketd.common.result.Result;
 import com.ketd.product.domain.*;
 import com.ketd.product.mapper.SkuImagesMapper;
@@ -228,6 +229,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoMapper, SpuInfo> impl
             spuBoundTo.setSpuId(spuBaseInfo.getId());
             spuBoundsOpenFeignApi.add(spuBoundTo);
 
+            List<WareSkuTO>  wareSkuTOList = new ArrayList<>();
 
             //5.保存spu的sku信息
             List<SpuSaveVo.SkusVO> skus = spuSaveVo.getSkus();
@@ -256,6 +258,17 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoMapper, SpuInfo> impl
                     skuInfo.setSkuDesc(spuInfoDesc.getDecript());
 
                     skuInfoServiceImpl.saveSkuInfo(skuInfo);
+
+
+                    WareSkuTO wareSkuTO =new WareSkuTO();
+                    wareSkuTO.setSkuId(skuInfo.getSkuId());
+                    wareSkuTO.setWareId(1L);
+                    wareSkuTO.setStock(0L);
+                    wareSkuTO.setStockLocked(0L);
+                    wareSkuTO.setSkuName(skuInfo.getSkuName());
+
+                    wareSkuTOList.add(wareSkuTO);
+
 
                     Long skuId = skuInfo.getSkuId();
 
@@ -318,6 +331,13 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoMapper, SpuInfo> impl
 
 
                 });
+            }
+
+
+            try {
+                wareSkuOpenFeignApi.addList(wareSkuTOList);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
 
             return Result.ok(null);

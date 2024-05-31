@@ -19,7 +19,7 @@ public interface SpuInfoOpenFeignApi {
      * 获取spu信息详细信息
      */
     @GetMapping(value = "/product/SpuInfo/info")
-    public Result<?> getInfo(@RequestParam("id") Long id);
+    public Result<SpuInfoTO> getInfo(@RequestParam("id") Long id);
     /**
      * 新增spu信息
      */

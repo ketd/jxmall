@@ -74,4 +74,8 @@ public interface IOrderService  extends IService<Order> {
     Result<?> toTrade(List<SkuCountVo> skuCountVo);
 
     Result<?> submitOrder(SubmitOrderVo submitOrderVo);
+
+    Result<?> getMemberOrders(Integer status);
+
+    Object getMemberOrderInfo(Long id);
 }

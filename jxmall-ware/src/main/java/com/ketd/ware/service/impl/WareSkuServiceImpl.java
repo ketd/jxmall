@@ -1,14 +1,25 @@
 package com.ketd.ware.service.impl;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ketd.common.api.product.SkuInfoOpenFeignApi;
+import com.ketd.common.api.product.SpuInfoOpenFeignApi;
+import com.ketd.common.domain.order.LockStickResult;
+import com.ketd.common.domain.order.SkuCountVo;
+import com.ketd.common.domain.order.WareSkuLockTo;
 import com.ketd.common.domain.ware.HasStockTo;
+import com.ketd.common.domain.ware.WareSkuTO;
 import com.ketd.common.result.Result;
+import com.ketd.ware.vo.SkuWareHasStock;
+import io.seata.spring.annotation.GlobalTransactional;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -34,8 +45,10 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuMapper, WareSku> impl
     @Autowired
     private WareSkuMapper wareSkuMapper;
 
+
     @Autowired
     private SkuInfoOpenFeignApi skuInfoOpenFeignApi;
+
 
     /**
      * 查询商品库存
@@ -168,9 +181,9 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuMapper, WareSku> impl
     @Override
     public Result<?> hasStockByCount(Long skuId, Integer count) {
         WareSku queryWareSku = wareSkuMapper.selectById(skuId);
-        if(queryWareSku == null){
+        if (queryWareSku == null) {
             return Result.ok(false);
-        }else{
+        } else {
             if (queryWareSku.getStock() >= count) {
                 return Result.ok(true);
             } else {
@@ -179,4 +192,73 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuMapper, WareSku> impl
         }
 
     }
+
+    @Override
+    public Result<?> addList(List<WareSkuTO> wareSkuTOList) {
+        System.out.println(wareSkuTOList);
+        try {
+            List<WareSku> wareSkuList = new ArrayList<>();
+            for (WareSkuTO wareSkuTO : wareSkuTOList) {
+                WareSku wareSku = new WareSku();
+                BeanUtils.copyProperties(wareSkuTO, wareSku);
+                wareSkuList.add(wareSku);
+            }
+
+            this.saveBatch(wareSkuList);
+            return Result.ok(null);
+        } catch (BeansException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
+    @Override
+    @Transactional
+    public Result<?> orderLockStock(WareSkuLockTo wareSkuLockTo) {
+        List<LockStickResult> lockStickResults = new ArrayList<>();
+        List<SkuCountVo> wareSkuLockTos = wareSkuLockTo.getLocks();
+
+        List<SkuWareHasStock> skuWareHasStockList = wareSkuLockTos.stream().map(item -> {
+            SkuWareHasStock skuWareHasStock = new SkuWareHasStock();
+            Long skuId = item.getSkuId();
+            skuWareHasStock.setSkuId(skuId);
+            skuWareHasStock.setCount(item.getSkuCont());
+            List<Long> wareIds = wareSkuMapper.listWareIdsHasSku(skuId);
+            skuWareHasStock.setWareIds(wareIds);
+            return skuWareHasStock;
+        }).toList();
+
+        for (SkuWareHasStock skuWareHasStock : skuWareHasStockList) {
+            boolean skuStocked = false;
+            Long skuId = skuWareHasStock.getSkuId();
+            List<Long> wares = skuWareHasStock.getWareIds();
+            if (wares == null || wares.isEmpty()) {
+                throw new StockLockException("没有库存");
+            }
+            for (Long wareId : wares) {
+                Long count = wareSkuMapper.lockSkuStock(skuId, wareId, skuWareHasStock.getCount());
+                if (count == 1) {
+                    skuStocked = true;
+                    LockStickResult lockStickResult = new LockStickResult();
+                    lockStickResult.setSkuId(skuId);
+                    lockStickResult.setWareId(wareId);
+                    lockStickResult.setCount(skuWareHasStock.getCount());
+                    lockStickResult.setLockStock(skuStocked);
+                    lockStickResults.add(lockStickResult);
+                    break;
+                }
+            }
+            if (!skuStocked) {
+                throw new StockLockException("没有库存");
+            }
+        }
+        return Result.ok(lockStickResults);
+    }
+    public static class StockLockException extends RuntimeException {
+        public StockLockException(String message) {
+            super(message);
+        }
+    }
+
 }

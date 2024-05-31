@@ -3,6 +3,8 @@ package com.ketd.ware.service;
 
 import java.util.List;
 
+import com.ketd.common.domain.order.WareSkuLockTo;
+import com.ketd.common.domain.ware.WareSkuTO;
 import com.ketd.common.result.Result;
 import jakarta.servlet.http.HttpServletResponse;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -74,4 +76,9 @@ public interface IWareSkuService  extends IService<WareSku> {
     Result<?> hasStock(List<Long> skuIds);
 
     Result<?> hasStockByCount(Long skuId, Integer count);
+
+    Result<?> addList(List<WareSkuTO> wareSkuTOList);
+
+
+    Result<?> orderLockStock(WareSkuLockTo wareSkuLockTo);
 }

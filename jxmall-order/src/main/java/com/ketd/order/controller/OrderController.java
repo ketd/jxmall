@@ -66,7 +66,7 @@ public class OrderController{
 
     @Operation(summary = "生成订单")
     @PostMapping("toTrade")
-    public Result<?> toTrade(@RequestBody List<SkuCountVo> skuCountVos){
+        public Result<?> toTrade(@RequestBody List<SkuCountVo> skuCountVos){
         return orderService.toTrade(skuCountVos);
     }
 
@@ -98,6 +98,14 @@ public class OrderController{
         return Result.ok(orderService.selectOrderById(id));
     }
 
+    @Operation(summary = "获取用户订单详细信息")
+    @GetMapping(value = "/info/member")
+    public Result<?> getMemberOrderInfo(@RequestParam("id") Long id)
+    {
+        return Result.ok(orderService.getMemberOrderInfo(id));
+    }
+
+
     /**
      * 新增订单
      */
@@ -127,4 +135,10 @@ public class OrderController{
     {
         return Result.ok(orderService.deleteOrderByIds(ids));
     }
+
+    @GetMapping(value = "/getMemberOrders")
+    public Result<?> getMemberOrders(@RequestParam(value = "status", required = false) Integer status) {
+        return orderService.getMemberOrders(status);
+    }
+
 }

@@ -22,4 +22,6 @@ public interface OrderMapper extends BaseMapper<Order>
 
 
     List<Order> selectAllByMemberIdAndStatus(@Param("memberId") Long memberId, @Param("status") Integer status);
+
+    Order selectOneByOrderSn(@Param("orderSn") String orderSn);
 }

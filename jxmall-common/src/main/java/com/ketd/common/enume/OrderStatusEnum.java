@@ -1,10 +1,13 @@
-package com.ketd.order.enume;
+package com.ketd.common.enume;
+
+import lombok.Getter;
 
 /**
  * 订单状态枚举
  * @author Jerry
  */
 
+@Getter
 public enum OrderStatusEnum {
     CREATE_NEW(0,"待付款"),
     PAYED(1,"已付款"),
@@ -21,11 +24,4 @@ public enum OrderStatusEnum {
         this.msg = msg;
     }
 
-    public Integer getCode() {
-        return code;
-    }
-
-    public String getMsg() {
-        return msg;
-    }
 }

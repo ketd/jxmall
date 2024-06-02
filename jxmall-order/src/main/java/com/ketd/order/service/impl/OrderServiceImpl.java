@@ -22,15 +22,17 @@ import com.ketd.common.domain.member.MemberTO;
 import com.ketd.common.domain.order.LockStickResult;
 import com.ketd.common.domain.product.SkuInfoTO;
 import com.ketd.common.domain.product.SpuInfoTO;
+import com.ketd.common.enume.OrderStatusEnum;
 import com.ketd.common.result.Result;
 import com.ketd.order.Interceptors.LoginProtectedInterceptor;
 import com.ketd.order.domain.OrderItem;
-import com.ketd.order.enume.OrderStatusEnum;
 import com.ketd.order.mapper.OrderItemMapper;
 import com.ketd.order.service.IOrderItemService;
+import com.ketd.order.util.MessageProcessorUtil;
 import com.ketd.order.util.RedisUtil;
 import com.ketd.order.vo.*;
-import io.seata.spring.annotation.GlobalTransactional;
+
+
 import jakarta.servlet.http.HttpServletResponse;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
@@ -61,10 +63,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private OrderMapper orderMapper;
 
     @Autowired
-    private OrderItemMapper  orderItemMapper;
+    private OrderItemMapper orderItemMapper;
 
     @Autowired
-    private IOrderItemService  orderItemService;
+    private IOrderItemService orderItemService;
 
     @Autowired
     private MemberReceiveAddressOpenFeignApi memberReceiveAddressOpenFeignApi;
@@ -92,6 +94,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
     @Autowired
     private StringRedisTemplate redisTemplate;
+
+    @Autowired
+    private MessageProcessorUtil messageProcessorUtil;
+
+
     /**
      * 查询订单
      *
@@ -99,11 +106,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
      * @return 订单
      */
     @Override
-    public Order selectOrderById(Long id)
-    {
+    public Order selectOrderById(Long id) {
         return orderMapper.selectById(id);
     }
 
+    @Override
+    public Result<?> getInfoByOrderSn(String orderSn) {
+        return Result.ok(orderMapper.selectOneByOrderSn(orderSn));
+    }
 
 
     /**
@@ -113,8 +123,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
      * @return 订单
      */
     @Override
-    public List<Order> selectOrderList(Order order)
-    {
+    public List<Order> selectOrderList(Order order) {
         QueryWrapper<Order> queryWrapper = new QueryWrapper<>(order);
         return orderMapper.selectList(queryWrapper);
     }
@@ -130,9 +139,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     public int insertOrder(Order order) {
         return orderMapper.insert(order);
     }
-
-
-
 
 
     /**
@@ -176,7 +182,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Override
     public void export(List<Order> list, HttpServletResponse response) {
 
-        extracted(list, response,Order.class);
+        extracted(list, response, Order.class);
 
     }
 
@@ -260,7 +266,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
 
     @Override
-    @GlobalTransactional
+    //@GlobalTransactional
     public Result<?> submitOrder(SubmitOrderVo submitOrderVo) {
         OrderCreateTo orderCreateTo = new OrderCreateTo();
         MemberTO currentMember = getCurrentMember();
@@ -279,10 +285,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             // 令牌匹配并已删除
             Order order = createOrder(submitOrderVo);
             List<OrderItem> orderItemList = createOrderItems(submitOrderVo.getSkuCountVoList(), order);
-
-
-            com.ketd.common.domain.order.WareSkuLockTo wareSkuLockTo = getWareSkuLockTo(submitOrderVo, order);
-            List<LockStickResult> lockStickResultList=  wareSkuOpenFeignApi.orderLockStock(wareSkuLockTo).getData();
 
 
             // 验证价格
@@ -307,12 +309,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             orderCreateTo.setPayAmount(payAmount);
             orderCreateTo.setFare(order.getFreightAmount());
 
+            com.ketd.common.domain.order.WareSkuLockTo wareSkuLockTo = getWareSkuLockTo(submitOrderVo, order);
+            List<LockStickResult> lockStickResultList = wareSkuOpenFeignApi.orderLockStock(wareSkuLockTo).getData();
 
 
-            boolean lockStock=true;
+            boolean lockStock = true;
             for (LockStickResult lockStickResult : lockStickResultList) {
                 if (!lockStickResult.getLockStock()) {
-                    lockStock=false;
+                    lockStock = false;
                     break;
                 }
             }
@@ -328,8 +332,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
                 cartOpenFeignApi.delete(skuIds);
                 /*return   Result.ok(orderCreateTo);*/
-                return   Result.ok(order.getId());
-            }else {
+
+
+
+
+                //int i=10/0;
+
+                return Result.ok(order.getId());
+            } else {
                 return Result.error("库存不足");
             }
 
@@ -340,13 +350,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     }
 
 
-
     private static com.ketd.common.domain.order.WareSkuLockTo getWareSkuLockTo(SubmitOrderVo submitOrderVo, Order order) {
-        com.ketd.common.domain.order.WareSkuLockTo  wareSkuLockTo = new com.ketd.common.domain.order.WareSkuLockTo();
+        com.ketd.common.domain.order.WareSkuLockTo wareSkuLockTo = new com.ketd.common.domain.order.WareSkuLockTo();
         wareSkuLockTo.setOrderSn(order.getOrderSn());
-        List<com.ketd.common.domain.order.SkuCountVo>  skuCountVoList = new ArrayList<>();
-        for(SkuCountVo skuCountVo: submitOrderVo.getSkuCountVoList()){
-            com.ketd.common.domain.order.SkuCountVo  skuCountVo1 = new com.ketd.common.domain.order.SkuCountVo();
+        List<com.ketd.common.domain.order.SkuCountVo> skuCountVoList = new ArrayList<>();
+        for (SkuCountVo skuCountVo : submitOrderVo.getSkuCountVoList()) {
+            com.ketd.common.domain.order.SkuCountVo skuCountVo1 = new com.ketd.common.domain.order.SkuCountVo();
             skuCountVo1.setSkuId(skuCountVo.getSkuId());
             skuCountVo1.setSkuCont(skuCountVo.getSkuCont());
             skuCountVoList.add(skuCountVo1);
@@ -391,7 +400,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         if (skuInfoTO == null) {
             return null;
         }
-        SpuInfoTO  spuInfoTO = spuInfoOpenFeignApi.getInfo(skuInfoTO.getSpuId()).getData();
+        SpuInfoTO spuInfoTO = spuInfoOpenFeignApi.getInfo(skuInfoTO.getSpuId()).getData();
 
         if (spuInfoTO == null) {
             return null;
@@ -442,8 +451,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
         return orderItem;
     }
-
-
 
 
     private Order createOrder(SubmitOrderVo submitOrderVo) {
@@ -505,19 +512,20 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             getOrderItems(ordersVoList, orders);
             return Result.ok(ordersVoList);
         } else {
-            return   Result.ok(getOrdersVoList(getCurrentMember().getId(), status));
+            return Result.ok(getOrdersVoList(getCurrentMember().getId(), status));
         }
     }
-    private List<OrdersVo>  getOrdersVoList(Long memberId,Integer status){
-        List<OrdersVo> ordersVoList  = new ArrayList<>();
-        List<Order> orders = orderMapper.selectAllByMemberIdAndStatus(memberId,status);
+
+    private List<OrdersVo> getOrdersVoList(Long memberId, Integer status) {
+        List<OrdersVo> ordersVoList = new ArrayList<>();
+        List<Order> orders = orderMapper.selectAllByMemberIdAndStatus(memberId, status);
         getOrderItems(ordersVoList, orders);
         return ordersVoList;
     }
 
     private void getOrderItems(List<OrdersVo> ordersVoList, List<Order> orders) {
-        for(Order order:orders){
-            OrdersVo ordersVo=new OrdersVo();
+        for (Order order : orders) {
+            OrdersVo ordersVo = new OrdersVo();
             List<OrderItem> orderItemList = orderItemMapper.selectAllByOrderId(order.getId());
             ordersVo.setOrder(order);
             ordersVo.setOrderItem(orderItemList);
@@ -527,8 +535,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
     @Override
     public Object getMemberOrderInfo(Long id) {
-        return orderMapper.selectOneByIdAndMemberId(id,getCurrentMember().getId());
+        return orderMapper.selectOneByIdAndMemberId(id, getCurrentMember().getId());
     }
+
+
 
     private MemberTO getCurrentMember() {
         return LoginProtectedInterceptor.threadLocal.get();

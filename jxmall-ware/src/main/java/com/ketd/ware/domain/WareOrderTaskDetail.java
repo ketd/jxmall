@@ -43,11 +43,20 @@ public class WareOrderTaskDetail  implements Serializable
 
         @ExcelProperty(value = "购买个数")
         @Schema(description =  "购买个数")
-        private Long skuNum;
+        private Integer skuNum;
 
         @ExcelProperty(value = "工作单id")
         @Schema(description =  "工作单id")
         private Long taskId;
+
+        @ExcelProperty(value = "仓库id")
+        @Schema(description =  "仓库id")
+        private Long wareId;
+
+
+        @ExcelProperty(value = "锁定状态")
+        @Schema(description =  "锁定状态")
+        private Integer lockStatus;
 
 
 }

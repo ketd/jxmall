@@ -4,20 +4,35 @@ package com.ketd.ware.service.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ketd.common.api.product.SkuInfoOpenFeignApi;
-import com.ketd.common.api.product.SpuInfoOpenFeignApi;
+import com.ketd.common.domain.mq.MultiDelayMessage;
+import com.ketd.common.domain.mq.StockLockedTo;
+import com.ketd.common.domain.mq.WareOrderTaskDetailTo;
 import com.ketd.common.domain.order.LockStickResult;
+import com.ketd.common.domain.order.OrderTO;
 import com.ketd.common.domain.order.SkuCountVo;
 import com.ketd.common.domain.order.WareSkuLockTo;
 import com.ketd.common.domain.ware.HasStockTo;
 import com.ketd.common.domain.ware.WareSkuTO;
+import com.ketd.common.enume.LockStatusEnum;
+import com.ketd.common.enume.OrderStatusEnum;
+import com.ketd.common.no_authentication_api.order.NoAuthenticationOrderOpenFeignApi;
 import com.ketd.common.result.Result;
+import com.ketd.ware.domain.WareOrderTask;
+import com.ketd.ware.domain.WareOrderTaskDetail;
+import com.ketd.ware.enume.RabbitMQConstants;
+import com.ketd.ware.util.MessageProcessorUtil;
 import com.ketd.ware.vo.SkuWareHasStock;
-import io.seata.spring.annotation.GlobalTransactional;
+
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.amqp.core.ExchangeTypes;
+import org.springframework.amqp.rabbit.annotation.Exchange;
+import org.springframework.amqp.rabbit.annotation.Queue;
+import org.springframework.amqp.rabbit.annotation.QueueBinding;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,9 +60,20 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuMapper, WareSku> impl
     @Autowired
     private WareSkuMapper wareSkuMapper;
 
+    @Autowired
+    private WareOrderTaskServiceImpl wareOrderTaskService;
+
+    @Autowired
+    private WareOrderTaskDetailServiceImpl wareOrderTaskDetailService;
+
+   @Autowired
+   private MessageProcessorUtil messageProcessorUtil;
 
     @Autowired
     private SkuInfoOpenFeignApi skuInfoOpenFeignApi;
+
+    @Autowired
+    private NoAuthenticationOrderOpenFeignApi noAuthenticationOrderOpenFeignApi;
 
 
     /**
@@ -219,6 +245,11 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuMapper, WareSku> impl
         List<LockStickResult> lockStickResults = new ArrayList<>();
         List<SkuCountVo> wareSkuLockTos = wareSkuLockTo.getLocks();
 
+        WareOrderTask  wareOrderTask = new WareOrderTask();
+        wareOrderTask.setOrderSn(wareSkuLockTo.getOrderSn());
+        wareOrderTaskService.save(wareOrderTask);
+
+
         List<SkuWareHasStock> skuWareHasStockList = wareSkuLockTos.stream().map(item -> {
             SkuWareHasStock skuWareHasStock = new SkuWareHasStock();
             Long skuId = item.getSkuId();
@@ -239,6 +270,28 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuMapper, WareSku> impl
             for (Long wareId : wares) {
                 Long count = wareSkuMapper.lockSkuStock(skuId, wareId, skuWareHasStock.getCount());
                 if (count == 1) {
+
+
+                    WareOrderTaskDetail  wareOrderTaskDetail = new WareOrderTaskDetail();
+                    wareOrderTaskDetail.setSkuId(skuId);
+                    wareOrderTaskDetail.setSkuName(wareSkuMapper.selectOneBySkuIdAndWareId(skuId,wareId).getSkuName());
+                    wareOrderTaskDetail.setSkuNum(skuWareHasStock.getCount());
+                    wareOrderTaskDetail.setTaskId(wareOrderTask.getId());
+                    wareOrderTaskDetail.setWareId(wareId);
+                    wareOrderTaskDetail.setLockStatus(1);
+
+                    wareOrderTaskDetailService.save(wareOrderTaskDetail);
+
+                    StockLockedTo stockLockedTo=new StockLockedTo();
+                    stockLockedTo.setWareOrderTaskId(wareOrderTask.getId());
+
+                    WareOrderTaskDetailTo  wareOrderTaskDetailTo=new WareOrderTaskDetailTo();
+                    BeanUtils.copyProperties(wareOrderTaskDetail,wareOrderTaskDetailTo);
+                    stockLockedTo.setWareOrderTaskDetail(wareOrderTaskDetailTo);
+
+                    List<Integer> delayTimes = new ArrayList<>(Arrays.asList(5000, 5000, 10000, 10000, 15000, 15000, 20000, 20000, 30000, 30000, 60000, 60000, 120000, 120000, 240000, 240000, 480000));
+                    messageProcessorUtil.sendDelayedMessage(stockLockedTo,delayTimes);
+
                     skuStocked = true;
                     LockStickResult lockStickResult = new LockStickResult();
                     lockStickResult.setSkuId(skuId);
@@ -260,5 +313,70 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuMapper, WareSku> impl
             super(message);
         }
     }
+
+
+
+
+    /*
+     * 描述:库存自动解锁
+     * @description: 下订单成功，库存锁定成功，接下来的业务调用失败，导致订单回滚。之前锁定的库存就要自动解锁。
+     * @author: ketd
+     * @date: 2024/6/2 17:24
+     * @param null
+     * @return: null
+     **/
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(name = RabbitMQConstants.STOCK_RELEASE_ORDER_QUEUE, durable = "true"),
+            exchange = @Exchange(name = RabbitMQConstants.STOCK_RELEASE_ORDER_EXCHANGE, delayed = "true",type = ExchangeTypes.TOPIC),
+            key = RabbitMQConstants.STOCK_RELEASE_ORDER_ROUTING_KEY
+    ))
+    public void releaseOrderStock(MultiDelayMessage<StockLockedTo> message) {
+        System.out.println("释放订单锁库存：" + message);
+
+
+        StockLockedTo stockLockedTo = message.getData();
+        WareOrderTaskDetailTo  wareOrderTaskDetailTo = stockLockedTo.getWareOrderTaskDetail();
+        Long wareOrderTaskDetailId = wareOrderTaskDetailTo.getId();
+
+        WareOrderTaskDetail wareOrderTaskDetail = wareOrderTaskDetailService.getById(wareOrderTaskDetailId);
+        if (wareOrderTaskDetail == null) {
+            System.out.println("订单不存在");
+            return;
+        }else{
+
+
+            Long wareOrderTaskId = stockLockedTo.getWareOrderTaskId();
+            WareOrderTask wareOrderTask = wareOrderTaskService.getById(wareOrderTaskId);
+            String orderSn = wareOrderTask.getOrderSn();
+            OrderTO order  = noAuthenticationOrderOpenFeignApi.getInfoByOrderSn(orderSn).getData();
+
+            if (order == null||Objects.equals(order.getStatus(), OrderStatusEnum.CANCLED.getCode())) {
+
+                if(Objects.equals(wareOrderTaskDetail.getLockStatus(), LockStatusEnum.LOCK.getCode())){
+                    unLockStock(  wareOrderTaskDetail.getSkuId(), wareOrderTaskDetail.getWareId(), wareOrderTaskDetail.getSkuNum(), wareOrderTaskDetail.getId());
+                    return;
+                }
+
+            }
+
+        }
+
+
+        List<Integer> delayMillis = message.getDelayMillis();
+
+        if(message.hasNextDelay()) {
+            messageProcessorUtil.sendDelayedMessage(stockLockedTo, delayMillis);
+        }
+
+    }
+
+
+    private void unLockStock(Long skuId, Long wareId, Integer count,Long taskDetailId) {
+        wareSkuMapper.unLockStock(skuId, wareId, count);
+        //wareOrderTaskDetailService.unLockStock(taskDetailId);
+    }
+
+
+
 
 }

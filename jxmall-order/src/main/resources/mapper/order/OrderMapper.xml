@@ -76,6 +76,13 @@ id,member_id,order_sn,coupon_id,create_time,member_username,total_amount,pay_amo
         member_id = #{memberId,jdbcType=NUMERIC}
         AND status = #{status,jdbcType=NUMERIC}
     </select>
+    <select id="selectOneByOrderSn" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from oms_order
+        where
+        order_sn = #{orderSn,jdbcType=VARCHAR}
+    </select>
 
 </mapper>
 

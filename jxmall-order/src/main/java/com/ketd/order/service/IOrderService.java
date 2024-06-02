@@ -78,4 +78,6 @@ public interface IOrderService  extends IService<Order> {
     Result<?> getMemberOrders(Integer status);
 
     Object getMemberOrderInfo(Long id);
+
+    Result<?> getInfoByOrderSn(String orderSn);
 }

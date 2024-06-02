@@ -98,6 +98,13 @@ public class OrderController{
         return Result.ok(orderService.selectOrderById(id));
     }
 
+    @Operation(summary = "获取订单详细信息通过订单号")
+    @GetMapping(value = "/infoByOrderSn")
+    public Result<?> getInfoByOrderSn(@RequestParam("orderSn") String orderSn)
+    {
+        return orderService.getInfoByOrderSn(orderSn);
+    }
+
     @Operation(summary = "获取用户订单详细信息")
     @GetMapping(value = "/info/member")
     public Result<?> getMemberOrderInfo(@RequestParam("id") Long id)

@@ -29,7 +29,7 @@ public class OrderTO  implements Serializable
     private BigDecimal weight;
     private Long payType;
     private Long sourceType;
-    private Long status;
+    private Integer status;
     private String deliveryCompany;
     private String deliverySn;
     private Long autoConfirmDay;

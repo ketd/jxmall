@@ -11,8 +11,10 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,10 +37,23 @@ public class LoginProtectedInterceptor implements HandlerInterceptor {
     @Autowired
     private RedisUtil redisUtil;
 
+    @Value("${ip.whitelist}")
+    private String ipWhitelistStr;
+
     public static ThreadLocal<MemberTO> threadLocal = new ThreadLocal<>();
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+
+        List<String> ipWhitelist = Arrays.asList(ipWhitelistStr.split(","));
+        String ipAddress = request.getRemoteAddr();
+
+        String internalHeader = request.getHeader("Internal-Request");
+        if ("true".equals(internalHeader) && ipWhitelist.contains(ipAddress)) {
+            return true;
+        }
+
+        // 继续原来的鉴权逻辑
         try {
             String token;
             Cookie[] cookies = request.getCookies();
@@ -54,8 +69,7 @@ public class LoginProtectedInterceptor implements HandlerInterceptor {
                 Long userId = jXJwtTokenUtil.getUserIdFromToken(token);
                 String userKey = "jxmall:userInfo:user-" + userId;
 
-
-                MemberTO memberTO = redisUtil.getJson(userKey,new TypeReference<>(){});
+                MemberTO memberTO = redisUtil.getJson(userKey, new TypeReference<>() {});
                 threadLocal.set(memberTO);
                 return true;
             }

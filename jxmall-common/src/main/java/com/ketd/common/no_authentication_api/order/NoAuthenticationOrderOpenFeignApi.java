@@ -1,16 +1,14 @@
-package com.ketd.common.api.order;
+package com.ketd.common.no_authentication_api.order;
 
-import jakarta.servlet.http.HttpServletResponse;
+import com.ketd.common.domain.PageRequest;
+import com.ketd.common.domain.TableDataInfo;
+import com.ketd.common.domain.order.OrderTO;
+import com.ketd.common.result.Result;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
-import com.ketd.common.result.Result;
-import com.ketd.common.domain.TableDataInfo;
-import com.ketd.common.domain.PageRequest;
-import com.ketd.common.domain.order.OrderTO;
-
-@FeignClient(value = "cloud-gateway-service")
-public interface OrderOpenFeignApi {
+@FeignClient(value = "cloud-no-authentication-gateway-service")
+public interface NoAuthenticationOrderOpenFeignApi {
 
     @PostMapping("/order/Order/list/page")
     public TableDataInfo list(@RequestBody PageRequest<OrderTO> pageRequest);
@@ -20,6 +18,9 @@ public interface OrderOpenFeignApi {
      */
     @GetMapping(value = "/order/Order/info")
     public Result<OrderTO> getInfo(@RequestParam("id") Long id);
+
+    @GetMapping(value = "/order/Order/infoByOrderSn")
+    public Result<OrderTO> getInfoByOrderSn(@RequestParam("orderSn") String orderSn);
     /**
      * 新增订单
      */

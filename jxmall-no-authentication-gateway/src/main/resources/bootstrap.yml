@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: cloud-no-authentication-gateway-service #以微服务注册进consul或nacos服务列表内
+  cloud:
+    nacos:
+      discovery:
+        server-addr: http://123.57.215.188:8848/nacos
+      config:
+        server-addr: http://123.57.215.188:8848 #Nacos作为配置中心地址
+        file-extension: yaml #指定yaml格式的配置

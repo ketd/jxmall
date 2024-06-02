@@ -22,11 +22,12 @@
         WHERE sku_id = #{skuId}
           AND ware_id = #{wareId}
     </update>
-    <update id="lockSkuStock">
+
+    <update id="lockSkuStock" >
         UPDATE `wms_ware_sku`
         SET stock_locked=stock_locked+#{count}
         WHERE sku_id =#{skuId}
-          AND ware_id=#{wareId}
+          AND ware_id =#{wareId}
           AND stock-stock_locked>=#{count}
     </update>
 
@@ -37,7 +38,19 @@
         WHERE sku_id = #{skuId}
           AND stock - stock_locked > 0
     </select>
+    <select id="selectOneBySkuIdAndWareId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from wms_ware_sku
+        where
+        sku_id = #{skuId,jdbcType=NUMERIC}
+        AND ware_id = #{wareId,jdbcType=NUMERIC}
+    </select>
 
+
+    <update id="unLockStock">
+        UPDATE `wms_ware_sku` SET stock_locked=stock_locked-#{count} WHERE sku_id=#{skuId} AND ware_id=#{wareId}
+    </update>
 
 </mapper>
 

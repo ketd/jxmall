@@ -21,6 +21,7 @@
         <module>jxmall-third-party</module>
         <module>jxmall-auth</module>
         <module>jxmall-cart</module>
+        <module>jxmall-no-authentication-gateway</module>
 
 
     </modules>
@@ -301,11 +302,25 @@
             </dependency>
 
 
+            <!--引入Seata-->
             <dependency>
                 <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
                 <version>2023.0.1.0</version>
+                <!--排除alibaba默认的低版本seata（0.7.1）的干扰，使用我们自己引入的指定版本seata依赖-->
+                <exclusions>
+                    <exclusion>
+                        <groupId>io.seata</groupId>
+                        <artifactId>seata-all</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
+            <dependency>
+                <groupId>io.seata</groupId>
+                <artifactId>seata-all</artifactId>
+                <version>2.0.0</version>
+            </dependency>
+
 
         </dependencies>
 

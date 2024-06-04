@@ -15,6 +15,7 @@ import com.ketd.auth.vo.LoginVo;
 import com.ketd.auth.vo.MemberRegisterVo;
 import com.ketd.common.api.member.MemberOpenFeignApi;
 import com.ketd.common.domain.member.MemberTO;
+import com.ketd.common.no_authentication_api.member.NoAuthenticationMemberOpenFeignApi;
 import com.ketd.common.result.Result;
 import com.ketd.common.result.ResultCodeEnum;
 import jakarta.servlet.http.HttpServletRequest;
@@ -46,7 +47,7 @@ public class AuthServiceImpl implements AuthService {
     private EmailService emailService;
 
     @Autowired
-    private MemberOpenFeignApi  memberOpenFeignApi;
+    private NoAuthenticationMemberOpenFeignApi memberOpenFeignApi;
 
     @Autowired
     private ThreadPoolExecutor threadPoolExecutor;

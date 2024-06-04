@@ -1,5 +1,5 @@
 
-import com.ketd.ware.enume.RabbitMQConstants;
+import com.ketd.common.enume.RabbitMQConstants;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.amqp.AmqpException;
@@ -30,7 +30,7 @@ public class WareTest {
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue(name = RabbitMQConstants.STOCK_RELEASE_ORDER_QUEUE, durable = "true"),
             exchange = @Exchange(name = RabbitMQConstants.STOCK_RELEASE_ORDER_EXCHANGE, delayed = "true"),
-            key = RabbitMQConstants.STOCK_RELEASE_ORDER_ROUTING_KEY
+            key = RabbitMQConstants.STOCK_RELEASE_WARE_ROUTING_KEY
     ))
     public void releaseOrderStock(String orderToken) {
         System.out.println("释放订单锁库存");

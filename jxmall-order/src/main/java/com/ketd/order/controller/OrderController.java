@@ -105,6 +105,13 @@ public class OrderController{
         return orderService.getInfoByOrderSn(orderSn);
     }
 
+    @Operation(summary = "获取订单详细信息通过订单号")
+    @PutMapping(value = "/updateStatusByOrderSn")
+    public Result<?> updateStatusByOrderSn(@RequestParam("status") Integer status,@RequestParam("orderSn") String orderSn)
+    {
+        return orderService.updateStatusByOrderSn(status,orderSn);
+    }
+
     @Operation(summary = "获取用户订单详细信息")
     @GetMapping(value = "/info/member")
     public Result<?> getMemberOrderInfo(@RequestParam("id") Long id)
@@ -141,6 +148,13 @@ public class OrderController{
     public Result<?> remove(@RequestBody Long[] ids)
     {
         return Result.ok(orderService.deleteOrderByIds(ids));
+    }
+
+    @Operation(summary = "用户删除订单")
+    @DeleteMapping("/member/delete")
+    public Result<?> remove(@RequestParam(value = "id") Long id)
+    {
+        return orderService.deleteOrderById(id);
     }
 
     @GetMapping(value = "/getMemberOrders")

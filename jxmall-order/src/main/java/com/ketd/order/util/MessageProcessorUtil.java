@@ -3,6 +3,7 @@ package com.ketd.order.util;
 import com.ketd.common.domain.mq.MultiDelayMessage;
 
 import com.ketd.common.enume.RabbitMQConstants;
+import com.ketd.order.domain.Order;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,24 +20,7 @@ import java.util.*;
 @Service
 public class MessageProcessorUtil {
 
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
 
-    public  void sendDelayedMessage(Long data,List<Integer> delayTimes)   {
-
-        MultiDelayMessage<Long> msg = new MultiDelayMessage<>();
-
-        Integer nextDelay = delayTimes.remove(0);
-        msg.setDelayMillis(new ArrayList<>(delayTimes));
-        msg.setData(data);
-
-        rabbitTemplate.convertAndSend(RabbitMQConstants.STOCK_RELEASE_ORDER_EXCHANGE,
-                RabbitMQConstants.STOCK_RELEASE_ORDER_ROUTING_KEY, msg, message -> {
-                    message.getMessageProperties().setDelay(nextDelay);
-                    return message;
-                });
-
-    }
 
 
 }

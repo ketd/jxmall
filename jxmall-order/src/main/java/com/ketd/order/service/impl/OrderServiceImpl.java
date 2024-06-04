@@ -23,12 +23,12 @@ import com.ketd.common.domain.order.LockStickResult;
 import com.ketd.common.domain.product.SkuInfoTO;
 import com.ketd.common.domain.product.SpuInfoTO;
 import com.ketd.common.enume.OrderStatusEnum;
+import com.ketd.common.no_authentication_api.member.NoAuthenticationMemberReceiveAddressOpenFeignApi;
 import com.ketd.common.result.Result;
 import com.ketd.order.Interceptors.LoginProtectedInterceptor;
 import com.ketd.order.domain.OrderItem;
 import com.ketd.order.mapper.OrderItemMapper;
 import com.ketd.order.service.IOrderItemService;
-import com.ketd.order.util.MessageProcessorUtil;
 import com.ketd.order.util.RedisUtil;
 import com.ketd.order.vo.*;
 
@@ -69,7 +69,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private IOrderItemService orderItemService;
 
     @Autowired
-    private MemberReceiveAddressOpenFeignApi memberReceiveAddressOpenFeignApi;
+    private NoAuthenticationMemberReceiveAddressOpenFeignApi memberReceiveAddressOpenFeignApi;
 
     @Autowired
     private SkuInfoOpenFeignApi skuInfoOpenFeignApi;
@@ -96,7 +96,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private StringRedisTemplate redisTemplate;
 
     @Autowired
-    private MessageProcessorUtil messageProcessorUtil;
+    private RabbitMQServiceImpl  rabbitMQService;
 
 
     /**
@@ -113,6 +113,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Override
     public Result<?> getInfoByOrderSn(String orderSn) {
         return Result.ok(orderMapper.selectOneByOrderSn(orderSn));
+    }
+
+    @Override
+    public Result<?> updateStatusByOrderSn(Integer status, String orderSn) {
+        orderMapper.updateStatusByOrderSn(status,orderSn);
+        return Result.ok(null);
     }
 
 
@@ -171,8 +177,19 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
      * @return 结果
      */
     @Override
-    public int deleteOrderById(Long id) {
-        return orderMapper.deleteById(id);
+    public Result<?> deleteOrderById(Long id) {
+
+        try {
+            Long memberId = getCurrentMember().getId();
+            int success= orderMapper.deleteByIdAndMemberId(id, memberId);
+            if(success==1){
+                orderItemMapper.deleteByOrderId(id);
+            }
+            return Result.ok(null);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
 
@@ -334,6 +351,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 /*return   Result.ok(orderCreateTo);*/
 
 
+                //List<Integer> delayTimes = new ArrayList<>(Arrays.asList(5000, 5000, 10000, 10000, 15000, 15000, 20000, 20000, 30000, 30000, 60000, 60000, 120000, 120000, 240000, 240000, 480000));
+                List<Integer> delayTimes = new ArrayList<>(Arrays.asList(5000, 5000, 10000, 10000, 15000, 15000, 20000, 20000, 30000));
+                rabbitMQService.sendReleaseOrderDelayedMessage(order,delayTimes);
 
 
                 //int i=10/0;
@@ -365,7 +385,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     }
 
     private void saveOrder(OrderCreateTo orderCreateTo) {
+        StringBuilder orderTitle = new StringBuilder();
+
+        for( OrderItem orderItem: orderCreateTo.getOrderItemList()){
+            orderTitle.append(orderItem.getSkuName()).append(" ");
+        }
         Order order = orderCreateTo.getOrder();
+        order.setOrderTitle(orderTitle.toString());
         order.setCreateTime(new Date());
         orderMapper.insert(order);
 

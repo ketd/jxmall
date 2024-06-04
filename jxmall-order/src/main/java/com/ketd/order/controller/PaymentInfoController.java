@@ -85,6 +85,14 @@ public class PaymentInfoController{
         return Result.ok(paymentInfoService.selectPaymentInfoById(id));
     }
 
+    @Operation(summary = "获取支付信息详细信息")
+    @GetMapping(value = "/getInfoBySn")
+    public Result<?> getInfoBySn(@RequestParam("orderSn") String orderSn)
+    {
+        return paymentInfoService.getInfoBySn(orderSn);
+    }
+
+
     /**
      * 新增支付信息
      */

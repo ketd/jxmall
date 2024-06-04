@@ -47,6 +47,10 @@ public class Order implements Serializable {
     @Schema(description = "使用的优惠券")
     private Long couponId;
 
+    @ExcelProperty(value = "使用的优惠券")
+    @Schema(description = "使用的优惠券")
+    private String orderTitle;
+
     @ExcelProperty(value = "create_time")
     @Schema(description = "create_time")
     private Date createTime;

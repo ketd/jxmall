@@ -2,6 +2,8 @@ package com.ketd.order.service;
 
 
 import java.util.List;
+
+import com.ketd.common.result.Result;
 import jakarta.servlet.http.HttpServletResponse;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ketd.order.domain.PaymentInfo;
@@ -66,4 +68,6 @@ public interface IPaymentInfoService  extends IService<PaymentInfo> {
      * 导出支付信息列表
      */
     void export(List<PaymentInfo> list, HttpServletResponse response);
+
+    Result<?> getInfoBySn(String orderSn);
 }

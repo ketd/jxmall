@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.ketd.common.result.Result;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -119,5 +120,10 @@ public class PaymentInfoServiceImpl extends ServiceImpl<PaymentInfoMapper, Payme
 
         extracted(list, response,PaymentInfo.class);
 
+    }
+
+    @Override
+    public Result<?> getInfoBySn(String orderSn) {
+        return Result.ok(paymentInfoMapper.selectOneByOrderSn(orderSn));
     }
 }

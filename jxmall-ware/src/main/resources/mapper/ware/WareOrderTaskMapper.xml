@@ -24,6 +24,13 @@
     <sql id="Base_Column_List">
 id,order_id,order_sn,consignee,consignee_tel,delivery_address,order_comment,payment_way,task_status,order_body,tracking_no,create_time,ware_id,task_comment
     </sql>
+    <select id="selectOneByOrderSn" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from wms_ware_order_task
+        where
+        order_sn = #{orderSn,jdbcType=VARCHAR}
+    </select>
 
 </mapper>
 

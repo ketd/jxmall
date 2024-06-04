@@ -17,6 +17,14 @@
     <sql id="Base_Column_List">
 id,sku_id,sku_name,sku_num,task_id,ware_id,lock_status
     </sql>
+    <select id="selectAllByTaskIdAndLockStatus" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from wms_ware_order_task_detail
+        where
+        task_id = #{taskId,jdbcType=NUMERIC}
+        AND lock_status = #{lockStatus,jdbcType=NUMERIC}
+    </select>
 
 </mapper>
 

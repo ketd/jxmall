@@ -20,5 +20,7 @@ public interface OrderItemMapper extends BaseMapper<OrderItem>
 
     List<OrderItem> selectAllByOrderId(@Param("orderId") Long orderId);
 
+    int deleteByOrderId(@Param("orderId") Long orderId);
+
 
 }

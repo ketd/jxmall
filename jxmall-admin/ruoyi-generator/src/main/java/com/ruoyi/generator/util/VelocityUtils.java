@@ -141,6 +141,7 @@ public class VelocityUtils
         templates.add("vm/java/serviceImpl.java.vm");
         templates.add("vm/java/controller.java.vm");
         templates.add("vm/java/openFeignApi.java.vm");
+        templates.add("vm/java/noAuthenticationOpenFeignApi.java.vm");
         templates.add("vm/java/openFeignDomain.java.vm");
         templates.add("vm/xml/mapper.xml.vm");
         templates.add("vm/sql/sql.vm");
@@ -206,7 +207,10 @@ public class VelocityUtils
             fileName = StringUtils.format("{}/controller/{}Controller.java", javaPath, className);
         }
         else if (template.contains("openFeignApi.java.vm")){
-            fileName = StringUtils.format("{}/feign/{}OpenFeignApi.java", javaPath, className);
+            fileName = StringUtils.format("{}/feign/api/{}OpenFeignApi.java", javaPath, className);
+        }
+        else if (template.contains("noAuthenticationOpenFeignApi.java.vm")){
+            fileName = StringUtils.format("{}/feign/NoAuthenticationFeign/NoAuthentication{}OpenFeignApi.java", javaPath, className);
         }
         else if (template.contains("openFeignDomain.java.vm")){
             fileName = StringUtils.format("{}/feign/domain/{}TO.java", javaPath, className);

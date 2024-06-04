@@ -33,6 +33,10 @@ public interface NoAuthenticationOrderOpenFeignApi {
     @PutMapping("/order/Order/update")
     public Result<?> edit(@RequestBody OrderTO orderTO);
 
+    @PutMapping(value = "/order/Order/updateStatusByOrderSn")
+    public Result<?> updateStatusByOrderSn(@RequestParam("status") Integer status,@RequestParam("orderSn") String orderSn);
+
+
     /**
      * 删除订单
      */

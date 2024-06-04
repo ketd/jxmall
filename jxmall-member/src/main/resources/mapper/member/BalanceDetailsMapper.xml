@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ketd.member.mapper.BalanceDetailsMapper">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.ketd.member.domain.BalanceDetails" id="BaseResultMap">
+        <result property="id"    column="id"    />
+        <result property="memberId"    column="member_id"    />
+        <result property="transactionDate"    column="transaction_date"    />
+        <result property="transactionAmount"    column="transaction_amount"    />
+        <result property="transactionType"    column="transaction_type"    />
+        <result property="balanceBefore"    column="balance_before"    />
+        <result property="balanceAfter"    column="balance_after"    />
+        <result property="note"    column="note"    />
+        <result property="orderId"    column="order_id"    />
+        <result property="orderSn"    column="order_sn"    />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,member_id,transaction_date,transaction_amount,transaction_type,balance_before,balance_after,note,order_id,order_sn
+    </sql>
+
+</mapper>
+

@@ -1,4 +1,6 @@
 package com.ketd.ware.mapper;
+import java.util.List;
+import org.apache.ibatis.annotations.Param;
 
 
 import com.ketd.ware.domain.WareOrderTaskDetail;
@@ -14,4 +16,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 public interface WareOrderTaskDetailMapper extends BaseMapper<WareOrderTaskDetail>
 {
 
+    List<WareOrderTaskDetail> selectAllByTaskIdAndLockStatus(@Param("taskId") Long taskId, @Param("lockStatus") Integer lockStatus);
 }

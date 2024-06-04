@@ -39,6 +39,11 @@ id,order_id,order_sn,spu_id,spu_name,spu_pic,spu_brand,category_id,sku_id,sku_na
         where
         order_id = #{orderId,jdbcType=NUMERIC}
     </select>
+    <delete id="deleteByOrderId">
+        delete
+        from oms_order_item
+        where order_id = #{orderId,jdbcType=NUMERIC}
+    </delete>
 
 </mapper>
 

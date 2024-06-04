@@ -5,7 +5,9 @@ import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ketd.common.result.Result;
+import com.ketd.member.domain.Balance;
 import com.ketd.member.domain.Member;
+import com.ketd.member.mapper.BalanceMapper;
 import com.ketd.member.mapper.MemberMapper;
 import com.ketd.member.service.IMemberService;
 import com.ketd.member.util.RedisUtil;
@@ -14,7 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 
@@ -31,6 +35,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     @Autowired
     private MemberMapper memberMapper;
 
+    @Autowired
+    private BalanceMapper  balanceMapper;
 
 
 
@@ -75,7 +81,16 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
     @Override
     public Result<?> insertMember(Member member) {
-         memberMapper.insert(member);
+        memberMapper.insert(member);
+
+         Balance balance=new Balance();
+         balance.setMemberId(member.getId());
+         balance.setBalance(BigDecimal.valueOf(1000000.00));
+         balance.setStatus(1);
+         balance.setCreatedAt(new Date());
+         balance.setUpdatedAt(new Date());
+         balanceMapper.insert(balance);
+
         return Result.ok(member);
     }
 

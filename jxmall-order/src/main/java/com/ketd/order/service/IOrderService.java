@@ -64,7 +64,7 @@ public interface IOrderService  extends IService<Order> {
      * @param id 订单主键
      * @return 结果
      */
-    public int deleteOrderById(Long id);
+    public Result<?> deleteOrderById(Long id);
 
     /**
      * 导出订单列表
@@ -80,4 +80,6 @@ public interface IOrderService  extends IService<Order> {
     Object getMemberOrderInfo(Long id);
 
     Result<?> getInfoByOrderSn(String orderSn);
+
+    Result<?> updateStatusByOrderSn(Integer status, String orderSn);
 }

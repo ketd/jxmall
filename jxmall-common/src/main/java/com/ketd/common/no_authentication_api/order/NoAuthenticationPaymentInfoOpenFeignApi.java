@@ -7,8 +7,8 @@ import com.ketd.common.result.Result;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
-@FeignClient(value = "cloud-gateway-service")
-public interface PaymentInfoOpenFeignApi {
+@FeignClient(value = "cloud-no-authentication-gateway-service")
+public interface NoAuthenticationPaymentInfoOpenFeignApi {
 
     @PostMapping("/order/PaymentInfo/list/page")
     public TableDataInfo list(@RequestBody PageRequest<PaymentInfoTO> pageRequest);
@@ -24,6 +24,8 @@ public interface PaymentInfoOpenFeignApi {
     @PostMapping("/order/PaymentInfo/save")
     public Result<?> add(@RequestBody PaymentInfoTO paymentInfoTO);
 
+    @GetMapping(value = "/getInfoBySn")
+    public Result<PaymentInfoTO> getInfoBySn(@RequestParam("orderSn") String orderSn);
     /**
      * 修改支付信息
      */

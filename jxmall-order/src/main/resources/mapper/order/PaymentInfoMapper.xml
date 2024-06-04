@@ -21,6 +21,13 @@
     <sql id="Base_Column_List">
 id,order_sn,order_id,alipay_trade_no,total_amount,subject,payment_status,create_time,confirm_time,callback_content,callback_time
     </sql>
+    <select id="selectOneByOrderSn" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from oms_payment_info
+        where
+        order_sn = #{orderSn,jdbcType=VARCHAR}
+    </select>
 
 </mapper>
 

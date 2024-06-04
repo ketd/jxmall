@@ -19,11 +19,11 @@ import com.ketd.common.domain.ware.HasStockTo;
 import com.ketd.common.domain.ware.WareSkuTO;
 import com.ketd.common.enume.LockStatusEnum;
 import com.ketd.common.enume.OrderStatusEnum;
+import com.ketd.common.enume.RabbitMQConstants;
 import com.ketd.common.no_authentication_api.order.NoAuthenticationOrderOpenFeignApi;
 import com.ketd.common.result.Result;
 import com.ketd.ware.domain.WareOrderTask;
 import com.ketd.ware.domain.WareOrderTaskDetail;
-import com.ketd.ware.enume.RabbitMQConstants;
 import com.ketd.ware.util.MessageProcessorUtil;
 import com.ketd.ware.vo.SkuWareHasStock;
 
@@ -72,8 +72,7 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuMapper, WareSku> impl
     @Autowired
     private SkuInfoOpenFeignApi skuInfoOpenFeignApi;
 
-    @Autowired
-    private NoAuthenticationOrderOpenFeignApi noAuthenticationOrderOpenFeignApi;
+
 
 
     /**
@@ -314,67 +313,6 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuMapper, WareSku> impl
         }
     }
 
-
-
-
-    /*
-     * 描述:库存自动解锁
-     * @description: 下订单成功，库存锁定成功，接下来的业务调用失败，导致订单回滚。之前锁定的库存就要自动解锁。
-     * @author: ketd
-     * @date: 2024/6/2 17:24
-     * @param null
-     * @return: null
-     **/
-    @RabbitListener(bindings = @QueueBinding(
-            value = @Queue(name = RabbitMQConstants.STOCK_RELEASE_ORDER_QUEUE, durable = "true"),
-            exchange = @Exchange(name = RabbitMQConstants.STOCK_RELEASE_ORDER_EXCHANGE, delayed = "true",type = ExchangeTypes.TOPIC),
-            key = RabbitMQConstants.STOCK_RELEASE_ORDER_ROUTING_KEY
-    ))
-    public void releaseOrderStock(MultiDelayMessage<StockLockedTo> message) {
-        System.out.println("释放订单锁库存：" + message);
-
-
-        StockLockedTo stockLockedTo = message.getData();
-        WareOrderTaskDetailTo  wareOrderTaskDetailTo = stockLockedTo.getWareOrderTaskDetail();
-        Long wareOrderTaskDetailId = wareOrderTaskDetailTo.getId();
-
-        WareOrderTaskDetail wareOrderTaskDetail = wareOrderTaskDetailService.getById(wareOrderTaskDetailId);
-        if (wareOrderTaskDetail == null) {
-            System.out.println("订单不存在");
-            return;
-        }else{
-
-
-            Long wareOrderTaskId = stockLockedTo.getWareOrderTaskId();
-            WareOrderTask wareOrderTask = wareOrderTaskService.getById(wareOrderTaskId);
-            String orderSn = wareOrderTask.getOrderSn();
-            OrderTO order  = noAuthenticationOrderOpenFeignApi.getInfoByOrderSn(orderSn).getData();
-
-            if (order == null||Objects.equals(order.getStatus(), OrderStatusEnum.CANCLED.getCode())) {
-
-                if(Objects.equals(wareOrderTaskDetail.getLockStatus(), LockStatusEnum.LOCK.getCode())){
-                    unLockStock(  wareOrderTaskDetail.getSkuId(), wareOrderTaskDetail.getWareId(), wareOrderTaskDetail.getSkuNum(), wareOrderTaskDetail.getId());
-                    return;
-                }
-
-            }
-
-        }
-
-
-        List<Integer> delayMillis = message.getDelayMillis();
-
-        if(message.hasNextDelay()) {
-            messageProcessorUtil.sendDelayedMessage(stockLockedTo, delayMillis);
-        }
-
-    }
-
-
-    private void unLockStock(Long skuId, Long wareId, Integer count,Long taskDetailId) {
-        wareSkuMapper.unLockStock(skuId, wareId, count);
-        //wareOrderTaskDetailService.unLockStock(taskDetailId);
-    }
 
 
 

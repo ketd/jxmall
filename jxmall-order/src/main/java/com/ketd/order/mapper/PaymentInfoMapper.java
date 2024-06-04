@@ -1,4 +1,5 @@
 package com.ketd.order.mapper;
+import org.apache.ibatis.annotations.Param;
 
 
 import com.ketd.order.domain.PaymentInfo;
@@ -13,5 +14,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface PaymentInfoMapper extends BaseMapper<PaymentInfo>
 {
+
+    PaymentInfo selectOneByOrderSn(@Param("orderSn") String orderSn);
+
 
 }

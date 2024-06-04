@@ -1,0 +1,41 @@
+package com.ketd.common.no_authentication_api;
+
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.*;
+
+import com.ketd.common.result.Result;
+import com.ketd.common.domain.TableDataInfo;
+import com.ketd.common.domain.PageRequest;
+import com.ketd.common.domain.${moduleName}.${ClassName}TO;
+
+@FeignClient(value = "cloud-no-authentication-gateway-service")
+public interface NoAuthentication${ClassName}OpenFeignApi {
+
+    @PostMapping("/${moduleName}/${ClassName}/list/page")
+    public TableDataInfo list(@RequestBody PageRequest<${ClassName}TO> pageRequest);
+
+    /**
+     * 获取${functionName}详细信息
+     */
+    @GetMapping(value = "/${moduleName}/${ClassName}/info")
+    public Result<?> getInfo(@RequestParam("${pkColumn.javaField}") ${pkColumn.javaType} ${pkColumn.javaField});
+    /**
+     * 新增${functionName}
+     */
+    @PostMapping("/${moduleName}/${ClassName}/save")
+    public Result<?> add(@RequestBody ${ClassName}TO ${className}TO);
+
+    /**
+     * 修改${functionName}
+     */
+    @PutMapping("/${moduleName}/${ClassName}/update")
+    public Result<?> edit(@RequestBody ${ClassName}TO ${className}TO);
+
+    /**
+     * 删除${functionName}
+     */
+    @DeleteMapping("/${moduleName}/${ClassName}/delete")
+    public Result<?> remove(@RequestBody ${pkColumn.javaType}[] ${pkColumn.javaField}s);
+
+}

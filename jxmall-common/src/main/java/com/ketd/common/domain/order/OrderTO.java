@@ -16,6 +16,7 @@ public class OrderTO  implements Serializable
     private Long id;
     private Long memberId;
     private String orderSn;
+    private String orderTitle;
     private Long couponId;
     private Date createTime;
     private String memberUsername;

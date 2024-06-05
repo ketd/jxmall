@@ -56,6 +56,10 @@
 | **Commons IO**               | 2.13.0        | IO功能的工具包                              |
 | **POI**                      | 4.1.2         | 操作Microsoft Office文档的库                |
 | **EasyExcel**                | 3.3.4         | 阿里巴巴开源的Excel处理工具                |
+| **Alibaba Sentinel**         | 最新版本       | 提供流量控制、熔断降级和系统负载保护功能   |
+| **Nacos Discovery**          | 最新版本       | 服务注册和发现组件                          |
+| **Spring Cloud LoadBalancer**| 最新版本       | 负载均衡组件                                |
+| **Nacos Config**             | 最新版本       | 分布式配置管理组件                          |
 
 ## 快速开始
 

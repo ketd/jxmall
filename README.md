@@ -51,6 +51,7 @@
 | **Micrometer Observation**   | 1.12.0        | 收集和报告应用程序的指标                    |
 | **Feign Micrometer**         | 12.5          | 声明式HTTP客户端，用于微服务之间的通信      |
 | **Feign HC5**                | 13.1          | Feign HTTP客户端                            |
+| **Spring Cloud LoadBalancer**| 最新版本       | 负载均衡组件                                |
 | **Zipkin Reporter Brave**    | 2.17.0        | 分布式追踪系统                              |
 | **PageHelper Boot**          | 1.4.7         | MyBatis分页插件                             |
 | **Commons IO**               | 2.13.0        | IO功能的工具包                              |
@@ -58,7 +59,6 @@
 | **EasyExcel**                | 3.3.4         | 阿里巴巴开源的Excel处理工具                |
 | **Alibaba Sentinel**         | 最新版本       | 提供流量控制、熔断降级和系统负载保护功能   |
 | **Nacos Discovery**          | 最新版本       | 服务注册和发现组件                          |
-| **Spring Cloud LoadBalancer**| 最新版本       | 负载均衡组件                                |
 | **Nacos Config**             | 最新版本       | 分布式配置管理组件                          |
 
 ## 快速开始

@@ -82,10 +82,12 @@
 
 ## 特色功能演示
 
-###第三方登录
+### 第三方登录
 ![动画3](https://github.com/ketd/jxmall/assets/94940923/8cf27b74-9c76-43ff-9249-bcdba94a12b1)
 
-###支付宝沙箱付款
+### 支付宝沙箱付款
+![动画2](https://github.com/ketd/jxmall/assets/94940923/5c270cf5-ab4c-439f-94f8-b31123cebe86)
+![7caf768a8b2911a7e547 -original-original](https://github.com/ketd/jxmall/assets/94940923/f782db81-83ae-49d4-bf61-d18857d26b1c)
 
 
 ## 贡献指南

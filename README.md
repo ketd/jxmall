@@ -96,6 +96,8 @@
 ![动画4](https://github.com/ketd/jxmall/assets/94940923/ec3996a4-d868-4b62-bb4d-233303a8bfa2)
 
 ### 对象存储图片上传
+![动画5](https://github.com/ketd/jxmall/assets/94940923/fd1ed03e-e8ca-4873-bf39-fb4f7418c34c)
+
 
 ## 贡献指南
 

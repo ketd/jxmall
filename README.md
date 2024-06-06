@@ -90,7 +90,7 @@
 ### 支付宝沙箱付款
 <img src="https://github.com/ketd/jxmall/assets/94940923/5c270cf5-ab4c-439f-94f8-b31123cebe86" width="500px">
 
-<img src="https://github.com/ketd/jxmall/assets/94940923/f782db81-83ae-49d4-bf61-d18857d26b1c" width="300px">
+<img src="https://github.com/ketd/jxmall/assets/94940923/f782db81-83ae-49d4-bf61-d18857d26b1c" width="150px">
 
 
 

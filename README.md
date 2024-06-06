@@ -92,8 +92,10 @@
 
 <img src="https://github.com/ketd/jxmall/assets/94940923/f782db81-83ae-49d4-bf61-d18857d26b1c" width="150px">
 
+### RabbitMQ延迟消息队列自动解锁库存
+![动画4](https://github.com/ketd/jxmall/assets/94940923/ec3996a4-d868-4b62-bb4d-233303a8bfa2)
 
-
+### 对象存储图片上传
 
 ## 贡献指南
 

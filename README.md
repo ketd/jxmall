@@ -83,11 +83,16 @@
 ## 特色功能演示
 
 ### 第三方登录
-![动画3](https://github.com/ketd/jxmall/assets/94940923/8cf27b74-9c76-43ff-9249-bcdba94a12b1)
+<img src="https://github.com/ketd/jxmall/assets/94940923/8cf27b74-9c76-43ff-9249-bcdba94a12b1" width="500px">
+
+
 
 ### 支付宝沙箱付款
-![动画2](https://github.com/ketd/jxmall/assets/94940923/5c270cf5-ab4c-439f-94f8-b31123cebe86)
-![7caf768a8b2911a7e547 -original-original](https://github.com/ketd/jxmall/assets/94940923/f782db81-83ae-49d4-bf61-d18857d26b1c)
+<img src="https://github.com/ketd/jxmall/assets/94940923/5c270cf5-ab4c-439f-94f8-b31123cebe86" width="500px">
+
+<img src="https://github.com/ketd/jxmall/assets/94940923/f782db81-83ae-49d4-bf61-d18857d26b1c" width="100px">
+
+
 
 
 ## 贡献指南
